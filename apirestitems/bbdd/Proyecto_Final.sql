@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 03-04-2026 a las 21:14:21
+-- Tiempo de generación: 03-04-2026 a las 21:26:16
 -- Versión del servidor: 9.6.0
 -- Versión de PHP: 8.2.27
 
@@ -383,12 +383,12 @@ CREATE TABLE `USUARIOS` (
 --
 
 INSERT INTO `USUARIOS` (`id_usuario`, `id_suscripcion`, `id_rol`, `alias`, `password`, `token`, `nombre`, `apellidos`, `email`, `fecha_suscripcion`, `fecha_creacion`, `id_avatar`) VALUES
-(1, 4, 1, 'admin', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzUyNDEwMjYsImRhdGEiOnsiaWQiOiIxIiwibm9tYnJlIjoiQWRtaW5pc3RyYWRvciJ9fQ.FpG3ZmOs6-JBld9SMJPxw8q2DcIh3G3RNVKuka4fCgU', 'Administrador', 'García', 'admin@ejemplo.com', '2024-01-15', '2026-04-03 19:34:55', NULL),
-(2, 1, 4, 'jdoe', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzUyNDY2NjksImRhdGEiOnsiaWQiOiIyIiwibm9tYnJlIjoiamRvZSJ9fQ.bz6efugRAQO7ZyNRfbj_3VyaoxxI6tNigs_0lRmUhlw', 'John', 'Doe', 'john@mail.com', '2024-02-10', '2026-04-03 19:34:55', NULL),
-(3, 3, 3, 'akira_san', 'f29185ab577d8702dc4e6faa00f364abf359dca0020f3c9f88a243b29b0305c8', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzQ5NjAzODAsImRhdGEiOnsiaWQiOiIzIiwibm9tYnJlIjoiQWtpcmEifX0.PsKyLxMf5PVoBlBRA1ymIOjEezxbP8s5OignVkA_LQU', 'Akira', 'Tanaka', 'akira@mail.jp', '2024-03-01', '2026-04-03 19:34:55', NULL),
-(4, 2, 4, 'marie_fr', 'c3255ad8dad4cd57a29f3a61293003d5aca4447c0e7846173fb0fb6b186b62ee', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzQ5NjA0MjIsImRhdGEiOnsiaWQiOiI0Iiwibm9tYnJlIjoiTWFyaWUifX0.7Kfolgbx91ScyjEqRFs89A3HFAgFCw0lVn2yVDrOquY', 'Marie', 'Dubois', 'marie@mail.fr', '2024-02-20', '2026-04-03 19:34:55', NULL),
-(5, 4, 1, 'superadmin', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzQ5NTg3ODAsImRhdGEiOnsiaWQiOiI1Iiwibm9tYnJlIjoiU3VwZXIifX0.oCWSw6zT5d640mZYvrkf3VY0C4etEj9aVpF5hw3zvwo', 'Super', 'Admin', 'super@proyecto.com', '2026-03-31', '2026-04-03 19:34:55', NULL),
-(11, 1, 4, 'NuevoUsuario', '607e2cb7dda0621e99f121fdad9b0207a62387c20937a290cc4c95b25cfee9b7', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzUyNDY3MDEsImRhdGEiOnsiaWQiOiIxMSIsIm5vbWJyZSI6Ik51ZXZvVXN1YXJpbyJ9fQ.bv3bqOxvpRy8LhaOlaDN3m7pJMbArleIqnHuwUuQT5Y', 'Pepe', 'Pérez', 'pepe@email.com', NULL, '2026-04-03 20:04:43', NULL);
+(1, 4, 1, 'admin', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzUyNDEwMjYsImRhdGEiOnsiaWQiOiIxIiwibm9tYnJlIjoiQWRtaW5pc3RyYWRvciJ9fQ.FpG3ZmOs6-JBld9SMJPxw8q2DcIh3G3RNVKuka4fCgU', 'Administrador', 'García', 'admin@ejemplo.com', '2024-01-15', '2026-04-03 19:34:55', 20),
+(2, 1, 4, 'jdoe', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzUyNDY2NjksImRhdGEiOnsiaWQiOiIyIiwibm9tYnJlIjoiamRvZSJ9fQ.bz6efugRAQO7ZyNRfbj_3VyaoxxI6tNigs_0lRmUhlw', 'John', 'Doe', 'john@mail.com', '2024-02-10', '2026-04-03 19:34:55', 9),
+(3, 3, 3, 'akira_san', 'f29185ab577d8702dc4e6faa00f364abf359dca0020f3c9f88a243b29b0305c8', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzQ5NjAzODAsImRhdGEiOnsiaWQiOiIzIiwibm9tYnJlIjoiQWtpcmEifX0.PsKyLxMf5PVoBlBRA1ymIOjEezxbP8s5OignVkA_LQU', 'Akira', 'Tanaka', 'akira@mail.jp', '2024-03-01', '2026-04-03 19:34:55', 4),
+(4, 2, 4, 'marie_fr', 'c3255ad8dad4cd57a29f3a61293003d5aca4447c0e7846173fb0fb6b186b62ee', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzQ5NjA0MjIsImRhdGEiOnsiaWQiOiI0Iiwibm9tYnJlIjoiTWFyaWUifX0.7Kfolgbx91ScyjEqRFs89A3HFAgFCw0lVn2yVDrOquY', 'Marie', 'Dubois', 'marie@mail.fr', '2024-02-20', '2026-04-03 19:34:55', 2),
+(5, 4, 1, 'superadmin', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzQ5NTg3ODAsImRhdGEiOnsiaWQiOiI1Iiwibm9tYnJlIjoiU3VwZXIifX0.oCWSw6zT5d640mZYvrkf3VY0C4etEj9aVpF5hw3zvwo', 'Super', 'Admin', 'super@proyecto.com', '2026-03-31', '2026-04-03 19:34:55', 18),
+(11, 1, 4, 'NuevoUsuario', '607e2cb7dda0621e99f121fdad9b0207a62387c20937a290cc4c95b25cfee9b7', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzUyNDY3MDEsImRhdGEiOnsiaWQiOiIxMSIsIm5vbWJyZSI6Ik51ZXZvVXN1YXJpbyJ9fQ.bv3bqOxvpRy8LhaOlaDN3m7pJMbArleIqnHuwUuQT5Y', 'Pepe', 'Pérez', 'pepe@email.com', NULL, '2026-04-03 20:04:43', 10);
 
 --
 -- Índices para tablas volcadas
@@ -541,7 +541,7 @@ ALTER TABLE `SUSCRIPCION`
 -- AUTO_INCREMENT de la tabla `USUARIOS`
 --
 ALTER TABLE `USUARIOS`
-  MODIFY `id_usuario` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id_usuario` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- Restricciones para tablas volcadas
