@@ -5,32 +5,30 @@
 require_once 'src/response.php';
 require_once 'src/database.php';
 
-class suscripcion extends Database {
+class avatares extends Database {
 	/**
 	 * Atributo que indica la tabla asociada a la clase del modelo
 	 */
-	private $table = 'SUSCRIPCION';
+	private $table = 'AVATARES';
 
 	/**
 	 * Atributo que indica la columna que es primary key en la tabla
 	 */
-	private $primary_key = 'id_suscripcion';
+	private $primary_key = 'id_avatar';
 
 
 	/**
 	 * Array con los campos de la tabla que se pueden usar como filtro para recuperar registros
 	 */
 	private $allowedConditions_get = array(
-		'id_suscripcion'
+		'id_avatar'
 	);
 
 	/**
 	 * Array con los campos de la tabla que se pueden proporcionar para insertar registros
 	 */
 	private $allowedConditions_insert = array(
-		'nombre',
-        'descripcion',
-        'precio'
+		'imagen',
 	);
 
 	/**
@@ -38,10 +36,10 @@ class suscripcion extends Database {
 	 */
 	private function validate($data) {
 
-		if (!isset($data['nombre']) || empty($data['nombre']) || !isset($data['descripcion']) || empty($data['descripcion']) || !isset($data['precio']) || empty($data['precio'])) {
+		if (!isset($data['imagen']) || empty($data['imagen'])) {
 			$response = array(
 				'result' => 'error',
-				'details' => 'El campo nombre, descripcion, y precio son obligatorio'
+				'details' => 'El campo imagen es obligatorio'
 			);
 
 			Response::result(400, $response);

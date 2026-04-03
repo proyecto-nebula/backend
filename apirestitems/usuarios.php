@@ -1,10 +1,11 @@
 <?php
+
 /**
  * Script que se usa en los endpoints para trabajar con registros de la tabla USUARIOS
  */
 require_once 'src/response.php';
 require_once 'src/classes/auth.class.php';
-require_once 'src/classes/USUARIOS.class.php';
+require_once 'src/classes/usuarios.class.php';
 
 $auth = new Authentication();
 $auth->verify();

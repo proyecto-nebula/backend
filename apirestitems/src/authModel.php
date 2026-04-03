@@ -25,7 +25,7 @@ class AuthModel
     {
        
         // En tu SQL la tabla es USUARIOS y la columna es nombre (no nombres)
-        $query = "SELECT id_usuario, nombre FROM USUARIOS WHERE usuario = '$usuario' AND password = '$password'";
+        $query = "SELECT id_usuario, alias FROM USUARIOS WHERE alias = '$usuario' AND password = '$password'";
 
         $results = $this->connection->query($query);
 

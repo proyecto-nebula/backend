@@ -1,0 +1,25 @@
+RewriteEngine On
+RewriteBase /backend/
+
+# Añadimos el flag [B] para que escape los caracteres especiales antes de pasarlos al PHP
+RewriteRule ^api/v1/([^/]+)/([^/]+)/(.*)$ apirestitems/$1.php?$2=$3 [L,QSA,B]
+
+RewriteRule ^api/v1/([^/]+)$ apirestitems/$1.php [L,QSA]
+
+# RewriteEngine On
+
+# #------- Quitar la ext .php de las URL -------#
+# RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteCond %{REQUEST_FILENAME}.php -f
+# RewriteRule ^(.*)$ $1.php
+
+# #------- Quitar la ext .html de las URL -------#
+# RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteCond %{REQUEST_FILENAME}.html -f
+# RewriteRule ^(.*)$ $1.html
+
+# #------- Si el recurso no existe,  -------#
+# #------- redireccionar a index.php -------#
+# RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteRule ^(.+?)/?$ index.php?url=$1 [L,QSA]

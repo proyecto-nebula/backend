@@ -1,97 +1,199 @@
 <?php
 /**
- * Clase para el modelo que representa a la tabla "USUARIOS".
+ * Clase para el modelo que representa a la tabla "item".
  */
 require_once 'src/response.php';
 require_once 'src/database.php';
 
 class usuarios extends Database {
+    /**
+     * Atributo que indica la tabla asociada a la clase del modelo
+     */
     private $table = 'USUARIOS';
-    private $primary_key = 'id_usuario';
 
     /**
-     * Solo permitimos buscar por ID, Token y Fecha de creación (y sus rangos)
+     * Atributo que indica la columna que es primary key en la tabla
+     */
+    private $primary_key = 'id_usuario';
+
+
+    /**
+     * Array con los campos de la tabla que se pueden usar como filtro para recuperar registros
      */
     private $allowedConditions_get = array(
         'id_usuario',
         'token',
-        'page'
-    );
-
-    private $allowedConditions_insert = array(
-        'id_suscripcion', 'id_pais', 'id_rol', 'usuario', 'password', 'nombre', 'apellidos', 'email', 'id_avatar'
+        'fecha_creacion'
     );
 
     /**
-     * Ajustamos el filtro para que sea estricto con los campos solicitados
+     * Array con los campos de la tabla que se pueden proporcionar para insertar registros
      */
-    private function filtrarParametros($params, $allowed) {
-        foreach ($params as $key => $value) {
-            // Permitimos 'url', cualquier campo que empiece por 'id' (para la ruta amigable),
-            // el token, y los rangos de fecha.
-            if ($key === 'url' || 
-                strpos($key, 'id') === 0 || 
-                $key === 'token' || 
-                str_ends_with($key, '_min') || 
-                str_ends_with($key, '_max')) continue;
+    private $allowedConditions_insert = array(
+        'alias',
+        'id_rol',
+        'password',
+        'nombre',
+        'apellidos',
+        'email',
+        'fecha_suscripcion',
+        'id_avatar'
+    );
 
-            if (!in_array($key, $allowed)) {
-                Response::result(400, array(
+    /**
+     * Método para validar los datos que se mandan para insertar un registro, comprobar campos obligatorios, valores válidos, etc.
+     */
+    private function validate($data) {
+        // Comprobamos que todos los campos requeridos existan y no estén vacíos
+        if (
+            !isset($data['alias']) || empty($data['alias']) ||
+            !isset($data['password']) || empty($data['password']) ||
+            !isset($data['nombre']) || empty($data['nombre']) ||
+            !isset($data['apellidos']) || empty($data['apellidos']) ||
+            !isset($data['email']) || empty($data['email']) 
+        ) {
+            $response = array(
+                'result' => 'error',
+                'details' => 'Los campos alias, password, nombre, apellidos y email son obligatorios'
+            );
+
+            Response::result(400, $response);
+            exit;
+        }
+
+        // Encriptamos la contraseña en formato sha256 antes de guardarla en la base de datos
+        $data['password'] = hash('sha256', $data['password']);
+
+        return $data;
+    }
+
+    /**
+     * Método para recuperar registros, pudiendo indicar algunos filtros 
+     */
+    public function get($params) {
+        foreach ($params as $key => $param) {
+            if (!in_array($key, $this->allowedConditions_get)) {
+                unset($params[$key]);
+                $response = array(
                     'result' => 'error',
-                    'details' => "El campo '$key' no es válido para esta consulta"
-                ));
+                    'details' => 'Error en la solicitud'
+                );
+
+                Response::result(400, $response);
                 exit;
             }
         }
+
+        $items = parent::getDB($this->table, $params);
+
+        return $items;
     }
 
-    private function validate($data) {
-        if (!isset($data['usuario']) || empty($data['usuario']) || !isset($data['email']) || empty($data['email']) || !isset($data['password']) || empty($data['password'])) {
-            Response::result(400, array(
-                'result' => 'error',
-                'details' => 'Los campos usuario, email y password son obligatorios'
-            ));
-            exit;
-        }
-        return true;
-    }
-
-    public function get($params) {
-        $this->filtrarParametros($params, $this->allowedConditions_get);
-        return parent::getDB($this->table, $params);
-    }
-
+    /**
+     * Método para guardar un registro en la base de datos, recibe como parámetro el JSON con los datos a insertar
+     */
     public function insert($params) {
-        $this->filtrarParametros($params, $this->allowedConditions_insert);
-        if ($this->validate($params)) {
+        foreach ($params as $key => $param) {
+            if (!in_array($key, $this->allowedConditions_insert)) {
+                unset($params[$key]);
+                $response = array(
+                    'result' => 'error',
+                    'details' => 'Error en la solicitud'
+                );
+
+                Response::result(400, $response);
+                exit;
+            }
+        }
+
+        // Validamos los datos y obtenemos el array con la password ya encriptada
+        $params = $this->validate($params);
+
+        // Generamos un token aleatorio de forma automática para el nuevo usuario
+        $params['token'] = bin2hex(random_bytes(16));
+
+        if ($params) {
             return parent::insertDB($this->table, $params);
         }
     }
 
+    /**
+     * Método para actualizar un registro en la base de datos mediante PUT, se indica el id del registro que se quiere actualizar
+     */
     public function updatePut($id, $params) {
-        $this->filtrarParametros($params, $this->allowedConditions_insert);
+        foreach ($params as $key => $parm) {
+            if (!in_array($key, $this->allowedConditions_insert)) {
+                unset($params[$key]);
+                $response = array(
+                    'result' => 'error',
+                    'details' => 'Error en la solicitud'
+                );
+
+                Response::result(400, $response);
+                exit;
+            }
+        }
+
         if ($this->validate($params)) {
             $affected_rows = parent::updateDB($this->table, $id, $this->primary_key, $params);
+
             if ($affected_rows == 0) {
-                Response::result(200, array('result' => 'error', 'details' => 'No hubo cambios'));
+                $response = array(
+                    'result' => 'error',
+                    'details' => 'No hubo cambios'
+                );
+
+                Response::result(200, $response);
                 exit;
             }
         }
     }
 
+
+    /**
+     * Método para actualizar un registro en la base de datos mediante PATCH, se indica el id del registro que se quiere actualizar
+     */
     public function updatePatch($id, $params) {
-        $this->filtrarParametros($params, $this->allowedConditions_insert);
+        foreach ($params as $key => $parm) {
+            if (!in_array($key, $this->allowedConditions_insert)) {
+                unset($params[$key]);
+                $response = array(
+                    'result' => 'error',
+                    'details' => 'Error en la solicitud'
+                );
+
+                Response::result(400, $response);
+                exit;
+            }
+        }
+
         $affected_rows = parent::updateDB($this->table, $id, $this->primary_key, $params);
+
         if ($affected_rows == 0) {
-            Response::result(200, array('result' => 'error', 'details' => 'No hubo cambios'));
+            $response = array(
+                'result' => 'error',
+                'details' => 'No hubo cambios'
+            );
+
+            Response::result(200, $response);
             exit;
         }
     }
 
+
+    /**
+     * Método para borrar un registro de la base de datos, se indica el id del registro que queremos eliminar
+     */
     public function delete($id) {
         $affected_rows = parent::deleteDB($this->table, $id, $this->primary_key);
+
         if ($affected_rows == 0) {
-            Response::result(200, array('result' => 'error', 'details' => 'No hubo cambios'));
+            $response = array(
+                'result' => 'error',
+                'details' => 'No hubo cambios'
+            );
+
+            Response::result(200, $response);
             exit;
         }
     }

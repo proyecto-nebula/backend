@@ -27,10 +27,10 @@ class Authentication extends AuthModel
      */
     public function signIn($user)
     {
-        if(!isset($user['usuario']) || !isset($user['password']) || empty($user['usuario']) || empty($user['password'])){
+        if(!isset($user['alias']) || !isset($user['password']) || empty($user['alias']) || empty($user['password'])){
             $response = array(
                 'result' => 'error',
-                'details' => 'Los campos password y usuario son obligatorios'
+                'details' => 'Los campos password y alias son obligatorios'
             );
             
             Response::result(400, $response);
@@ -39,12 +39,12 @@ class Authentication extends AuthModel
 
         // Importante: En los datos random que insertamos, las contraseñas no tienen hash. 
         // Si vas a usar hash('sha256'...), asegúrate de que en la BD estén hasheadas.
-        $result = parent::login($user['usuario'], hash('sha256' , $user['password']));
+        $result = parent::login($user['alias'], hash('sha256' , $user['password']));
 
         if(sizeof($result) == 0){
             $response = array(
                 'result' => 'error',
-                'details' => 'El usuario y/o la contraseña son incorrectas'
+                'details' => 'El alias y/o la contraseña son incorrectas'
             );
 
             Response::result(403, $response);
@@ -56,7 +56,7 @@ class Authentication extends AuthModel
             'iat' => time(),
             'data' => array(
                 'id' => $result[0]['id_usuario'],
-                'nombre' => $result[0]['nombre']
+                'nombre' => $result[0]['alias']
             )
         );
 

@@ -21,7 +21,6 @@ class CAPTURAS extends Database {
      * Array con los campos de la tabla que se pueden usar como filtro para recuperar registros
      */
     private $allowedConditions_get = array(
-        'id_captura',
         'id_juego',
         'page'
     );
@@ -37,20 +36,22 @@ class CAPTURAS extends Database {
     /**
      * Método privado para filtrar los parámetros recibidos y evitar errores con las rutas del .htaccess
      */
-    private function filtrarParametros($params, $allowed) {
+   private function filtrarParametros($params, $allowed) {
         foreach ($params as $key => $value) {
-            // Ignoramos 'url' y cualquier parámetro que empiece por 'id' (id_captura, id_juego, id...)
+    //         // Ignoramos 'url' y cualquier parámetro que empiece por 'id' (id_captura, id_juego, id...)
             if ($key === 'url' || strpos($key, 'id') === 0) continue;
 
             if (!in_array($key, $allowed)) {
                 Response::result(400, array(
-                    'result' => 'error',
-                    'details' => "El campo '$key' no es válido para esta consulta"
-                ));
+                   'result' => 'error',
+                     'details' => "El campo '$key' no es válido para esta consulta"
+             ));
                 exit;
             }
-        }
-    }
+         }
+     }
+
+
 
     /**
      * Método para validar los datos que se mandan para insertar un registro, comprobar campos obligatorios, valores válidos, etc.

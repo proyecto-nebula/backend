@@ -1,38 +1,151 @@
 <?php
 /**
- * Script que se usa en los endpoints para trabajar con registros de la tabla SUSCRIPCION
- */
+ *	Script que se usa en los endpoints para trabajar con registros de la tabla PLAYER
+ *	La clase "item.class.php" es la clase del modelo, que representa a un item de la tabla
+*/
 require_once 'src/response.php';
 require_once 'src/classes/auth.class.php';
-require_once 'src/classes/SUSCRIPCION.class.php';
+require_once 'src/classes/suscripcion.class.php';
 
 $auth = new Authentication();
 $auth->verify();
 
-$item = new SUSCRIPCION();
+$item = new suscripcion();
 
+/**
+ * Se mira el tipo de petición que ha llegado a la API y dependiendo de ello se realiza una u otra accción
+ */
 switch ($_SERVER['REQUEST_METHOD']) {
-    case 'GET':
-        $items = $item->get($_GET);
-        Response::result(200, array('result' => 'ok', 'items' => $items));
-        break;
-    case 'POST':
-        $insert_id = $item->insert(json_decode(file_get_contents('php://input'), true));
-        Response::result(201, array('result' => 'ok', 'insert_id' => $insert_id));
-        break;
-    case 'PUT':
-        $item->updatePut($_GET['id_suscripcion'], json_decode(file_get_contents('php://input'), true));
-        Response::result(200, array('result' => 'ok'));
-        break;
-    case 'PATCH':
-        $item->updatePatch($_GET['id_suscripcion'], json_decode(file_get_contents('php://input'), true));
-        Response::result(200, array('result' => 'ok'));
-        break;
-    case 'DELETE':
-        $item->delete($_GET['id_suscripcion']);
-        Response::result(200, array('result' => 'ok'));
-        break;
-    default:
-        Response::result(404, array('result' => 'error'));
-        break;
+	/**
+	 * Si se ha recibido un GET se llama al método get() del modelo y se le pasan los parámetros recibidos por GET en la petición
+	 */
+	case 'GET':
+		$params = $_GET;
+
+		$items = $item->get($params);
+
+		$response = array(
+			'result' => 'ok',
+			'items' => $items
+		);
+
+		Response::result(200, $response);
+		break;
+		
+	/**
+	 * Si se recibe un POST, se comprueba si se han recibido parámetros y en caso afirmativo se usa el método insert() del modelo
+	 */
+	case 'POST':
+		$params = json_decode(file_get_contents('php://input'), true);
+
+		if(!isset($params)){
+			$response = array(
+				'result' => 'error',
+				'details' => 'Error en la solicitud'
+			);
+
+			Response::result(400, $response);
+			exit;
+		}
+
+		$insert_id = $item->insert($params);
+
+		$response = array(
+			'result' => 'ok',
+			'insert_id' => $insert_id
+		);
+
+		Response::result(201, $response);
+		break;
+
+	/**
+	 * Cuando es PUT, comprobamos si la petición lleva el id del item que hay que actualizar. En caso afirmativo se usa el método update() del modelo.
+	 * En PUT hay que enviar todos los datos del registro, aunque no se cambien
+	 */
+	case 'PUT':
+		$params = json_decode(file_get_contents('php://input'), true);
+
+		if(!isset($params) || !isset($_GET['codigo']) || empty($_GET['codigo'])){
+			$response = array(
+				'result' => 'error',
+				'details' => 'Error en la solicitud'
+			);
+
+			Response::result(400, $response);
+			exit;
+		}
+
+		$item->updatePut($_GET['codigo'], $params);
+
+		$response = array(
+			'result' => 'ok'
+		);
+
+		Response::result(200, $response);
+		break;
+
+/**
+	 * Cuando es PATCH, comprobamos si la petición lleva el id del item que hay que actualizar. En caso afirmativo se usa el método updatePatch() del modelo.
+	 * En PATCH no es necesario enviar todos los datos del registro, unicamente los que cambian
+	 */
+	case 'PATCH':
+		$params = json_decode(file_get_contents('php://input'), true);
+
+		if(!isset($params) || !isset($_GET['codigo']) || empty($_GET['codigo'])){
+			$response = array(
+				'result' => 'error',
+				'details' => 'Error en la solicitud'
+			);
+
+			Response::result(400, $response);
+			exit;
+		}
+
+		$item->updatePatch($_GET['codigo'], $params);
+
+		$response = array(
+			'result' => 'ok'
+		);
+
+		Response::result(200, $response);
+		break;
+
+
+
+
+	/**
+	 * Cuando se solicita un DELETE se comprueba que se envíe un codigo de item. En caso afirmativo se utiliza el método delete() del modelo.
+	 */
+	case 'DELETE':
+		if(!isset($_GET['codigo']) || empty($_GET['codigo'])){
+			$response = array(
+				'result' => 'error',
+				'details' => 'Error en la solicitud'
+			);
+
+			Response::result(400, $response);
+			exit;
+		}
+
+		$item->delete($_GET['codigo']);
+
+		$response = array(
+			'result' => 'ok'
+		);
+
+		Response::result(200, $response);
+		break;
+
+	/**
+	 * Para cualquier otro tipo de petición se devuelve un mensaje de error 404.
+	 */
+	default:
+		$response = array(
+			'result' => 'error'
+		);
+
+		Response::result(404, $response);
+
+		break;
 }
+?>
