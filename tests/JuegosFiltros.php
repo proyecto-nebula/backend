@@ -1,7 +1,7 @@
 <?php
 use PHPUnit\Framework\TestCase;
 
-class GameFiltersTest extends TestCase {
+class JuegosFiltros extends TestCase {
 
     private $baseUrl = "http://localhost:3000/Nebula/api/v1/juegos";
 
