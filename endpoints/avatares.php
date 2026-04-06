@@ -2,9 +2,9 @@
 /**
  * Script que se usa en los endpoints para trabajar con registros de la tabla IDIOMAS
  */
-require_once 'src/response.php';
-require_once 'src/classes/auth.class.php';
-require_once 'src/classes/AVATARES.class.php';
+require_once  __DIR__ . '/../src/utils/response.php';
+require_once __DIR__ . '/../src/classes/auth.class.php';
+require_once __DIR__ . '/../src/classes/avatares.class.php';
 
 $auth = new Authentication();
 $auth->verify();

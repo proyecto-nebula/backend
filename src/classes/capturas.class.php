@@ -2,10 +2,10 @@
 /**
  * Clase para el modelo que representa a la tabla "CAPTURAS".
  */
-require_once 'src/response.php';
-require_once 'src/database.php';
+require_once __DIR__ . '/../utils/response.php';
+require_once __DIR__ . '/../models/database.php';
 
-class CAPTURAS extends Database {
+class capturas extends Database {
     /**
      * Atributo que indica la tabla asociada a la clase del modelo
      */

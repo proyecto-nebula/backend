@@ -1,0 +1,59 @@
+name: CI Nebula Auto-Testing
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.DB_NAME }}
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Instalación de PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, mysql, curl, json
+
+      - name: Instalación de Dependencias
+        run: composer install --prefer-dist --no-progress
+
+      - name: Configuración de Entorno (.env)
+        # Usamos los secretos configurados en GitHub
+        run: |
+          echo "DB_HOST=127.0.0.1" >> .env
+          echo "DB_USER=${{ secrets.DB_USER }}" >> .env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
+          echo "DB_PORT=3306" >> .env
+          echo "JWT_SECRET=${{ secrets.JWR_SECRET }}" >> .env
+
+      - name: Levantar Servidor API
+        # Apuntamos a la carpeta public detectada
+        run: php -S 127.0.0.1:8000 -t public & 
+
+      - name: Esperar a que el servidor esté listo
+        run: sleep 3
+
+      - name: Ejecutar Pruebas Automáticas
+        # Forzamos a PHPUnit a mirar solo en tests/Feature para evitar el error de "directory not found"
+        run: ./vendor/bin/phpunit --colors=always tests/Feature

@@ -24,6 +24,17 @@ $id = $parts[1] ?? null;       // 5 (opcional)
 if ($id) {
     if ($resource === 'usuarios') $_GET['id_usuario'] = $id;
     if ($resource === 'juegos')   $_GET['id_juego'] = $id;
+    if ($resource === 'avatares')   $_GET['id_avatar'] = $id;
+    if ($resource === 'capturas')   $_GET['id_captura'] = $id;
+    if ($resource === 'categorias')   $_GET['id_categoria'] = $id;
+    if ($resource === 'estudios')   $_GET['id_estudio'] = $id;
+    if ($resource === 'favoritos')   $_GET['id_usuario'] = $id;
+    if ($resource === 'juegos_categoria')   $_GET['id_juego'] = $id;
+    if ($resource === 'juegos')   $_GET['id_juego'] = $id;
+    if ($resource === 'partidas')   $_GET['id_partida'] = $id;
+    if ($resource === 'pegi')   $_GET['id_pegi'] = $id;
+    if ($resource === 'roles')   $_GET['id_rol'] = $id;
+    if ($resource === 'suscripcion')   $_GET['id_suscripcion'] = $id;
     // Añade aquí otros si tienes más recursos (ej: 'roles' => 'id_rol')
 }
 

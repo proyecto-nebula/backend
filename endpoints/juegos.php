@@ -3,9 +3,9 @@
  * Script que se usa en los endpoints para trabajar con registros de la tabla JUEGOS
  * La clase "JUEGOS.class.php" es la clase del modelo, que representa a un item de la tabla
 */
-require_once 'src/response.php';
-require_once 'src/classes/auth.class.php';
-require_once 'src/classes/JUEGOS.class.php';
+require_once  __DIR__ . '/../src/utils/response.php';
+require_once __DIR__ . '/../src/classes/auth.class.php';
+require_once __DIR__ . '/../src/classes/juegos.class.php';
 
 $auth = new Authentication();
 $auth->verify();

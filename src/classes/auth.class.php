@@ -29,8 +29,7 @@ public function __construct() {
         // Asignación directa en una sola línea
 
         $this->key = getenv('JWT_SECRET');
-
-        $this->authModel = new authModel();
+        parent::__construct();
 
     }
 
