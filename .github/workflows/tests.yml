@@ -1,23 +1,22 @@
-name: Backend Tests
+name: CI Nebula Backend
 
-# 1. ¿Cuándo se ejecuta?
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, master, develop ]
   pull_request:
     branches: [ main ]
 
 jobs:
-  php-tests:
+  backend-testing:
     runs-on: ubuntu-latest
 
-    # 2. Definir servicios (Base de Datos)
+    # 1. Base de Datos para los tests
     services:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: testing_db
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.DB_NAME }}
         ports:
           - 3306:3306
         options: >-
@@ -27,28 +26,42 @@ jobs:
           --health-retries=3
 
     steps:
-      # 3. Descargar el código del repo
-      - uses: actions/checkout@v4
+      # 2. Clonar el código del repositorio
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      # 4. Configurar versión de PHP
+      # 3. Configurar PHP con las extensiones necesarias para juegos/APIs
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mbstring, xml, ctype, iconv, mysql
-          coverage: xdebug
+          extensions: mbstring, dom, curl, libxml, mysql, bcmath
+          coverage: none
 
-      # 5. Instalar dependencias (con caché para ir más rápido)
-      - name: Install Dependencies
-        run: composer install --prefer-dist --no-progress
+      # 4. Instalar dependencias (Composer)
+      - name: Install dependencies
+        run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
-      # 6. Ejecutar las pruebas
-      - name: Run Unit & Integration Tests
+      # 5. CONSTRUCCIÓN DEL .ENV (Aquí ocurre la magia)
+      # Este paso crea un archivo .env desde cero usando tus Repository Secrets
+      - name: Generate ephemeral .env file
+        run: |
+          touch .env
+          echo "DB_HOST=127.0.0.1" >> .env
+          echo "DB_USER=${{ secrets.DB_USER }}" >> .env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
+          echo "DB_PORT=3306" >> .env
+          echo "JWT_SECRET=${{ secrets.JWR_SECRET }}" >> .env
+          echo "APP_ENV=testing" >> .env
+
+      # 6. Ejecutar PHPUnit
+      # Pasamos las variables también aquí para asegurar que los procesos hijos las vean
+      - name: Run Tests
         env:
-          DB_CONNECTION: mysql
           DB_HOST: 127.0.0.1
           DB_PORT: 3306
-          DB_DATABASE: testing_db
-          DB_USERNAME: root
-          DB_PASSWORD: root
-        run: ./vendor/bin/phpunit
+          DB_DATABASE: ${{ secrets.DB_NAME }}
+          DB_USERNAME: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        run: ./vendor/bin/phpunit --display-deprecations --display-phpunit-deprecations
