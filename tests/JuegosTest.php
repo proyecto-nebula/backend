@@ -3,7 +3,7 @@ use PHPUnit\Framework\TestCase;
 
 class GameTest extends TestCase {
 
-    private $baseUrl = "http://localhost:3000/Nebula/api/v1";
+    private $baseUrl = "http://localhost:8000/api/v1/1";
 
     public function testObtenerTodosLosJuegos() {
         $response = @file_get_contents($this->baseUrl . "/juegos");
