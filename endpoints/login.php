@@ -1,6 +1,6 @@
 <?php
-require_once 'src/auth.model.php'; // Asegúrate de que la ruta sea correcta
-require_once 'src/response.php';
+require_once __DIR__ . '/../src/auth.model.php'; // Asegúrate de que la ruta sea correcta
+require_once __DIR__ . '/../src/response.php';
 
 // Permitir peticiones desde cualquier origen y formato JSON
 header("Access-Control-Allow-Origin: *");
