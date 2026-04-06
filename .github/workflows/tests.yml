@@ -10,7 +10,6 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
-    # Configuración del contenedor de Base de Datos para las pruebas
     services:
       mysql:
         image: mysql:8.0
@@ -36,11 +35,10 @@ jobs:
           extensions: mbstring, mysql, curl, json
 
       - name: Instalación de Dependencias
-        # Asegúrate de haber corregido el composer.json antes de subir esto
         run: composer install --prefer-dist --no-progress
 
       - name: Configuración de Entorno (.env)
-        # Generamos el archivo .env usando tus secretos de GitHub
+        # Usamos los secretos configurados en GitHub
         run: |
           echo "DB_HOST=127.0.0.1" >> .env
           echo "DB_USER=${{ secrets.DB_USER }}" >> .env
@@ -50,13 +48,12 @@ jobs:
           echo "JWT_SECRET=${{ secrets.JWR_SECRET }}" >> .env
 
       - name: Levantar Servidor API
-        # Lanzamos el servidor interno de PHP apuntando a tu carpeta public
+        # Apuntamos a la carpeta public detectada
         run: php -S 127.0.0.1:8000 -t public & 
 
       - name: Esperar a que el servidor esté listo
-        # Añadimos este margen de tiempo para evitar errores de conexión en los tests
         run: sleep 3
 
       - name: Ejecutar Pruebas Automáticas
-        # Ejecuta PHPUnit buscando la configuración en phpunit.xml
-        run: ./vendor/bin/phpunit --colors=always
+        # Forzamos a PHPUnit a mirar solo en tests/Feature para evitar el error de "directory not found"
+        run: ./vendor/bin/phpunit --colors=always tests/Feature
