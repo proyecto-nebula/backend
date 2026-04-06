@@ -20,7 +20,19 @@ class Authentication extends AuthModel
     /**
      * Clave secreta para realizar la encriptación y desencriptación del token
      */
-    private $key = 'clave_secreta_robusta_PROYECTO';
+    //private $key = 'clave_secreta_robusta_PROYECTO';
+    private $key;
+    private $authModel;
+
+public function __construct() {
+
+        // Asignación directa en una sola línea
+
+        $this->key = getenv('JWT_SECRET');
+
+        $this->authModel = new authModel();
+
+    }
 
     /**
      * Método para que un usuario se autentifique con un nombre de usuario y una contraseña

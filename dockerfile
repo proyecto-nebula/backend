@@ -13,3 +13,6 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.
 RUN docker-php-ext-install mysqli && docker-php-ext-enable mysqli
 
 WORKDIR /var/www/html
+
+RUN cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini \
+    && sed -i 's/variables_order = "GPCS"/variables_order = "EGPCS"/' /usr/local/etc/php/php.ini

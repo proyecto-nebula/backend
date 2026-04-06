@@ -6,10 +6,29 @@
 class AuthModel
 {
     private $connection;
+    private $host;
+	private $db;
+	private $user;
+	private $password;
+	private $port;
     
     public function __construct(){
+        
+        $this->host = getenv('DB_HOST');
+		$this->db = getenv('DB_NAME');
+		$this->user = getenv('DB_USER');
+		$this->password = getenv('DB_PASSWORD');
+		$this->port = getenv('DB_PORT');
         // Ajustado a los datos de tu SQL y servidor db
-        $this->connection = new mysqli('db', 'root', 'root', 'Proyecto_Final', '3306');
+        //$this->connection = new mysqli('db', 'root', 'root', 'Proyecto_Final', '3306');
+        $this->connection = new mysqli(
+			$this->host,
+			$this->user,
+			$this->password,
+			$this->db,
+			//$this->port
+            '3306'
+		);
 
         if($this->connection->connect_errno){
             echo 'Error de conexión a la base de datos';

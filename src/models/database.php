@@ -4,19 +4,39 @@
  */
 class Database
 {
-    private $connection;
-    private $results_page = 50;
+	private $connection;
+	private $results_page = 50;
 
-    public function __construct(){
-        $this->connection = new mysqli('db', 'root', 'root', 'Proyecto_Final', '3306');
+	private $host;
+	private $db;
+	private $user;
+	private $password;
+	private $port;
 
-        if($this->connection->connect_errno){
-            echo 'Error de conexión a la base de datos';
-            exit;
-        }
-    }
+	public function __construct()
+	{
+		$this->host = getenv('DB_HOST');
+		$this->db = getenv('DB_NAME');
+		$this->user = getenv('DB_USER');
+		$this->password = getenv('DB_PASSWORD');
+		$this->port = getenv('DB_PORT');
 
- /**
+		//$this->connection = new mysqli('db', 'root', 'root', 'Proyecto_Final', '3306');
+		$this->connection = new mysqli(
+			$this->host,
+			$this->user,
+			$this->password,
+			$this->db,
+			$this->port
+		);
+
+		if ($this->connection->connect_errno) {
+			echo 'Error de conexión a la base de datos';
+			exit;
+		}
+	}
+
+	/**
 	 * Método para recuperar datos de una tabla, pudiendo indicar filtros con el parámetro $extra
 	 */
 	public function getDB($table, $extra = null)
@@ -24,17 +44,17 @@ class Database
 		$page = 0;
 		$query = "SELECT * FROM $table";
 
-		if(isset($extra['page'])){
+		if (isset($extra['page'])) {
 			$page = $extra['page'];
 			unset($extra['page']);
 		}
 
-		if($extra != null){
+		if ($extra != null) {
 			$query .= ' WHERE';
 
 			foreach ($extra as $key => $condition) {
-				$query .= ' '.$key.' = "'.$condition.'"';
-				if($extra[$key] != end($extra)){
+				$query .= ' ' . $key . ' = "' . $condition . '"';
+				if ($extra[$key] != end($extra)) {
 					$query .= " AND ";
 				}
 			}
@@ -43,11 +63,10 @@ class Database
 		/**
 		 * Aquí se paginan los resultados para evitar recuperar todos los registros de una tabla que contenga muchísimos
 		 */
-		if($page > 0){
-			$since = (($page-1) * $this->results_page);
+		if ($page > 0) {
+			$since = (($page - 1) * $this->results_page);
 			$query .= " LIMIT $since, $this->results_page";
-		}
-		else{
+		} else {
 			$query .= " LIMIT 0, $this->results_page";
 		}
 
@@ -71,7 +90,7 @@ class Database
 		$values .= implode('","', array_values($data));
 		$values .= '"';
 
-		$query = "INSERT INTO $table (".$fields.') VALUES ('.$values.')';
+		$query = "INSERT INTO $table (" . $fields . ') VALUES (' . $values . ')';
 		$this->connection->query($query);
 
 		return $this->connection->insert_id;
@@ -83,20 +102,20 @@ class Database
 	 * El parámetro "pk" indica la columna de la tabla que es primary key
 	 */
 	public function updateDB($table, $id, $pk, $data)
-	{	
+	{
 		$query = "UPDATE $table SET ";
 		foreach ($data as $key => $value) {
 			$query .= "$key = '$value'";
-			if(sizeof($data) > 1 && $key != array_key_last($data)){
+			if (sizeof($data) > 1 && $key != array_key_last($data)) {
 				$query .= " , ";
 			}
 		}
 
-		$query .= ' WHERE '. $pk . ' = '.$id;
+		$query .= ' WHERE ' . $pk . ' = ' . $id;
 
 		$this->connection->query($query);
 
-		if(!$this->connection->affected_rows){
+		if (!$this->connection->affected_rows) {
 			return 0;
 		}
 
@@ -113,7 +132,7 @@ class Database
 		$query = "DELETE FROM $table WHERE $pk = $id";
 		$this->connection->query($query);
 
-		if(!$this->connection->affected_rows){
+		if (!$this->connection->affected_rows) {
 			return 0;
 		}
 
