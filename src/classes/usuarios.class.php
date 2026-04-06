@@ -2,8 +2,8 @@
 /**
  * Clase para el modelo que representa a la tabla "item".
  */
-require_once 'src/response.php';
-require_once 'src/database.php';
+require_once __DIR__ . '/../utils/response.php';
+require_once __DIR__ . '/../models/database.php';
 
 class usuarios extends Database {
     /**

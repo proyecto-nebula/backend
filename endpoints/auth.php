@@ -3,8 +3,8 @@
  * Clase que hace de endpoint para la autentificación
  * Se debe mandar por POST un json con el usuario y la contraseña
  */
-require_once 'src/classes/auth.class.php';
-require_once 'src/response.php';
+require_once __DIR__ . '/../src/classes/auth.class.php';
+require_once __DIR__ . '/../src/utils/response.php';
 
 $auth = new Authentication();
 

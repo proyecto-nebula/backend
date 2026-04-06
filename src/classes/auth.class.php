@@ -5,9 +5,9 @@
  * El token se genera a partir del id del usuario, por lo que cada usuario tendrá siempre un token distinto. 
  * Además del id, para generar el token se hace uso de una clave secreta que es un atributo de la clase
  */
-require_once 'jwt/JWT.php';
-require_once 'src/authModel.php';
-require_once 'src/response.php';
+require_once __DIR__ . '/../lib/jwt/JWT.php';
+require_once __DIR__ . '/../models/authModel.php';
+require_once __DIR__ . '/../utils/response.php';
 use Firebase\JWT\JWT;
 
 class Authentication extends AuthModel
