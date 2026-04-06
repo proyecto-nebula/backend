@@ -3,14 +3,14 @@ use PHPUnit\Framework\TestCase;
 
 class SubscriptionTest extends TestCase {
 
-    private $baseUrl = "http://localhost:3000/Nebula/api/v1/suscripcion";
+    private $baseUrl = "http://localhost:8000/api/v1/suscripcion/1";
 
     public function testTodasLasSuscripciones() {
         $this->assertEndpoint("");
     }
 
     public function testSuscripcionPorId() {
-        $this->assertEndpoint("/id_suscripcion/1");
+        $this->assertEndpoint("/suscripcion/1");
     }
 
     public function testPorNombre() {
