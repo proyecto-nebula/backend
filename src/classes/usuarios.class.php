@@ -22,7 +22,7 @@ class usuarios extends Database {
      */
     private $allowedConditions_get = array(
         'id_usuario',
-        'token_usuario',
+        'token',
         'fecha_creacion_usuario'
     );
 
@@ -37,7 +37,9 @@ class usuarios extends Database {
         'apellidos_usuario',
         'email_usuario',
         'fecha_suscripcion_usuario',
-        'id_avatar'
+        'id_avatar',
+        'id_suscripcion',
+        'fecha_creacion_usuario'
     );
 
     /**

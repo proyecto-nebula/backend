@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 07-04-2026 a las 15:13:36
+-- Tiempo de generación: 07-04-2026 a las 15:20:05
 -- Versión del servidor: 8.0.45
 -- Versión de PHP: 8.3.30
 
@@ -702,7 +702,7 @@ CREATE TABLE `usuarios` (
   `nombre_usuario` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `apellidos_usuario` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `email_usuario` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `fecha_suscripcion_usuario` date DEFAULT NULL,
+  `fecha_suscripcion` date DEFAULT NULL,
   `fecha_creacion_usuario` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `id_avatar` int DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -711,7 +711,7 @@ CREATE TABLE `usuarios` (
 -- Volcado de datos para la tabla `usuarios`
 --
 
-INSERT INTO `usuarios` (`id_usuario`, `id_suscripcion`, `id_rol`, `alias_usuario`, `password_usuario`, `token`, `nombre_usuario`, `apellidos_usuario`, `email_usuario`, `fecha_suscripcion_usuario`, `fecha_creacion_usuario`, `id_avatar`) VALUES
+INSERT INTO `usuarios` (`id_usuario`, `id_suscripcion`, `id_rol`, `alias_usuario`, `password_usuario`, `token`, `nombre_usuario`, `apellidos_usuario`, `email_usuario`, `fecha_suscripcion`, `fecha_creacion_usuario`, `id_avatar`) VALUES
 (0, 2, 0, 'admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU1NzA2MzQsImRhdGEiOnsiaWQiOiIwIiwibm9tYnJlIjoiYWRtaW4ifX0.mQ9FrHAwRNqczO3j2Dj9kZCfaMAj7dQb2ey9Pq4vXaw', 'Administrador', 'García', 'admin@ejemplo.com', '2024-01-15', '2026-04-03 19:34:55', 4),
 (1, 0, 1, 'usuario', '9250e222c4c71f0c58d4c54b50a880a312e9f9fed55d5c3aa0b0e860ded99165', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU1NjIxMzQsImRhdGEiOnsiaWQiOiIxNiIsIm5vbWJyZSI6InVzdWFyaW8ifX0.VcPJII1aXuoLz23UNuMSy5zIbcEhUDAIClGBdKeEsVc', 'usuario nombre', 'usuario apellido', 'usuario@test.com', NULL, '2026-04-07 11:35:29', 5);
 
