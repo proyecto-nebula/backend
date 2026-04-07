@@ -9,7 +9,7 @@ class suscripcion extends Database {
 	/**
 	 * Atributo que indica la tabla asociada a la clase del modelo
 	 */
-	private $table = 'suscripcion';
+	private $table = 'suscripciones';
 
 	/**
 	 * Atributo que indica la columna que es primary key en la tabla
