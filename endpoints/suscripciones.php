@@ -5,12 +5,12 @@
 */
 require_once  __DIR__ . '/../src/utils/response.php';
 require_once __DIR__ . '/../src/classes/auth.class.php';
-require_once __DIR__ . '/../src/classes/suscripcion.class.php';
+require_once __DIR__ . '/../src/classes/suscripciones.class.php';
 
 $auth = new Authentication();
 $auth->verify();
 
-$item = new suscripcion();
+$item = new suscripciones();
 
 /**
  * Se mira el tipo de petición que ha llegado a la API y dependiendo de ello se realiza una u otra accción

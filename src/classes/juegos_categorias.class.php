@@ -5,8 +5,8 @@
 require_once __DIR__ . '/../utils/response.php';
 require_once __DIR__ . '/../models/database.php';
 
-class JUEGOS_CATEGORIAS extends Database {
-    private $table = 'JUEGOS_CATEGORIAS';
+class juegos_categorias extends Database {
+    private $table = 'juegos_categorias';
     private $primary_key = 'id_juego';
 
     private $allowedConditions_get = array('id_juego', 'id_categoria', 'page');

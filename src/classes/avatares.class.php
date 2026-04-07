@@ -9,7 +9,7 @@ class avatares extends Database {
 	/**
 	 * Atributo que indica la tabla asociada a la clase del modelo
 	 */
-	private $table = 'AVATARES';
+	private $table = 'avatares';
 
 	/**
 	 * Atributo que indica la columna que es primary key en la tabla

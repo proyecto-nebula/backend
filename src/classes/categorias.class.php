@@ -2,14 +2,14 @@
 /**
  * Clase para el modelo que representa a la tabla "CATEGORIAS".
  */
-require_once 'src/response.php';
-require_once 'src/database.php';
+require_once __DIR__ . '/../utils/response.php';
+require_once __DIR__ . '/../models/database.php';
 
 class categorias extends Database {
     /**
      * Atributo que indica la tabla asociada a la clase del modelo
      */
-    private $table = 'CATEGORIAS';
+    private $table = 'categorias';
 
     /**
      * Atributo que indica la columna que es primary key en la tabla

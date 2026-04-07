@@ -9,7 +9,7 @@ class estudios extends Database {
     /**
      * Atributo que indica la tabla asociada a la clase del modelo
      */
-    private $table = 'ESTUDIOS';
+    private $table = 'estudios';
 
     /**
      * Atributo que indica la columna que es primary key en la tabla

@@ -5,11 +5,11 @@
 require_once __DIR__ . '/../utils/response.php';
 require_once __DIR__ . '/../models/database.php';
 
-class PEGI extends Database {
+class pegi extends Database {
     /**
      * Atributo que indica la tabla asociada a la clase del modelo
      */
-    private $table = 'PEGI';
+    private $table = 'pegi';
 
     /**
      * Atributo que indica la columna que es primary key en la tabla

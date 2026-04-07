@@ -6,7 +6,7 @@ require_once __DIR__ . '/../utils/response.php';
 require_once __DIR__ . '/../models/database.php';
 
 class juegos extends Database {
-    private $table = 'JUEGOS';
+    private $table = 'juegos';
     private $primary_key = 'id_juego';
 
     /**

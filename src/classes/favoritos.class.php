@@ -9,7 +9,7 @@ class favoritos extends Database {
     /**
      * Atributo que indica la tabla asociada a la clase del modelo
      */
-    private $table = 'FAVORITOS';
+    private $table = 'favoritos';
 
     /**
      * Atributo que indica la columna que es primary key en la tabla
