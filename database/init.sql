@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 07-04-2026 a las 12:06:39
+-- Tiempo de generación: 07-04-2026 a las 13:33:32
 -- Versión del servidor: 8.0.45
 -- Versión de PHP: 8.3.30
 
@@ -29,6 +29,7 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `avatares` (
   `id_avatar` int NOT NULL,
+  `nombre` varchar(50) NOT NULL,
   `imagen` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -36,27 +37,27 @@ CREATE TABLE `avatares` (
 -- Volcado de datos para la tabla `avatares`
 --
 
-INSERT INTO `avatares` (`id_avatar`, `imagen`) VALUES
-(1, 'https://api.multiavatar.com/estrella.png'),
-(2, 'https://api.multiavatar.com/gamerpro.png'),
-(3, 'https://api.multiavatar.com/n00b.png'),
-(4, 'https://api.multiavatar.com/admin.png'),
-(5, 'https://api.multiavatar.com/anonimo.png'),
-(6, 'https://api.multiavatar.com/soporte.png'),
-(7, 'https://api.multiavatar.com/tester1.png'),
-(8, 'https://api.multiavatar.com/speedrunner.png'),
-(9, 'https://api.multiavatar.com/coleccionista.png'),
-(10, 'https://api.multiavatar.com/critico.png'),
-(11, 'https://api.multiavatar.com/achievements.png'),
-(12, 'https://api.multiavatar.com/indie.png'),
-(13, 'https://api.multiavatar.com/wolf.png'),
-(14, 'https://api.multiavatar.com/world.png'),
-(15, 'https://api.multiavatar.com/strategy.png'),
-(16, 'https://api.multiavatar.com/pilot.png'),
-(17, 'https://api.multiavatar.com/mercenary.png'),
-(18, 'https://api.multiavatar.com/wizard.png'),
-(19, 'https://api.multiavatar.com/build.png'),
-(20, 'https://api.multiavatar.com/legend.png');
+INSERT INTO `avatares` (`id_avatar`, `nombre`, `imagen`) VALUES
+(1, 'Estrella', 'https://api.multiavatar.com/estrella.png'),
+(2, 'Gamer Pro', 'https://api.multiavatar.com/gamerpro.png'),
+(3, 'Noob', 'https://api.multiavatar.com/n00b.png'),
+(4, 'Admin', 'https://api.multiavatar.com/admin.png'),
+(5, 'Anónimo', 'https://api.multiavatar.com/anonimo.png'),
+(6, 'Soporte', 'https://api.multiavatar.com/soporte.png'),
+(7, 'Tester', 'https://api.multiavatar.com/tester1.png'),
+(8, 'Speedrunner', 'https://api.multiavatar.com/speedrunner.png'),
+(9, 'Coleccionista', 'https://api.multiavatar.com/coleccionista.png'),
+(10, 'Crítico', 'https://api.multiavatar.com/critico.png'),
+(11, 'Logros', 'https://api.multiavatar.com/achievements.png'),
+(12, 'Indie', 'https://api.multiavatar.com/indie.png'),
+(13, 'Lobo', 'https://api.multiavatar.com/wolf.png'),
+(14, 'Mundo', 'https://api.multiavatar.com/world.png'),
+(15, 'Estratega', 'https://api.multiavatar.com/strategy.png'),
+(16, 'Piloto', 'https://api.multiavatar.com/pilot.png'),
+(17, 'Mercenario', 'https://api.multiavatar.com/mercenary.png'),
+(18, 'Mago', 'https://api.multiavatar.com/wizard.png'),
+(19, 'Constructor', 'https://api.multiavatar.com/build.png'),
+(20, 'Leyenda', 'https://api.multiavatar.com/legend.png');
 
 -- --------------------------------------------------------
 
@@ -239,6 +240,34 @@ CREATE TABLE `favoritos` (
   `id_juego` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+--
+-- Volcado de datos para la tabla `favoritos`
+--
+
+INSERT INTO `favoritos` (`id_usuario`, `id_juego`) VALUES
+(0, 1),
+(1, 2),
+(1, 3),
+(0, 4),
+(0, 7),
+(0, 9),
+(0, 10),
+(1, 11),
+(1, 13),
+(0, 15),
+(1, 17),
+(1, 18),
+(0, 101),
+(1, 102),
+(0, 105),
+(1, 108),
+(0, 110),
+(1, 115),
+(0, 120),
+(1, 122),
+(0, 125),
+(1, 129);
+
 -- --------------------------------------------------------
 
 --
@@ -408,9 +437,114 @@ INSERT INTO `juegos` (`id_juego`, `id_desarrollador`, `id_distribuidor`, `id_peg
 
 CREATE TABLE `juegos_categorias` (
   `id_juego` int NOT NULL,
-  `id_categoria` int NOT NULL,
-  `nombre` varchar(255) NOT NULL
+  `id_categoria` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Volcado de datos para la tabla `juegos_categorias`
+--
+
+INSERT INTO `juegos_categorias` (`id_juego`, `id_categoria`) VALUES
+(2, 1),
+(4, 1),
+(5, 1),
+(6, 1),
+(7, 1),
+(9, 1),
+(10, 1),
+(13, 1),
+(14, 1),
+(15, 1),
+(16, 1),
+(17, 1),
+(18, 1),
+(101, 1),
+(102, 1),
+(103, 1),
+(104, 1),
+(105, 1),
+(106, 1),
+(107, 1),
+(108, 1),
+(109, 1),
+(110, 1),
+(111, 1),
+(112, 1),
+(113, 1),
+(114, 1),
+(115, 1),
+(116, 1),
+(117, 1),
+(118, 1),
+(119, 1),
+(120, 1),
+(121, 1),
+(122, 1),
+(123, 1),
+(124, 1),
+(125, 1),
+(126, 1),
+(127, 1),
+(128, 1),
+(129, 1),
+(7, 2),
+(9, 2),
+(10, 2),
+(11, 2),
+(16, 2),
+(2, 3),
+(4, 3),
+(8, 3),
+(15, 3),
+(17, 3),
+(3, 4),
+(11, 4),
+(14, 5),
+(1, 6),
+(13, 6),
+(3, 7),
+(1, 8),
+(1, 9),
+(4, 10),
+(5, 10),
+(6, 10),
+(7, 10),
+(9, 10),
+(10, 10),
+(12, 10),
+(18, 10),
+(103, 10),
+(104, 10),
+(105, 10),
+(106, 10),
+(107, 10),
+(108, 10),
+(109, 10),
+(110, 10),
+(111, 10),
+(112, 10),
+(113, 10),
+(114, 10),
+(115, 10),
+(116, 10),
+(117, 10),
+(118, 10),
+(119, 10),
+(120, 10),
+(121, 10),
+(122, 10),
+(123, 10),
+(124, 10),
+(125, 10),
+(126, 10),
+(127, 10),
+(128, 10),
+(129, 10),
+(5, 11),
+(101, 11),
+(102, 11),
+(12, 15),
+(8, 18);
 
 -- --------------------------------------------------------
 
@@ -425,6 +559,59 @@ CREATE TABLE `partidas` (
   `fecha` datetime DEFAULT NULL,
   `tiempo` time DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Volcado de datos para la tabla `partidas`
+--
+
+INSERT INTO `partidas` (`id_partida`, `id_usuario`, `id_juego`, `fecha`, `tiempo`) VALUES
+(1, 0, 1, '2026-01-10 10:00:00', '05:30:00'),
+(2, 0, 2, '2026-01-12 15:30:00', '12:45:00'),
+(3, 0, 3, '2026-01-15 20:00:00', '45:20:00'),
+(4, 0, 4, '2026-01-18 12:45:00', '80:10:00'),
+(5, 0, 5, '2026-01-20 18:00:00', '15:00:00'),
+(6, 0, 6, '2026-01-22 09:00:00', '02:30:00'),
+(7, 0, 7, '2026-01-25 21:15:00', '34:50:00'),
+(8, 0, 8, '2026-01-28 14:20:00', '08:15:00'),
+(9, 0, 9, '2026-02-01 19:30:00', '56:00:00'),
+(10, 0, 10, '2026-02-03 11:00:00', '120:00:00'),
+(11, 0, 11, '2026-02-05 22:00:00', '95:40:00'),
+(12, 0, 12, '2026-02-07 08:00:00', '22:15:00'),
+(13, 0, 13, '2026-02-10 17:45:00', '18:20:00'),
+(14, 0, 14, '2026-02-12 13:00:00', '04:10:00'),
+(15, 0, 15, '2026-02-14 20:30:00', '42:00:00'),
+(16, 0, 16, '2026-02-16 10:15:00', '31:25:00'),
+(17, 0, 17, '2026-02-18 15:00:00', '27:50:00'),
+(18, 0, 18, '2026-02-20 23:00:00', '50:00:00'),
+(19, 1, 101, '2026-03-01 10:00:00', '15:20:00'),
+(20, 1, 102, '2026-03-02 12:00:00', '08:45:00'),
+(21, 1, 103, '2026-03-03 14:00:00', '12:10:00'),
+(22, 1, 104, '2026-03-04 16:00:00', '25:30:00'),
+(23, 1, 105, '2026-03-05 18:00:00', '04:15:00'),
+(24, 1, 106, '2026-03-06 20:00:00', '19:00:00'),
+(25, 1, 107, '2026-03-07 22:00:00', '07:50:00'),
+(26, 1, 108, '2026-03-08 09:00:00', '33:20:00'),
+(27, 1, 109, '2026-03-09 11:00:00', '11:40:00'),
+(28, 1, 110, '2026-03-10 13:00:00', '02:00:00'),
+(29, 1, 111, '2026-03-11 15:00:00', '05:30:00'),
+(30, 1, 112, '2026-03-12 17:00:00', '14:20:00'),
+(31, 1, 113, '2026-03-13 19:00:00', '21:10:00'),
+(32, 1, 114, '2026-03-14 21:00:00', '09:00:00'),
+(33, 1, 115, '2026-03-15 23:00:00', '18:45:00'),
+(34, 1, 116, '2026-03-20 10:00:00', '30:00:00'),
+(35, 1, 117, '2026-03-21 12:00:00', '12:15:00'),
+(36, 1, 118, '2026-03-22 14:00:00', '07:40:00'),
+(37, 1, 119, '2026-03-23 16:00:00', '15:20:00'),
+(38, 1, 120, '2026-03-24 18:00:00', '40:00:00'),
+(39, 1, 121, '2026-03-25 20:00:00', '22:30:00'),
+(40, 1, 122, '2026-03-26 22:00:00', '05:10:00'),
+(41, 1, 123, '2026-03-27 09:00:00', '11:00:00'),
+(42, 1, 124, '2026-03-28 11:00:00', '03:45:00'),
+(43, 1, 125, '2026-03-29 13:00:00', '08:20:00'),
+(44, 1, 126, '2026-03-30 15:00:00', '14:50:00'),
+(45, 1, 127, '2026-03-31 17:00:00', '26:15:00'),
+(46, 1, 128, '2026-04-01 19:00:00', '02:30:00'),
+(47, 1, 129, '2026-04-02 21:00:00', '10:00:00');
 
 -- --------------------------------------------------------
 
@@ -486,11 +673,11 @@ CREATE TABLE `suscripciones` (
 --
 
 INSERT INTO `suscripciones` (`id_suscripcion`, `nombre`, `descripcion`, `precio`) VALUES
-(1, 'Gratis', 'Acceso limitado a juegos antiguos', 0.00),
-(2, 'Bronce', 'Acceso a 50 juegos y guardado en la nube', 4.99),
-(3, 'Plata', 'Acceso a 200 juegos y descuentos exclusivos', 9.99),
-(4, 'Oro', 'Acceso total a todo el catálogo y betas', 14.99),
-(8, 'Prueba', NULL, NULL);
+(0, 'Gratis', 'Acceso limitado a juegos antiguos', 0.00),
+(1, 'Plata', 'Acceso a 200 juegos y descuentos exclusivos', 9.99),
+(2, 'Oro', 'Acceso total a todo el catálogo y betas', 14.99),
+(3, 'Bronce', 'Acceso a 50 juegos y guardado en la nube', 4.99),
+(4, 'Prueba', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -518,8 +705,8 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id_usuario`, `id_suscripcion`, `id_rol`, `alias`, `password`, `token`, `nombre`, `apellidos`, `email`, `fecha_suscripcion`, `fecha_creacion`, `id_avatar`) VALUES
-(1, 4, 0, 'admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU1NjIyMDAsImRhdGEiOnsiaWQiOiIxIiwibm9tYnJlIjoiYWRtaW4ifX0.mntfKgRGJlmEBv_UNBLiWv6nxN8trWTR8O1HKtIYNGQ', 'Administrador', 'García', 'admin@ejemplo.com', '2024-01-15', '2026-04-03 19:34:55', 20),
-(16, 1, 1, 'usuario', '9250e222c4c71f0c58d4c54b50a880a312e9f9fed55d5c3aa0b0e860ded99165', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU1NjIxMzQsImRhdGEiOnsiaWQiOiIxNiIsIm5vbWJyZSI6InVzdWFyaW8ifX0.VcPJII1aXuoLz23UNuMSy5zIbcEhUDAIClGBdKeEsVc', 'usuario nombre', 'usuario apellido', 'usuario@test.com', NULL, '2026-04-07 11:35:29', NULL);
+(0, 2, 0, 'admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU1NjIyMDAsImRhdGEiOnsiaWQiOiIxIiwibm9tYnJlIjoiYWRtaW4ifX0.mntfKgRGJlmEBv_UNBLiWv6nxN8trWTR8O1HKtIYNGQ', 'Administrador', 'García', 'admin@ejemplo.com', '2024-01-15', '2026-04-03 19:34:55', 4),
+(1, 0, 1, 'usuario', '9250e222c4c71f0c58d4c54b50a880a312e9f9fed55d5c3aa0b0e860ded99165', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU1NjIxMzQsImRhdGEiOnsiaWQiOiIxNiIsIm5vbWJyZSI6InVzdWFyaW8ifX0.VcPJII1aXuoLz23UNuMSy5zIbcEhUDAIClGBdKeEsVc', 'usuario nombre', 'usuario apellido', 'usuario@test.com', NULL, '2026-04-07 11:35:29', 5);
 
 --
 -- Índices para tablas volcadas
@@ -648,7 +835,7 @@ ALTER TABLE `juegos`
 -- AUTO_INCREMENT de la tabla `partidas`
 --
 ALTER TABLE `partidas`
-  MODIFY `id_partida` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id_partida` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 
 --
 -- AUTO_INCREMENT de la tabla `roles`
