@@ -1,4 +1,7 @@
 <?php
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
 // 0. Configurar CORS para permitir solicitudes desde el frontend
 $frontendUrl = $_ENV['FRONTEND_URL'] ?? 'http://localhost:4200';
 header("Access-Control-Allow-Origin: $frontendUrl");

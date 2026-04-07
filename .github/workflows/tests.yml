@@ -14,6 +14,7 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
+          # Usamos los secretos que ya tienes configurados
           MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
           MYSQL_DATABASE: ${{ secrets.DB_NAME }}
         ports:
@@ -38,7 +39,6 @@ jobs:
         run: composer install --prefer-dist --no-progress
 
       - name: Configuración de Entorno (.env)
-        # Usamos los secretos configurados en GitHub
         run: |
           echo "DB_HOST=127.0.0.1" >> .env
           echo "DB_USER=${{ secrets.DB_USER }}" >> .env
@@ -47,13 +47,18 @@ jobs:
           echo "DB_PORT=3306" >> .env
           echo "JWT_SECRET=${{ secrets.JWR_SECRET }}" >> .env
 
+      - name: Importar Base de Datos
+        # Cambia 'database/schema.sql' por la ruta real de tu archivo SQL
+        run: mysql -h 127.0.0.1 -u root -proot Nebula_db < database/init.sql 
+        if: always() # Para asegurar que intente importar aunque falte algo
+
       - name: Levantar Servidor API
-        # Apuntamos a la carpeta public detectada
-        run: php -S 127.0.0.1:8000 -t public & 
+        # IMPORTANTE: Usamos public/index.php como router para evitar 404
+        run: php -S 127.0.0.1:8000 -t public public/index.php & 
 
       - name: Esperar a que el servidor esté listo
         run: sleep 3
 
       - name: Ejecutar Pruebas Automáticas
-        # Forzamos a PHPUnit a mirar solo en tests/Feature para evitar el error de "directory not found"
+        # Ejecutamos el Test Maestro que creamos para todos los endpoints
         run: ./vendor/bin/phpunit --colors=always tests/Feature
