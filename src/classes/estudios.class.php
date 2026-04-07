@@ -22,16 +22,14 @@ class estudios extends Database {
      */
     private $allowedConditions_get = array(
         'id_estudio',
-        'nombre',
-        'page'
     );
 
     /**
      * Array con los campos de la tabla que se pueden proporcionar para insertar registros
      */
     private $allowedConditions_insert = array(
-        'nombre',
-        'logo'
+        'nombre_estudio',
+        'logo_estudio'
     );
 
     /**

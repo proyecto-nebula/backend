@@ -21,16 +21,15 @@ class pegi extends Database {
      * Array con los campos de la tabla que se pueden usar como filtro para recuperar registros
      */
     private $allowedConditions_get = array(
-        'id_pegi',
-        'imagen',
-        'page'
+        'id_pegi'
     );
 
     /**
      * Array con los campos de la tabla que se pueden proporcionar para insertar registros
      */
     private $allowedConditions_insert = array(
-        'imagen'
+        'nombre_pegi',
+        'imagen_pegi'
     );
 
     /**

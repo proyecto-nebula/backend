@@ -28,7 +28,7 @@ class roles extends Database {
      * Array con los campos de la tabla que se pueden proporcionar para insertar registros
      */
     private $allowedConditions_insert = array(
-        'nombre'
+        'nombre_rol'
     );
 
     /**

@@ -22,21 +22,21 @@ class usuarios extends Database {
      */
     private $allowedConditions_get = array(
         'id_usuario',
-        'token',
-        'fecha_creacion'
+        'token_usuario',
+        'fecha_creacion_usuario'
     );
 
     /**
      * Array con los campos de la tabla que se pueden proporcionar para insertar registros
      */
     private $allowedConditions_insert = array(
-        'alias',
+        'alias_usuario',
         'id_rol',
-        'password',
-        'nombre',
-        'apellidos',
-        'email',
-        'fecha_suscripcion',
+        'password_usuario',
+        'nombre_usuario',
+        'apellidos_usuario',
+        'email_usuario',
+        'fecha_suscripcion_usuario',
         'id_avatar'
     );
 
@@ -203,14 +203,14 @@ class usuarios extends Database {
     public function getPerfilCompleto($id) {
         $sql = "SELECT 
                     u.id_usuario, 
-                    u.alias, 
-                    u.nombre, 
-                    u.apellidos, 
-                    u.email,
+                    u.alias_usuario, 
+                    u.nombre_usuario, 
+                    u.apellidos_usuario, 
+                    u.email_usuario,
                     r.id_rol,
-                    r.nombre AS nombre_rol,
-                    a.imagen AS imagen_avatar,
-                    s.nombre AS nombre_suscripcion
+                    r.nombre_rol,
+                    a.imagen_avatar,
+                    s.nombre_suscripcion 
                 FROM usuarios u
                 INNER JOIN roles r ON u.id_rol = r.id_rol
                 LEFT JOIN avatares a ON u.id_avatar = a.id_avatar

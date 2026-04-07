@@ -22,15 +22,14 @@ class categorias extends Database {
      */
     private $allowedConditions_get = array(
         'id_categoria',
-        'nombre',
-        'page'
+        'nombre_categoria'
     );
 
     /**
      * Array con los campos de la tabla que se pueden proporcionar para insertar registros
      */
     private $allowedConditions_insert = array(
-        'nombre'
+        'nombre_categoria'
     );
 
     /**

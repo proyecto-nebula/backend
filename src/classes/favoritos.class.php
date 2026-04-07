@@ -22,7 +22,6 @@ class favoritos extends Database {
     private $allowedConditions_get = array(
         'id_usuario', 
         'id_juego', 
-        'page'
     );
 
     /**

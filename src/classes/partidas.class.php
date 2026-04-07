@@ -24,7 +24,7 @@ class partidas extends Database {
         'id_partida',
         'id_usuario',
         'id_juego',
-        'page'
+        'fecha_partida'
     );
 
     /**
@@ -33,8 +33,8 @@ class partidas extends Database {
     private $allowedConditions_insert = array(
         'id_usuario',
         'id_juego',
-        'fecha',
-        'tiempo'
+        'fecha_partida',
+        'tiempo_partida'
     );
 
     /**

@@ -13,16 +13,11 @@ class juegos extends Database {
      * He añadido los sufijos _min y _max para Metacritic y Fecha
      */
     private $allowedConditions_get = array(
-        'id_juego', 'titulo', 'id_desarrollador', 'destacado', 'id_pegi',
-        'id_steam', 'id_igdb', 'metacritic', 'metacritic_min', 'metacritic_max',
-        'fecha_lanzamiento', 'fecha_lanzamiento_min', 'fecha_lanzamiento_max',
-        'fecha_publicacion', 'hero', 'page'
+        'id_juego', 'titulo_juego', 'fecha_lanzamiento_juego', 'metacritic_juego', 'id_pegi', 'fecha_publicacion_juego', 'destacado_juego', 'id_desarollador', 'id_distribuidor'
     );
 
     private $allowedConditions_insert = array(
-        'id_desarrollador', 'id_distribuidor', 'id_pegi', 'id_steam', 'id_igdb',
-        'titulo', 'descripcion_corta', 'descripcion_larga', 'portada_v', 
-        'portada_h', 'hero', 'logo', 'metacritic', 'fecha_lanzamiento', 'destacado'
+        'id_desarrollador', 'id_distribuidor', 'id_pegi', 'id_steam', 'id_igdb', 'titulo_juego', 'descripcion_corta', 'descripcion_larga', 'portada_v', 'portada_h', 'hero_juego', 'logo_juego', 'metacritic_juego', 'fecha_lanzamiento_juego', 'fecha_publicacion_juego', 'destacado_juego'
     );
 
     /**

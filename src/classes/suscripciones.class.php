@@ -28,9 +28,9 @@ class suscripciones extends Database {
 	 * Array con los campos de la tabla que se pueden proporcionar para insertar registros
 	 */
 	private $allowedConditions_insert = array(
-		'nombre',
-        'descripcion',
-        'precio'
+		'nombre_suscripcion',
+        'descripcion_suscripcion',
+        'precio_suscripcion'
 	);
 
 	/**
@@ -38,7 +38,7 @@ class suscripciones extends Database {
 	 */
 	private function validate($data) {
 
-		if (!isset($data['nombre']) || empty($data['nombre']) || !isset($data['descripcion']) || empty($data['descripcion']) || !isset($data['precio']) || empty($data['precio'])) {
+		if (!isset($data['nombre_suscripcion']) || empty($data['nombre_suscripcion']) || !isset($data['descripcion_suscripcion']) || empty($data['descripcion_suscripcion']) || !isset($data['precio_suscripcion']) || empty($data['precio_suscripcion'])) {
 			$response = array(
 				'result' => 'error',
 				'details' => 'El campo nombre, descripcion, y precio son obligatorio'

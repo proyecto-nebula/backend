@@ -21,8 +21,8 @@ class capturas extends Database {
      * Array con los campos de la tabla que se pueden usar como filtro para recuperar registros
      */
     private $allowedConditions_get = array(
-        'id_juego',
-        'page'
+        'id_captura',
+        'id_juego'
     );
 
     /**
@@ -30,7 +30,7 @@ class capturas extends Database {
      */
     private $allowedConditions_insert = array(
         'id_juego',
-        'imagen'
+        'imagen_captura'
     );
 
     /**
