@@ -38,7 +38,16 @@ class ConnectionTest extends TestCase {
 
         foreach ($endpoints as $resource) {
             $url = "/api/v1/$resource";
-            $response = $this->client->request('GET', $url);
+           $response = $this->client->request('GET', $url);
+
+            // Verificamos que el archivo existe (no debe dar 404)
+            $this->assertNotEquals(404, $response->getStatusCode(), "El archivo para $url no existe.");
+            
+            // Solo pedimos JSON si NO es el endpoint de auth (mientras lo arregláis)
+            if ($resource !== 'auth' && $resource !== 'login') {
+                $contentType = $response->getHeaderLine('Content-Type');
+                $this->assertStringContainsString('application/json', $contentType);
+            }
             
             // Verificamos que el servidor responda 200 OK
             $this->assertEquals(
