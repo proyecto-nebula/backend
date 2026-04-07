@@ -138,6 +138,10 @@ class Database
 
 		return $this->connection->affected_rows;
 	}
+
+	public function getConnection() {
+        return $this->connection;
+    }
 }
 
 

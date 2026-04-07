@@ -197,5 +197,37 @@ class usuarios extends Database {
             exit;
         }
     }
+    /**
+     * Método para recuperar toda la información vinculada del usuario
+     */
+    public function getPerfilCompleto($id) {
+        $sql = "SELECT 
+                    u.id_usuario, 
+                    u.alias, 
+                    u.nombre, 
+                    u.apellidos, 
+                    u.email,
+                    r.id_rol,
+                    r.nombre AS nombre_rol,
+                    a.imagen AS imagen_avatar,
+                    s.nombre AS nombre_suscripcion
+                FROM usuarios u
+                INNER JOIN roles r ON u.id_rol = r.id_rol
+                LEFT JOIN avatares a ON u.id_avatar = a.id_avatar
+                INNER JOIN suscripciones s ON u.id_suscripcion = s.id_suscripcion
+                WHERE u.id_usuario = $id";
+                
+        // Obtenemos la conexión mysqli de la clase padre
+        $db = $this->getConnection();
+        $result = $db->query($sql);
+
+        // Si hay resultados, devolvemos la primera fila como array asociativo
+        if ($result && $result->num_rows > 0) {
+            return $result->fetch_assoc();
+        }
+
+        return null;
+    }
+    
 }
 ?>
