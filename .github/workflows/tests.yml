@@ -1,0 +1,68 @@
+name: CI Nebula Auto-Testing
+
+on:
+  push:
+    branches: [ main, master, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.DB_NAME }}
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Instalación de PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, mysql, curl, json
+          # Activamos logs de error para debuguear el 500
+          ini-values: display_errors=On, error_reporting=E_ALL
+
+      - name: Instalación de Dependencias
+        run: composer install --prefer-dist --no-progress
+
+      - name: Configuración de Entorno (.env)
+        run: |
+          echo "DB_HOST=127.0.0.1" >> .env
+          echo "DB_USER=root" >> .env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
+          echo "DB_PORT=3306" >> .env
+          echo "JWT_SECRET=${{ secrets.JWR_SECRET }}" >> .env
+
+      - name: Importar Base de Datos
+        # Usamos la ruta detectada en tus logs anteriores
+        run: mysql -h 127.0.0.1 -u root -p${{ secrets.DB_PASSWORD }} ${{ secrets.DB_NAME }} < database/init.sql
+
+      - name: Levantar Servidor API
+        # Canalizamos los errores a un archivo para poder leerlos si falla
+        run: php -S 127.0.0.1:8000 -t public public/index.php > php_server_log.txt 2>&1 & 
+
+      - name: Esperar a que el servidor esté listo
+        run: sleep 3
+
+      - name: Ejecutar Pruebas Automáticas
+        run: ./vendor/bin/phpunit --colors=always tests/Feature
+
+      - name: Mostrar Logs de PHP si hay error
+        # Este paso solo se ejecuta si los tests fallan
+        if: failure()
+        run: cat php_server_log.txt
