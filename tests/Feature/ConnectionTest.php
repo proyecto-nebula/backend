@@ -6,7 +6,7 @@ class ConnectionTest extends TestCase {
     /** @test */
     public function test_db_connection() {
     // Forzamos la lectura de las variables configuradas en el YAML
-    $host = '127.0.0.1';
+    $host = 'db';
     $user = getenv('DB_USER') ?: 'root'; 
     $pass = getenv('DB_PASSWORD') ?: 'root';
     $db   = getenv('DB_NAME') ?: 'Nebula_db';
