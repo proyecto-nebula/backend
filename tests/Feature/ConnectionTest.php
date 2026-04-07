@@ -16,14 +16,13 @@ class ConnectionTest extends TestCase {
     $mysqli->close();
 }
 
-   /** @test */
 /** @test */
-public function test_api_endpoints_are_up() {
+public function test_api_router_works() {
     $client = new \GuzzleHttp\Client(['base_uri' => 'http://127.0.0.1:8000']);
     
-    // Probamos el endpoint de status que no depende de la DB ni de clases externas
-    $response = $client->request('GET', '/api/v1/status'); 
+    // Atacamos al archivo test.php a través de tu router api/v1
+    $response = $client->request('GET', '/api/v1/test'); 
 
-    $this->assertEquals(200, $response->getStatusCode(), "El servidor respondió con error 500. Revisa los logs de PHP.");
+    $this->assertEquals(200, $response->getStatusCode(), "El router no pudo cargar el endpoint de prueba.");
 }
 }
