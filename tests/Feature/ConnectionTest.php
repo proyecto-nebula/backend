@@ -12,6 +12,27 @@ class ConnectionTest extends TestCase {
             'timeout' => 10
         ]);
     }
+    public function test_auth_endpoint_response() {
+        $client = new \GuzzleHttp\Client([
+            'base_uri' => 'http://127.0.0.1:8000',
+            'http_errors' => false // Evita que el test explote si devuelve 401 o 500
+        ]);
+
+        // Enviamos un POST simulando un intento de login
+        $response = $client->request('POST', '/api/v1/auth', [
+            'form_params' => [
+                'alias' => 'admin',
+                'password' => 'admin123'
+            ]
+        ]);
+
+        $status = $response->getStatusCode();
+
+        // Consideramos "éxito" si el servidor responde algo coherente:
+        // 200 (Login OK), 401 (No autorizado), o 400 (Faltan datos)
+        // Lo que NO queremos es un 500 (Error de código) o 404 (No encontrado)
+        $this->assertContains($status, [200, 401, 400], "El endpoint de Auth devolvió un error crítico: $status");
+    }
 
     /** @test */
     public function test_api_endpoints_health() {
