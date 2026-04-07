@@ -32,14 +32,14 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mbstring, mysql, curl, json
-          # Activamos logs de error para debuguear el 500
+          extensions: mbstring, mysql, curl, json, gd
           ini-values: display_errors=On, error_reporting=E_ALL
 
       - name: Instalación de Dependencias
         run: composer install --prefer-dist --no-progress
 
       - name: Configuración de Entorno (.env)
+        # Aquí mapeamos tus secretos a las variables que el MVC espera
         run: |
           echo "DB_HOST=127.0.0.1" >> .env
           echo "DB_USER=root" >> .env
@@ -49,20 +49,21 @@ jobs:
           echo "JWT_SECRET=${{ secrets.JWR_SECRET }}" >> .env
 
       - name: Importar Base de Datos
-        # Usamos la ruta detectada en tus logs anteriores
+        # Usamos la ruta detectada en tu repositorio: database/init.sql
         run: mysql -h 127.0.0.1 -u root -p${{ secrets.DB_PASSWORD }} ${{ secrets.DB_NAME }} < database/init.sql
 
       - name: Levantar Servidor API
-        # Canalizamos los errores a un archivo para poder leerlos si falla
+        # IMPORTANTE: Forzamos el ruteo a través de index.php para que las rutas amigables funcionen
         run: php -S 127.0.0.1:8000 -t public public/index.php > php_server_log.txt 2>&1 & 
 
       - name: Esperar a que el servidor esté listo
-        run: sleep 3
+        run: sleep 5
 
       - name: Ejecutar Pruebas Automáticas
+        # Ejecuta los tests de la carpeta Feature que creamos
         run: ./vendor/bin/phpunit --colors=always tests/Feature
 
       - name: Mostrar Logs de PHP si hay error
-        # Este paso solo se ejecuta si los tests fallan
+        # Si los tests fallan (como el 500 de auth), esto nos dirá por qué en la consola
         if: failure()
         run: cat php_server_log.txt
