@@ -5,7 +5,7 @@
 require_once __DIR__ . '/../utils/response.php';
 require_once __DIR__ . '/../models/database.php';
 
-class suscripciones extends Database {
+class suscripcion extends Database {
 	/**
 	 * Atributo que indica la tabla asociada a la clase del modelo
 	 */
