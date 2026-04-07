@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 07-04-2026 a las 12:01:09
+-- Tiempo de generación: 07-04-2026 a las 12:06:39
 -- Versión del servidor: 8.0.45
 -- Versión de PHP: 8.3.30
 
@@ -465,10 +465,8 @@ CREATE TABLE `roles` (
 --
 
 INSERT INTO `roles` (`id_rol`, `nombre`) VALUES
-(1, 'Administrador'),
-(2, 'Moderador'),
-(3, 'Usuario Premium'),
-(4, 'Usuario Estándar');
+(0, 'Administrador'),
+(1, 'Usuario');
 
 -- --------------------------------------------------------
 
@@ -520,13 +518,8 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id_usuario`, `id_suscripcion`, `id_rol`, `alias`, `password`, `token`, `nombre`, `apellidos`, `email`, `fecha_suscripcion`, `fecha_creacion`, `id_avatar`) VALUES
-(1, 4, 1, 'admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU1NjIyMDAsImRhdGEiOnsiaWQiOiIxIiwibm9tYnJlIjoiYWRtaW4ifX0.mntfKgRGJlmEBv_UNBLiWv6nxN8trWTR8O1HKtIYNGQ', 'Administrador', 'García', 'admin@ejemplo.com', '2024-01-15', '2026-04-03 19:34:55', 20),
-(2, 1, 4, 'jdoe', '9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzUyNDY2NjksImRhdGEiOnsiaWQiOiIyIiwibm9tYnJlIjoiamRvZSJ9fQ.bz6efugRAQO7ZyNRfbj_3VyaoxxI6tNigs_0lRmUhlw', 'John', 'Doe', 'john@mail.com', '2024-02-10', '2026-04-03 19:34:55', 9),
-(3, 3, 3, 'akira_san', 'f29185ab577d8702dc4e6faa00f364abf359dca0020f3c9f88a243b29b0305c8', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzQ5NjAzODAsImRhdGEiOnsiaWQiOiIzIiwibm9tYnJlIjoiQWtpcmEifX0.PsKyLxMf5PVoBlBRA1ymIOjEezxbP8s5OignVkA_LQU', 'Akira', 'Tanaka', 'akira@mail.jp', '2024-03-01', '2026-04-03 19:34:55', 4),
-(4, 2, 4, 'marie_fr', 'c3255ad8dad4cd57a29f3a61293003d5aca4447c0e7846173fb0fb6b186b62ee', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzQ5NjA0MjIsImRhdGEiOnsiaWQiOiI0Iiwibm9tYnJlIjoiTWFyaWUifX0.7Kfolgbx91ScyjEqRFs89A3HFAgFCw0lVn2yVDrOquY', 'Marie', 'Dubois', 'marie@mail.fr', '2024-02-20', '2026-04-03 19:34:55', 2),
-(5, 4, 1, 'superadmin', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzQ5NTg3ODAsImRhdGEiOnsiaWQiOiI1Iiwibm9tYnJlIjoiU3VwZXIifX0.oCWSw6zT5d640mZYvrkf3VY0C4etEj9aVpF5hw3zvwo', 'Super', 'Admin', 'super@proyecto.com', '2026-03-31', '2026-04-03 19:34:55', 18),
-(11, 1, 4, 'NuevoUsuario', '607e2cb7dda0621e99f121fdad9b0207a62387c20937a290cc4c95b25cfee9b7', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU1NjE4NDgsImRhdGEiOnsiaWQiOiIxMSIsIm5vbWJyZSI6Ik51ZXZvVXN1YXJpbyJ9fQ.RYh4iF2n61y8peIQcf0QTjnXCAlC7okyqWAhpY3RG9A', 'Pepe', 'Pérez', 'pepe@email.com', NULL, '2026-04-03 20:04:43', 10),
-(16, 1, 4, 'usuario', '9250e222c4c71f0c58d4c54b50a880a312e9f9fed55d5c3aa0b0e860ded99165', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU1NjIxMzQsImRhdGEiOnsiaWQiOiIxNiIsIm5vbWJyZSI6InVzdWFyaW8ifX0.VcPJII1aXuoLz23UNuMSy5zIbcEhUDAIClGBdKeEsVc', 'usuario nombre', 'usuario apellido', 'usuario@test.com', NULL, '2026-04-07 11:35:29', NULL);
+(1, 4, 0, 'admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU1NjIyMDAsImRhdGEiOnsiaWQiOiIxIiwibm9tYnJlIjoiYWRtaW4ifX0.mntfKgRGJlmEBv_UNBLiWv6nxN8trWTR8O1HKtIYNGQ', 'Administrador', 'García', 'admin@ejemplo.com', '2024-01-15', '2026-04-03 19:34:55', 20),
+(16, 1, 1, 'usuario', '9250e222c4c71f0c58d4c54b50a880a312e9f9fed55d5c3aa0b0e860ded99165', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU1NjIxMzQsImRhdGEiOnsiaWQiOiIxNiIsIm5vbWJyZSI6InVzdWFyaW8ifX0.VcPJII1aXuoLz23UNuMSy5zIbcEhUDAIClGBdKeEsVc', 'usuario nombre', 'usuario apellido', 'usuario@test.com', NULL, '2026-04-07 11:35:29', NULL);
 
 --
 -- Índices para tablas volcadas
