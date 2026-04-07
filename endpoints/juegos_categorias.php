@@ -4,12 +4,12 @@
  */
 require_once  __DIR__ . '/../src/utils/response.php';
 require_once __DIR__ . '/../src/classes/auth.class.php';
-require_once __DIR__ . '/../src/classes/JUEGOS_CATEGORIAS.class.php';
+require_once __DIR__ . '/../src/classes/juegos_categorias.class.php';
 
 $auth = new Authentication();
 $auth->verify();
 
-$item = new JUEGOS_CATEGORIAS();
+$item = new juegos_categorias();
 
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
