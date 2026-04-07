@@ -20,7 +20,7 @@ class ConnectionTest extends TestCase {
         $host = '127.0.0.1';
         $user = getenv('DB_USER') ?: 'root';
         $pass = getenv('DB_PASSWORD') ?: 'root';
-        $db   = getenv('DB_NAME') ?: 'Nebula_db';
+        $db   = getenv('DB_NAME') ?: 'nebula_db';
 
         $mysqli = new mysqli($host, $user, $pass, $db);
         $this->assertNull($mysqli->connect_error, "Error conectando a la DB: " . $mysqli->connect_error);
