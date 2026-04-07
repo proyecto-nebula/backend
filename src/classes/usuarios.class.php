@@ -9,7 +9,7 @@ class usuarios extends Database {
     /**
      * Atributo que indica la tabla asociada a la clase del modelo
      */
-    private $table = 'USUARIOS';
+    private $table = 'usuarios';
 
     /**
      * Atributo que indica la columna que es primary key en la tabla

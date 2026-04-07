@@ -38,13 +38,13 @@ class AuthModel
 
     /**
      * Método para autentificarse en la API
-     * Corregido: nombre de tabla 'USUARIOS' y columna 'nombre'
+     * Corregido: nombre de tabla 'usuarios' y columna 'nombre'
      */
     public function login($usuario, $password)
     {
        
-        // En tu SQL la tabla es USUARIOS y la columna es nombre (no nombres)
-        $query = "SELECT id_usuario, alias FROM USUARIOS WHERE alias = '$usuario' AND password = '$password'";
+        // En tu SQL la tabla es usuarios y la columna es nombre (no nombres)
+        $query = "SELECT id_usuario, alias FROM usuarios WHERE alias = '$usuario' AND password = '$password'";
 
         $results = $this->connection->query($query);
 
@@ -61,12 +61,12 @@ class AuthModel
 
     /**
      * Método para actualizar el token de un usuario con un determinado id
-     * Corregido: nombre de tabla 'USUARIOS' e 'id_usuario'
+     * Corregido: nombre de tabla 'usuarios' e 'id_usuario'
      */
     public function update($id, $token)
     {
-        // Corregido: id_usuario y USUARIOS
-        $query = "UPDATE USUARIOS SET token = '$token' WHERE id_usuario = $id";
+        // Corregido: id_usuario y usuarios
+        $query = "UPDATE usuarios SET token = '$token' WHERE id_usuario = $id";
 
         $this->connection->query($query);
         
@@ -84,7 +84,7 @@ class AuthModel
     public function getById($id)
     {
         // Corregido: id_usuario y tabla USUARIOS
-        $query = "SELECT token FROM USUARIOS WHERE id_usuario = $id";
+        $query = "SELECT token FROM usuarios WHERE id_usuario = $id";
 
         $results = $this->connection->query($query);
 

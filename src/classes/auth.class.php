@@ -15,7 +15,7 @@ class Authentication extends AuthModel
     /**
      * Tabla donde estarán los usuarios (Ajustado a tu SQL: USUARIOS)
      */
-    private $table = 'USUARIOS';
+    private $table = 'usuarios';
 
     /**
      * Clave secreta para realizar la encriptación y desencriptación del token

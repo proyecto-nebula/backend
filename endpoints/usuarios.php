@@ -10,7 +10,7 @@ require_once __DIR__ . '/../src/classes/usuarios.class.php';
 $auth = new Authentication();
 $auth->verify();
 
-$item = new USUARIOS();
+$item = new usuarios();
 
 /**
  * Se mira el tipo de petición que ha llegado a la API
