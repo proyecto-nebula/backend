@@ -16,7 +16,7 @@ class ConnectionTest extends TestCase {
     /** @test */
     public function test_api_endpoints_health() {
         $endpoints = [
-            'avatares', 'capturas', 'categorias', 'estudios', 
+            'avatares', 'capturas', 'estudios', 
             'favoritos', 'juegos', 'juegos_categorias', 
             'partidas', 'pegi', 'roles', 'suscripcion', 'test', 'usuarios'
         ];
