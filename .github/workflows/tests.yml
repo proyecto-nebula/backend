@@ -46,7 +46,7 @@ jobs:
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
           echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
           echo "DB_PORT=3306" >> .env
-          echo "JWT_SECRET=${{ secrets.JWR_SECRET }}" >> .env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
 
       - name: Importar Base de Datos
         # Usamos la ruta detectada en tu repositorio: database/init.sql
