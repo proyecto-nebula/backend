@@ -4,7 +4,7 @@
  */
 require_once  __DIR__ . '/../src/utils/response.php';
 require_once __DIR__ . '/../src/classes/auth.class.php';
-require_once __DIR__ . '/../src/classes/esudios.class.php';
+require_once __DIR__ . '/../src/classes/estudios.class.php';
 
 $auth = new Authentication();
 $auth->verify();
