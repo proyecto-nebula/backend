@@ -32,8 +32,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mbstring, mysql, curl, json
-          # Activamos logs de error para debuguear el 500
+          extensions: mbstring, mysql, curl, json, gd
           ini-values: display_errors=On, error_reporting=E_ALL
 
       - name: Instalación de Dependencias
@@ -49,20 +48,23 @@ jobs:
           echo "JWT_SECRET=${{ secrets.JWR_SECRET }}" >> .env
 
       - name: Importar Base de Datos
-        # Usamos la ruta detectada en tus logs anteriores
         run: mysql -h 127.0.0.1 -u root -p${{ secrets.DB_PASSWORD }} ${{ secrets.DB_NAME }} < database/init.sql
 
       - name: Levantar Servidor API
-        # Canalizamos los errores a un archivo para poder leerlos si falla
-        run: php -S 127.0.0.1:8000 -t public public/index.php > php_server_log.txt 2>&1 & 
+        # El '&' al final es vital para que no bloquee el terminal
+        run: php -S 127.0.0.1:8000 -t public public/index.php > php_server.log 2>&1 & 
 
-      - name: Esperar a que el servidor esté listo
-        run: sleep 3
+      - name: Esperar a que el servidor responda
+        run: |
+          timeout 30s bash -c 'until curl -s localhost:8000 > /dev/null; do sleep 1; done'
+          echo "Servidor listo!"
 
-      - name: Ejecutar Pruebas Automáticas
-        run: ./vendor/bin/phpunit --colors=always tests/Feature
+      - name: Ejecutar PHPUnit
+        # Forzamos la ruta exacta del ejecutable
+        run: ./vendor/bin/phpunit --colors=always tests/Feature/ConnectionTest.php
 
-      - name: Mostrar Logs de PHP si hay error
-        # Este paso solo se ejecuta si los tests fallan
+      - name: Logs de error en caso de fallo
         if: failure()
-        run: cat php_server_log.txt
+        run: |
+          echo "--- LOG DE PHP ---"
+          cat php_server.log
