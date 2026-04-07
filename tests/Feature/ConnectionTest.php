@@ -18,7 +18,7 @@ class ConnectionTest extends TestCase {
 
    /** @test */
 public function test_api_endpoints_are_up() {
-    $client = new \GuzzleHttp\Client(['base_uri' => 'http://127.0.0.1:8000']);
+    $client = new \GuzzleHttp\Client(['base_uri' => 'http://db:8000']);
     
     // IMPORTANTE: La ruta debe empezar con /api/v1/ seguido de un recurso real
     // Ejemplo: /api/v1/juegos o /api/v1/usuarios
