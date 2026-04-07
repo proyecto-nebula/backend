@@ -48,8 +48,7 @@ jobs:
           echo "JWT_SECRET=${{ secrets.JWR_SECRET }}" >> .env
 
       - name: Levantar Servidor API
-        # Apuntamos a la carpeta public detectada
-        run: php -S 127.0.0.1:8000 -t public & 
+        run: php -S 127.0.0.1:8000 -t public public/index.php &
 
       - name: Esperar a que el servidor esté listo
         run: sleep 3
