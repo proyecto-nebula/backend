@@ -39,7 +39,6 @@ jobs:
         run: composer install --prefer-dist --no-progress
 
       - name: Configuración de Entorno (.env)
-        # Aseguramos que las variables coincidan con lo que tu código busca
         run: |
           echo "DB_HOST=127.0.0.1" >> .env
           echo "DB_USER=root" >> .env
@@ -49,21 +48,23 @@ jobs:
           echo "JWT_SECRET=${{ secrets.JWR_SECRET }}" >> .env
 
       - name: Importar Base de Datos
-        # Usamos el archivo que tienes en tu repo
         run: mysql -h 127.0.0.1 -u root -p${{ secrets.DB_PASSWORD }} ${{ secrets.DB_NAME }} < database/init.sql
 
       - name: Levantar Servidor API
-        # Redirigimos errores a un log visible
-        run: php -S 127.0.0.1:8000 -t public public/index.php > php_error.log 2>&1 & 
+        # El '&' al final es vital para que no bloquee el terminal
+        run: php -S 127.0.0.1:8000 -t public public/index.php > php_server.log 2>&1 & 
 
-      - name: Esperar a que el servidor esté listo
-        run: sleep 5
+      - name: Esperar a que el servidor responda
+        run: |
+          timeout 30s bash -c 'until curl -s localhost:8000 > /dev/null; do sleep 1; done'
+          echo "Servidor listo!"
 
-      - name: Ejecutar Pruebas Automáticas
-        run: ./vendor/bin/phpunit --colors=always tests/Feature
+      - name: Ejecutar PHPUnit
+        # Forzamos la ruta exacta del ejecutable
+        run: ./vendor/bin/phpunit --colors=always tests/Feature/ConnectionTest.php
 
-      - name: Debug: Mostrar errores de PHP si falla
+      - name: Logs de error en caso de fallo
         if: failure()
         run: |
-          echo "--- LOG DEL SERVIDOR PHP ---"
-          cat php_error.log
+          echo "--- LOG DE PHP ---"
+          cat php_server.log
