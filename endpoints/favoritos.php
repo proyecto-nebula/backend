@@ -4,11 +4,11 @@
  */
 require_once  __DIR__ . '/../src/utils/response.php';
 require_once __DIR__ . '/../src/classes/auth.class.php';
-require_once __DIR__ . '/../src/classes/FAVORITOS.class.php';
+require_once __DIR__ . '/../src/classes/favoritos.class.php';
 
 $auth = new Authentication();
 $auth->verify();
-$item = new FAVORITOS();
+$item = new favoritos();
 
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
