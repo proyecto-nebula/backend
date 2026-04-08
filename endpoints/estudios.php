@@ -4,12 +4,12 @@
  */
 require_once  __DIR__ . '/../src/utils/response.php';
 require_once __DIR__ . '/../src/classes/auth.class.php';
-require_once __DIR__ . '/../src/classes/ESTUDIOS.class.php';
+require_once __DIR__ . '/../src/classes/estudios.class.php';
 
 $auth = new Authentication();
 $auth->verify();
 
-$item = new ESTUDIOS();
+$item = new estudios();
 
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':

@@ -14,11 +14,11 @@ class AuthModel
     
     public function __construct(){
         
-        $this->host = getenv('DB_HOST');
-		$this->db = getenv('DB_NAME');
-		$this->user = getenv('DB_USER');
-		$this->password = getenv('DB_PASSWORD');
-		$this->port = getenv('DB_PORT');
+        $this->host     = getenv('DB_HOST')     ?: '127.0.0.1';
+    $this->db       = getenv('DB_NAME')     ?: 'nebula_db'; // Asegúrate que coincida con tu SQL
+    $this->user     = getenv('DB_USER')     ?: 'root';
+    $this->password = getenv('DB_PASSWORD') ?: 'root'; // En GitHub Actions es la que pongas en Secrets
+    $this->port     = getenv('DB_PORT')     ?: '3306';
         // Ajustado a los datos de tu SQL y servidor db
         //$this->connection = new mysqli('db', 'root', 'root', 'Proyecto_Final', '3306');
         $this->connection = new mysqli(

@@ -4,12 +4,12 @@
  */
 require_once  __DIR__ . '/../src/utils/response.php';
 require_once __DIR__ . '/../src/classes/auth.class.php';
-require_once __DIR__ . '/../src/classes/PARTIDAS.class.php';
+require_once __DIR__ . '/../src/classes/partidas.class.php';
 
 $auth = new Authentication();
 $auth->verify();
 
-$item = new PARTIDAS();
+$item = new partidas();
 
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
