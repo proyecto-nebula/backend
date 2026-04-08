@@ -21,8 +21,8 @@ class ConnectionTest extends TestCase {
         // Enviamos un POST simulando un intento de login
         $response = $client->request('POST', '/api/v1/auth', [
             'form_params' => [
-                'alias' => 'admin',
-                'password' => 'admin123'
+                'alias_usuario' => 'admin',
+                'password_usuario' => 'admin123'
             ]
         ]);
 
