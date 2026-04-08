@@ -38,10 +38,10 @@ public function __construct() {
      */
     public function signIn($user)
     {
-        if(!isset($user['alias']) || !isset($user['password']) || empty($user['alias']) || empty($user['password'])){
+        if(!isset($user['email_usuario']) || !isset($user['password_usuario']) || empty($user['email_usuario']) || empty($user['password_usuario'])){
             $response = array(
                 'result' => 'error',
-                'details' => 'Los campos password y alias son obligatorios'
+                'details' => 'Los campos password y el email son obligatorios'
             );
             
             Response::result(400, $response);
@@ -50,12 +50,12 @@ public function __construct() {
 
         // Importante: En los datos random que insertamos, las contraseñas no tienen hash. 
         // Si vas a usar hash('sha256'...), asegúrate de que en la BD estén hasheadas.
-        $result = parent::login($user['alias'], hash('sha256' , $user['password']));
+        $result = parent::login($user['email_usuario'], hash('sha256' , $user['password_usuario']));
 
         if(sizeof($result) == 0){
             $response = array(
                 'result' => 'error',
-                'details' => 'El alias y/o la contraseña son incorrectas'
+                'details' => 'El email y/o la contraseña son incorrectas'
             );
 
             Response::result(403, $response);
@@ -67,7 +67,7 @@ public function __construct() {
             'iat' => time(),
             'data' => array(
                 'id' => $result[0]['id_usuario'],
-                'nombre' => $result[0]['alias']
+                'nombre' => $result[0]['email_usuario']
             )
         );
 
