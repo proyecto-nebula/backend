@@ -51,14 +51,14 @@ jobs:
 
       - name: Importar Base de Datos
         run: mysql -h 127.0.0.1 -u root -p${{ secrets.DB_PASSWORD }} ${{ secrets.DB_NAME }} < database/init.sql
-
+        
       - name: Levantar Servidor API
         env:
           DB_HOST: 127.0.0.1
           DB_NAME: ${{ secrets.DB_NAME }}
           DB_USER: root
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_PORT: 3306
+          JWT_SECRET: ${{ secrets.JWT_SECRET }} # ¡Asegúrate de que esto esté aquí!
         run: php -S 127.0.0.1:8000 -t public public/index.php > php_server.log 2>&1 &
 
       - name: Esperar a que el servidor responda
