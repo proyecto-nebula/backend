@@ -48,11 +48,11 @@ class usuarios extends Database {
     private function validate($data) {
         // Comprobamos que todos los campos requeridos existan y no estén vacíos
         if (
-            !isset($data['alias']) || empty($data['alias']) ||
-            !isset($data['password']) || empty($data['password']) ||
-            !isset($data['nombre']) || empty($data['nombre']) ||
-            !isset($data['apellidos']) || empty($data['apellidos']) ||
-            !isset($data['email']) || empty($data['email']) 
+            !isset($data['alias_usuario']) || empty($data['alias_usuario']) ||
+            !isset($data['password_usuario']) || empty($data['password_usuario']) ||
+            !isset($data['nombre_usuario']) || empty($data['nombre_usuario']) ||
+            !isset($data['apellidos_usuario']) || empty($data['apellidos_usuario']) ||
+            !isset($data['email_usuario']) || empty($data['email_usuario']) 
         ) {
             $response = array(
                 'result' => 'error',
@@ -64,7 +64,7 @@ class usuarios extends Database {
         }
 
         // Encriptamos la contraseña en formato sha256 antes de guardarla en la base de datos
-        $data['password'] = hash('sha256', $data['password']);
+        $data['password_usuario'] = hash('sha256', $data['password_usuario']);
 
         return $data;
     }

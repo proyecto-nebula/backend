@@ -36,7 +36,7 @@ class juegos extends Database {
     }
 
     private function validate($data) {
-        if (!isset($data['titulo']) || empty($data['titulo'])) {
+        if (!isset($data['titulo_juego']) || empty($data['titulo_juego'])) {
             Response::result(400, array('result' => 'error', 'details' => 'El campo titulo es obligatorio'));
             exit;
         }
