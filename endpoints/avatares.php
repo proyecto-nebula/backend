@@ -21,15 +21,15 @@ switch ($_SERVER['REQUEST_METHOD']) {
         Response::result(201, array('result' => 'ok', 'insert_id' => $insert_id));
         break;
     case 'PUT':
-        $item->updatePut($_GET['id_idioma'], json_decode(file_get_contents('php://input'), true));
+        $item->updatePut($_GET['id_avatar'], json_decode(file_get_contents('php://input'), true));
         Response::result(200, array('result' => 'ok'));
         break;
     case 'PATCH':
-        $item->updatePatch($_GET['id_idioma'], json_decode(file_get_contents('php://input'), true));
+        $item->updatePatch($_GET['id_avatar'], json_decode(file_get_contents('php://input'), true));
         Response::result(200, array('result' => 'ok'));
         break;
     case 'DELETE':
-        $item->delete($_GET['id_idioma']);
+        $item->delete($_GET['id_avatar']);
         Response::result(200, array('result' => 'ok'));
         break;
     default:

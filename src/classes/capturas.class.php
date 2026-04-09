@@ -58,7 +58,7 @@ class capturas extends Database {
      */
     private function validate($data) {
 
-        if (!isset($data['id_juego']) || empty($data['id_juego']) || !isset($data['imagen']) || empty($data['imagen'])) {
+        if (!isset($data['id_juego']) || empty($data['id_juego']) || !isset($data['imagen_captura']) || empty($data['imagen_captura'])) {
             $response = array(
                 'result' => 'error',
                 'details' => 'Los campos id_juego e imagen son obligatorios'

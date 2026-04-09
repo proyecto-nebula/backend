@@ -28,6 +28,7 @@ class pegi extends Database {
      * Array con los campos de la tabla que se pueden proporcionar para insertar registros
      */
     private $allowedConditions_insert = array(
+        'id_pegi',
         'nombre_pegi',
         'imagen_pegi'
     );
@@ -55,10 +56,10 @@ class pegi extends Database {
      */
     private function validate($data) {
 
-        if (!isset($data['imagen']) || empty($data['imagen'])) {
+        if (!isset($data['imagen_pegi']) || empty($data['imagen_pegi']) || !isset($data['nombre_pegi']) || empty($data['nombre_pegi'])) {
             $response = array(
                 'result' => 'error',
-                'details' => 'El campo imagen es obligatorio'
+                'details' => 'El campo imagen y/o nombre es obligatorio'
             );
 
             Response::result(400, $response);
@@ -80,18 +81,38 @@ class pegi extends Database {
         return $items;
     }
 
-    /**
-     * Método para guardar un registro en la base de datos, recibe como parámetro el JSON con los datos a insertar
-     */
-    public function insert($params) {
-        // Validación de parámetros permitidos
-        $this->filtrarParametros($params, $this->allowedConditions_insert);
+  public function insert($params) {
+        // Si usas filtrarParametros, ponlo aquí
+        if (method_exists($this, 'filtrarParametros')) {
+            $this->filtrarParametros($params, $this->allowedConditions_insert);
+        }
 
         if ($this->validate($params)) {
-            return parent::insertDB($this->table, $params);
+            try {
+                return parent::insertDB($this->table, $params);
+            } catch (mysqli_sql_exception $e) {
+                // Error 1062: ID duplicado
+                if ($e->getCode() == 1062) {
+                    Response::result(400, array(
+                        'result' => 'error',
+                        'details' => 'Ya existe un registro PEGI con este identificador'
+                    ));
+                    exit;
+                }
+                
+                // Por si acaso hubiera alguna clave foránea en PEGI (Error 1452)
+                if ($e->getCode() == 1452) {
+                    Response::result(404, array(
+                        'result' => 'error',
+                        'details' => 'Alguna de las referencias indicadas no existe'
+                    ));
+                    exit;
+                }
+
+                throw $e;
+            }
         }
     }
-
     /**
      * Método para actualizar un registro en la base de datos mediante PUT, se indica el id del registro que se quiere actualizar
      */
@@ -119,19 +140,29 @@ class pegi extends Database {
      * Método para actualizar un registro en la base de datos mediante PATCH, se indica el id del registro que se quiere actualizar
      */
     public function updatePatch($id, $params) {
-        // Validación de parámetros permitidos
         $this->filtrarParametros($params, $this->allowedConditions_insert);
 
-        $affected_rows = parent::updateDB($this->table, $id, $this->primary_key, $params);
+        try {
+            $affected_rows = parent::updateDB($this->table, $id, $this->primary_key, $params);
 
-        if ($affected_rows == 0) {
-            $response = array(
-                'result' => 'error',
-                'details' => 'No hubo cambios'
-            );
-
-            Response::result(200, $response);
-            exit;
+            if ($affected_rows == 0) {
+                // Esto ocurre si el ID no existe O si los datos son iguales
+                Response::result(200, array(
+                    'result' => 'error', 
+                    'details' => 'No se realizaron cambios (verifique que el ID existe o que los datos son diferentes)'
+                ));
+                exit;
+            }
+        } catch (mysqli_sql_exception $e) {
+            // Error 1062: Si intentas actualizar y causas un duplicado
+            if ($e->getCode() == 1062) {
+                Response::result(400, array(
+                    'result' => 'error',
+                    'details' => 'Los nuevos datos ya están en uso por otro registro PEGI'
+                ));
+                exit;
+            }
+            throw $e;
         }
     }
 

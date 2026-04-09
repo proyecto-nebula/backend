@@ -35,30 +35,30 @@ switch ($_SERVER['REQUEST_METHOD']) {
 
     case 'PUT':
         $params = json_decode(file_get_contents('php://input'), true);
-        if(!isset($params) || !isset($_GET['id_captura']) || empty($_GET['id_captura'])){
+        if(!isset($params) || !isset($_GET['id_categoria']) || empty($_GET['id_categoria'])){
             Response::result(400, array('result' => 'error', 'details' => 'Error en la solicitud'));
             exit;
         }
-        $item->updatePut($_GET['id_captura'], $params);
+        $item->updatePut($_GET['id_categoria'], $params);
         Response::result(200, array('result' => 'ok'));
         break;
 
     case 'PATCH':
         $params = json_decode(file_get_contents('php://input'), true);
-        if(!isset($params) || !isset($_GET['id_captura']) || empty($_GET['id_captura'])){
+        if(!isset($params) || !isset($_GET['id_categoria']) || empty($_GET['id_categoria'])){
             Response::result(400, array('result' => 'error', 'details' => 'Error en la solicitud'));
             exit;
         }
-        $item->updatePatch($_GET['id_captura'], $params);
+        $item->updatePatch($_GET['id_categoria'], $params);
         Response::result(200, array('result' => 'ok'));
         break;
 
     case 'DELETE':
-        if(!isset($_GET['id_captura']) || empty($_GET['id_captura'])){
+        if(!isset($_GET['id_categoria']) || empty($_GET['id_categoria'])){
             Response::result(400, array('result' => 'error', 'details' => 'Error en la solicitud'));
             exit;
         }
-        $item->delete($_GET['id_captura']);
+        $item->delete($_GET['id_categoria']);
         Response::result(200, array('result' => 'ok'));
         break;
 

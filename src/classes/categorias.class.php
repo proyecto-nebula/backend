@@ -38,7 +38,7 @@ class categorias extends Database {
     private function filtrarParametros($params, $allowed) {
         foreach ($params as $key => $value) {
             // Ignoramos 'url' y cualquier ID o campo de búsqueda dinámico que venga del .htaccess
-            if ($key === 'url' || strpos($key, 'id') === 0 || $key === 'nombre') continue;
+            if ($key === 'url' || strpos($key, 'id_categoria') === 0 || $key === 'nombre_categoria') continue;
 
             if (!in_array($key, $allowed)) {
                 Response::result(400, array(
@@ -55,7 +55,7 @@ class categorias extends Database {
      */
     private function validate($data) {
 
-        if (!isset($data['nombre']) || empty(trim($data['nombre']))) {
+        if (!isset($data['nombre_categoria']) || empty(trim($data['nombre_categoria']))) {
             $response = array(
                 'result' => 'error',
                 'details' => 'El campo nombre es obligatorio'

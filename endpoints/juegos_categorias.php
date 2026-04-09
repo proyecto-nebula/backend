@@ -11,6 +11,7 @@ $auth->verify();
 
 $item = new juegos_categorias();
 
+
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
         Response::result(200, array('result' => 'ok', 'items' => $item->get($_GET)));
@@ -20,7 +21,15 @@ switch ($_SERVER['REQUEST_METHOD']) {
         Response::result(201, array('result' => 'ok'));
         break;
     case 'DELETE':
-        $item->delete($_GET['id_juego']);
+        // Verificamos que lleguen ambos parámetros por la URL
+        if(!isset($_GET['id_juego']) || !isset($_GET['id_categoria'])){
+            Response::result(400, array('result' => 'error', 'details' => 'Faltan parámetros (id_juego e id_categoria)'));
+            exit;
+        }
+        
+        // Llamamos al método correcto que está en tu clase
+        $item->deleteRelacion($_GET['id_juego'], $_GET['id_categoria']);
+        
         Response::result(200, array('result' => 'ok'));
         break;
     default:

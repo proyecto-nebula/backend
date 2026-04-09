@@ -43,7 +43,7 @@ if ($id) {
     if ($resource === 'partidas')   $_GET['id_partida'] = $id;
     if ($resource === 'pegi')   $_GET['id_pegi'] = $id;
     if ($resource === 'roles')   $_GET['id_rol'] = $id;
-    if ($resource === 'suscripcion')   $_GET['id_suscripcion'] = $id;
+    if ($resource === 'suscripciones')   $_GET['id_suscripcion'] = $id;
     // Añade aquí otros si tienes más recursos (ej: 'roles' => 'id_rol')
 }
 

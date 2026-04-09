@@ -100,43 +100,61 @@ class partidas extends Database {
     /**
      * Método para actualizar un registro en la base de datos mediante PUT, se indica el id del registro que se quiere actualizar
      */
+    /**
+     * Método para actualizar un registro mediante PUT
+     */
     public function updatePut($id, $params) {
-        // Validación de parámetros permitidos
         $this->filtrarParametros($params, $this->allowedConditions_insert);
 
         if ($this->validate($params)) {
-            $affected_rows = parent::updateDB($this->table, $id, $this->primary_key, $params);
+            try {
+                $affected_rows = parent::updateDB($this->table, $id, $this->primary_key, $params);
 
-            if ($affected_rows == 0) {
-                $response = array(
-                    'result' => 'error',
-                    'details' => 'No hubo cambios'
-                );
-
-                Response::result(200, $response);
-                exit;
+                if ($affected_rows == 0) {
+                    Response::result(200, array('result' => 'error', 'details' => 'No hubo cambios o la partida no existe'));
+                    exit;
+                }
+            } catch (mysqli_sql_exception $e) {
+                // Error 1452: El ID del juego o usuario que intentas poner no existe
+                if ($e->getCode() == 1452) {
+                    Response::result(404, array(
+                        'result' => 'error', 
+                        'details' => 'No se puede actualizar: el usuario o el juego indicados no existen'
+                    ));
+                    exit;
+                }
+                throw $e;
             }
         }
     }
 
 
     /**
-     * Método para actualizar un registro en la base de datos mediante PATCH, se indica el id del registro que se quiere actualizar
+     * Método para actualizar parcialmente un registro (PATCH)
      */
     public function updatePatch($id, $params) {
-        // Validación de parámetros permitidos
         $this->filtrarParametros($params, $this->allowedConditions_insert);
 
-        $affected_rows = parent::updateDB($this->table, $id, $this->primary_key, $params);
+        try {
+            $affected_rows = parent::updateDB($this->table, $id, $this->primary_key, $params);
 
-        if ($affected_rows == 0) {
-            $response = array(
-                'result' => 'error',
-                'details' => 'No hubo cambios'
-            );
-
-            Response::result(200, $response);
-            exit;
+            if ($affected_rows == 0) {
+                Response::result(200, array(
+                    'result' => 'error', 
+                    'details' => 'No hubo cambios (los datos ya eran iguales o el ID no existe)'
+                ));
+                exit;
+            }
+        } catch (mysqli_sql_exception $e) {
+            // Error 1452: Fallo de clave foránea (el ID del juego o usuario no existe)
+            if ($e->getCode() == 1452) {
+                Response::result(404, array(
+                    'result' => 'error', 
+                    'details' => 'No se puede actualizar: el usuario o el juego indicados no existen'
+                ));
+                exit;
+            }
+            throw $e;
         }
     }
 

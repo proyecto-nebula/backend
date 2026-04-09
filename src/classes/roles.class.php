@@ -54,7 +54,7 @@ class roles extends Database {
      */
     private function validate($data) {
 
-        if (!isset($data['nombre']) || empty($data['nombre'])) {
+        if (!isset($data['nombre_rol']) || empty($data['nombre_rol'])) {
             $response = array(
                 'result' => 'error',
                 'details' => 'El campo nombre es obligatorio'

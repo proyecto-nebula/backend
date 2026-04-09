@@ -12,21 +12,29 @@ $item = new favoritos();
 
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
-        Response::result(200, array('result' => 'ok', 'items' => $item->get($_GET)));
+        $items = $item->get($_GET);
+        Response::result(200, array('result' => 'ok', 'items' => $items));
         break;
+        
     case 'POST':
-        $insert_id = $item->insert(json_decode(file_get_contents('php://input'), true));
-        Response::result(201, array('result' => 'ok'));
+        $params = json_decode(file_get_contents('php://input'), true);
+        $insert_id = $item->insert($params);
+        Response::result(201, array('result' => 'ok', 'insert_id' => $insert_id));
         break;
+
+
     case 'DELETE':
-        // Para borrar un favorito necesitamos ambos IDs en la URL
+        // Validamos que vengan AMBOS parámetros
         if(!isset($_GET['id_usuario']) || !isset($_GET['id_juego'])){
-            Response::result(400, array('result' => 'error', 'details' => 'Faltan IDs'));
+            Response::result(400, array('result' => 'error', 'details' => 'Falta id_usuario o id_juego'));
             exit;
         }
-        // Aquí llamarías a un método personalizado de borrado
-        Response::result(200, array('result' => 'ok'));
+        
+        // Pasamos ambos al método delete
+        $item->deleteFavorito($_GET['id_usuario'], $_GET['id_juego']);
+        Response::result(200, array('result' => 'ok', 'details' => 'Favorito eliminado'));
         break;
+
     default:
         Response::result(404, array('result' => 'error'));
         break;

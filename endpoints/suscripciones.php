@@ -5,7 +5,7 @@
 */
 require_once  __DIR__ . '/../src/utils/response.php';
 require_once __DIR__ . '/../src/classes/auth.class.php';
-require_once __DIR__ . '/../src/classes/suscripcion.class.php';
+require_once __DIR__ . '/../src/classes/suscripciones.class.php';
 
 $auth = new Authentication();
 $auth->verify();
@@ -65,7 +65,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
 	case 'PUT':
 		$params = json_decode(file_get_contents('php://input'), true);
 
-		if(!isset($params) || !isset($_GET['codigo']) || empty($_GET['codigo'])){
+		if(!isset($params) || !isset($_GET['id_suscripcion']) || empty($_GET['id_suscripcion'])){
 			$response = array(
 				'result' => 'error',
 				'details' => 'Error en la solicitud'
@@ -75,7 +75,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
 			exit;
 		}
 
-		$item->updatePut($_GET['codigo'], $params);
+		$item->updatePut($_GET['id_suscripcion'], $params);
 
 		$response = array(
 			'result' => 'ok'
@@ -91,7 +91,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
 	case 'PATCH':
 		$params = json_decode(file_get_contents('php://input'), true);
 
-		if(!isset($params) || !isset($_GET['codigo']) || empty($_GET['codigo'])){
+		if(!isset($params) || !isset($_GET['id_suscripcion']) || empty($_GET['id_suscripcion'])){
 			$response = array(
 				'result' => 'error',
 				'details' => 'Error en la solicitud'
@@ -101,7 +101,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
 			exit;
 		}
 
-		$item->updatePatch($_GET['codigo'], $params);
+		$item->updatePatch($_GET['id_suscripcion'], $params);
 
 		$response = array(
 			'result' => 'ok'
@@ -114,10 +114,10 @@ switch ($_SERVER['REQUEST_METHOD']) {
 
 
 	/**
-	 * Cuando se solicita un DELETE se comprueba que se envíe un codigo de item. En caso afirmativo se utiliza el método delete() del modelo.
+	 * Cuando se solicita un DELETE se comprueba que se envíe un id_suscripcion de item. En caso afirmativo se utiliza el método delete() del modelo.
 	 */
 	case 'DELETE':
-		if(!isset($_GET['codigo']) || empty($_GET['codigo'])){
+		if(!isset($_GET['id_suscripcion']) || empty($_GET['id_suscripcion'])){
 			$response = array(
 				'result' => 'error',
 				'details' => 'Error en la solicitud'
@@ -127,7 +127,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
 			exit;
 		}
 
-		$item->delete($_GET['codigo']);
+		$item->delete($_GET['id_suscripcion']);
 
 		$response = array(
 			'result' => 'ok'

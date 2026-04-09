@@ -37,7 +37,7 @@ class avatares extends Database {
 	 */
 	private function validate($data) {
 
-		if (!isset($data['imagen']) || empty($data['imagen'])) {
+		if (!isset($data['imagen_avatar']) || empty($data['imagen_avatar'])) {
 			$response = array(
 				'result' => 'error',
 				'details' => 'El campo imagen es obligatorio'

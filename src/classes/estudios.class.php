@@ -38,7 +38,7 @@ class estudios extends Database {
     private function filtrarParametros($params, $allowed) {
         foreach ($params as $key => $value) {
             // Ignoramos 'url' y cualquier parámetro que empiece por 'id' o sea 'nombre'
-            if ($key === 'url' || strpos($key, 'id') === 0 || $key === 'nombre') continue;
+            if ($key === 'url' || strpos($key, 'id_estudio') === 0 || $key === 'nombre_estudio') continue;
 
             if (!in_array($key, $allowed)) {
                 Response::result(400, array(
@@ -55,7 +55,7 @@ class estudios extends Database {
      */
     private function validate($data) {
 
-        if (!isset($data['nombre']) || empty($data['nombre'])) {
+        if (!isset($data['nombre_estudio']) || empty($data['nombre_estudio'])) {
             $response = array(
                 'result' => 'error',
                 'details' => 'El campo nombre es obligatorio'
