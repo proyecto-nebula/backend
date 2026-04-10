@@ -39,7 +39,7 @@ class ConnectionTest extends TestCase {
         $endpoints = [
             'avatares', 'capturas', 'categorias', 'estudios', 
             'favoritos', 'juegos', 'juegos_categorias', 
-            'partidas', 'pegi', 'roles', 'suscripcion', 'usuarios'
+            'partidas', 'pegi', 'roles', 'suscripciones', 'usuarios'
         ];
 
         foreach ($endpoints as $resource) {
