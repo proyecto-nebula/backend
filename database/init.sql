@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 07-04-2026 a las 15:20:05
+-- Tiempo de generación: 10-04-2026 a las 17:07:49
 -- Versión del servidor: 8.0.45
 -- Versión de PHP: 8.3.30
 
@@ -57,7 +57,12 @@ INSERT INTO `avatares` (`id_avatar`, `nombre_avatar`, `imagen_avatar`) VALUES
 (17, 'Mercenario', 'https://api.multiavatar.com/mercenary.png'),
 (18, 'Mago', 'https://api.multiavatar.com/wizard.png'),
 (19, 'Constructor', 'https://api.multiavatar.com/build.png'),
-(20, 'Leyenda', 'https://api.multiavatar.com/legend.png');
+(20, 'Leyenda', 'https://api.multiavatar.com/legend.png'),
+(22, 'prueba23', 'https://api.multiavatar.com/estrella.png'),
+(23, 'prueba23', 'https://api.multiavatar.com/estrella.png'),
+(24, 'prueba23', 'https://api.multiavatar.com/estrella.png'),
+(25, 'prueba23', 'https://api.multiavatar.com/estrella.png'),
+(27, 'prueba244', 'https://api.multiavatar.com/estrella.png');
 
 -- --------------------------------------------------------
 
@@ -113,7 +118,10 @@ INSERT INTO `categorias` (`id_categoria`, `nombre_categoria`) VALUES
 (17, 'Plataformas'),
 (18, 'Novela Visual'),
 (19, 'Educativo'),
-(20, 'Familiar');
+(20, 'Familiar'),
+(22, 'prueba22'),
+(23, 'prueba22'),
+(24, 'prueba33');
 
 -- --------------------------------------------------------
 
@@ -264,6 +272,9 @@ INSERT INTO `favoritos` (`id_usuario`, `id_juego`) VALUES
 (0, 15),
 (1, 17),
 (1, 18),
+(1, 95),
+(1, 98),
+(1, 99),
 (0, 101),
 (1, 102),
 (0, 105),
@@ -273,7 +284,8 @@ INSERT INTO `favoritos` (`id_usuario`, `id_juego`) VALUES
 (0, 120),
 (1, 122),
 (0, 125),
-(1, 129);
+(1, 129),
+(1, 131);
 
 -- --------------------------------------------------------
 
@@ -434,7 +446,8 @@ INSERT INTO `juegos` (`id_juego`, `id_desarrollador`, `id_distribuidor`, `id_peg
 (126, NULL, NULL, 18, '1649240', NULL, 'Hitman World of Assassination', 'Conviértete en el Agente 47, el asesino definitivo.', 'Viaja por todo el mundo y elimina a tus objetivos de las formas más creativas y sigilosas imaginables.', 'https://cdn.akamai.steamstatic.com/steam/apps/1649240/library_600x900_2x.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/1649240/header.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/1649240/library_hero.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/1649240/logo.png', 87, '2022-01-20', '2026-01-01', 0),
 (127, NULL, NULL, 18, '403640', NULL, 'Dishonored 2', 'Recupera lo que es tuyo con sigilo y poderes sobrenaturales.', 'Juega como Emily o Corvo y usa habilidades únicas para infiltrarte. Un diseño de niveles soberbio.', 'https://cdn.akamai.steamstatic.com/steam/apps/403640/library_600x900_2x.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/403640/header.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/403640/library_hero.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/403640/logo.png', 88, '2016-11-11', '2026-01-01', 0),
 (128, NULL, NULL, 18, '287700', NULL, 'Metal Gear Solid V: The Phantom Pain', 'Sigilo táctico de nueva generación en un mundo abierto.', 'Snake regresa para una misión épica. Usa gadgets, entorno y estrategia para completar objetivos.', 'https://cdn.akamai.steamstatic.com/steam/apps/287700/library_600x900_2x.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/287700/header.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/287700/library_hero.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/287700/logo.png', 91, '2015-09-01', '2026-01-01', 0),
-(129, NULL, NULL, 18, '235600', NULL, 'Splinter Cell Blacklist', 'Sam Fisher regresa para detener una amenaza global.', 'Detén ataques terroristas usando tecnología de vanguardia y el sigilo más letal.', 'https://cdn.akamai.steamstatic.com/steam/apps/235600/library_600x900_2x.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/235600/header.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/235600/library_hero.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/235600/logo.png', 82, '2013-08-20', '2026-01-01', 0);
+(129, NULL, NULL, 18, '235600', NULL, 'Splinter Cell Blacklist', 'Sam Fisher regresa para detener una amenaza global.', 'Detén ataques terroristas usando tecnología de vanguardia y el sigilo más letal.', 'https://cdn.akamai.steamstatic.com/steam/apps/235600/library_600x900_2x.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/235600/header.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/235600/library_hero.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/235600/logo.png', 82, '2013-08-20', '2026-01-01', 0),
+(131, 1, 1, 3, '123456', '99999', 'Nebula Adventure Test', 'Un juego de prueba para verificar el funcionamiento de la API.', 'En este juego de prueba exploramos las capacidades de inserción de la tabla juegos en la base de datos nebula_db.', 'https://via.placeholder.com/600x900', 'https://via.placeholder.com/460x215', 'https://via.placeholder.com/1920x1080', 'https://via.placeholder.com/400x100', 95, '2026-04-08', '2026-04-08', 1);
 
 -- --------------------------------------------------------
 
@@ -504,6 +517,7 @@ INSERT INTO `juegos_categorias` (`id_juego`, `id_categoria`) VALUES
 (8, 3),
 (15, 3),
 (17, 3),
+(131, 3),
 (3, 4),
 (11, 4),
 (14, 5),
@@ -684,7 +698,10 @@ INSERT INTO `suscripciones` (`id_suscripcion`, `nombre_suscripcion`, `descripcio
 (1, 'Plata', 'Acceso a 200 juegos y descuentos exclusivos', 9.99),
 (2, 'Oro', 'Acceso total a todo el catálogo y betas', 14.99),
 (3, 'Bronce', 'Acceso a 50 juegos y guardado en la nube', 4.99),
-(4, 'Prueba', NULL, NULL);
+(4, 'Prueba', NULL, NULL),
+(9, 'prueba', 'Acceso limitado a juegos antiguos', 0.00),
+(11, 'Plan Premium', 'Acceso total a todos los juegos', 9.99),
+(12, 'Plan Premiumddd', 'Acceso total a todos los juegos', 9.99);
 
 -- --------------------------------------------------------
 
@@ -712,8 +729,8 @@ CREATE TABLE `usuarios` (
 --
 
 INSERT INTO `usuarios` (`id_usuario`, `id_suscripcion`, `id_rol`, `alias_usuario`, `password_usuario`, `token`, `nombre_usuario`, `apellidos_usuario`, `email_usuario`, `fecha_suscripcion`, `fecha_creacion_usuario`, `id_avatar`) VALUES
-(0, 2, 0, 'admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU1NzA2MzQsImRhdGEiOnsiaWQiOiIwIiwibm9tYnJlIjoiYWRtaW4ifX0.mQ9FrHAwRNqczO3j2Dj9kZCfaMAj7dQb2ey9Pq4vXaw', 'Administrador', 'García', 'admin@ejemplo.com', '2024-01-15', '2026-04-03 19:34:55', 4),
-(1, 0, 1, 'usuario', '9250e222c4c71f0c58d4c54b50a880a312e9f9fed55d5c3aa0b0e860ded99165', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU1NjIxMzQsImRhdGEiOnsiaWQiOiIxNiIsIm5vbWJyZSI6InVzdWFyaW8ifX0.VcPJII1aXuoLz23UNuMSy5zIbcEhUDAIClGBdKeEsVc', 'usuario nombre', 'usuario apellido', 'usuario@test.com', NULL, '2026-04-07 11:35:29', 5);
+(0, 2, 0, 'admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzM5MTAsImRhdGEiOnsiaWQiOiIwIiwibm9tYnJlIjoiYWRtaW5AZWplbXBsby5jb20ifX0.CiryWHQbch2W2xS982JCjdQRbKs1lJo8NSwIVtOAlKU', 'Administrador', 'García', 'admin@ejemplo.com', '2024-01-15', '2026-04-03 19:34:55', 4),
+(1, 0, 1, 'usuario', '9250e222c4c71f0c58d4c54b50a880a312e9f9fed55d5c3aa0b0e860ded99165', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzQwMTIsImRhdGEiOnsiaWQiOiIxIiwibm9tYnJlIjoidXN1YXJpb0B0ZXN0LmNvbSJ9fQ.Qw6ybv4POr1QIauFET8F1KBemdKw5dY6m1UtaJPESZE', 'usuario nombre', 'usuario apellido', 'usuario@test.com', NULL, '2026-04-07 11:35:29', 5);
 
 --
 -- Índices para tablas volcadas
@@ -812,55 +829,55 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `avatares`
 --
 ALTER TABLE `avatares`
-  MODIFY `id_avatar` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id_avatar` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT de la tabla `capturas`
 --
 ALTER TABLE `capturas`
-  MODIFY `id_captura` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_captura` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `categorias`
 --
 ALTER TABLE `categorias`
-  MODIFY `id_categoria` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id_categoria` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT de la tabla `estudios`
 --
 ALTER TABLE `estudios`
-  MODIFY `id_estudio` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=104;
+  MODIFY `id_estudio` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=105;
 
 --
 -- AUTO_INCREMENT de la tabla `juegos`
 --
 ALTER TABLE `juegos`
-  MODIFY `id_juego` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=130;
+  MODIFY `id_juego` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=132;
 
 --
 -- AUTO_INCREMENT de la tabla `partidas`
 --
 ALTER TABLE `partidas`
-  MODIFY `id_partida` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+  MODIFY `id_partida` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT de la tabla `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `id_rol` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id_rol` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `suscripciones`
 --
 ALTER TABLE `suscripciones`
-  MODIFY `id_suscripcion` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id_suscripcion` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id_usuario` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id_usuario` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- Restricciones para tablas volcadas
