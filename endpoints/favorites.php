@@ -1,6 +1,6 @@
 <?php
 /**
- * Script para trabajar con registros de la tabla FAVORITOS
+ * Script para trabajar con registros de la tabla favorites
  */
 require_once  __DIR__ . '/../src/utils/response.php';
 require_once __DIR__ . '/../src/classes/auth.class.php';

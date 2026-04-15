@@ -1,7 +1,7 @@
 <?php
 /**
- * Script que se usa en los endpoints para trabajar con registros de la tabla JUEGOS
- * La clase "JUEGOS.class.php" es la clase del modelo, que representa a un item de la tabla
+ * Script que se usa en los endpoints para trabajar con registros de la tabla games
+ * La clase "games.class.php" es la clase del modelo, que representa a un item de la tabla
 */
 require_once  __DIR__ . '/../src/utils/response.php';
 require_once __DIR__ . '/../src/classes/auth.class.php';

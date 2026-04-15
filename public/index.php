@@ -58,8 +58,8 @@ if ($resource && file_exists($file)) {
     echo json_encode([
         'error' => 'Recurso no encontrado',
         'debug' => [
-            'resource_buscado' => $resource,
-            'ruta_fich' => $file
+            'resource' => $resource,
+            'file' => $file
         ]
     ]);
 }
