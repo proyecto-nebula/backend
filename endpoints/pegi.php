@@ -9,7 +9,7 @@ require_once __DIR__ . '/../src/classes/pegi.class.php';
 $auth = new Authentication();
 $auth->verify();
 
-$item = new PEGI();
+$item = new pegi();
 
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
@@ -21,15 +21,15 @@ switch ($_SERVER['REQUEST_METHOD']) {
         Response::result(201, array('result' => 'ok', 'insert_id' => $insert_id));
         break;
     case 'PUT':
-        $item->updatePut($_GET['id_pegi'], json_decode(file_get_contents('php://input'), true));
+        $item->updatePut($_GET['id'], json_decode(file_get_contents('php://input'), true));
         Response::result(200, array('result' => 'ok'));
         break;
     case 'PATCH':
-        $item->updatePatch($_GET['id_pegi'], json_decode(file_get_contents('php://input'), true));
+        $item->updatePatch($_GET['id'], json_decode(file_get_contents('php://input'), true));
         Response::result(200, array('result' => 'ok'));
         break;
     case 'DELETE':
-        $item->delete($_GET['id_pegi']);
+        $item->delete($_GET['id']);
         Response::result(200, array('result' => 'ok'));
         break;
     default:

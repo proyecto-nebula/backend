@@ -5,12 +5,12 @@
 */
 require_once  __DIR__ . '/../src/utils/response.php';
 require_once __DIR__ . '/../src/classes/auth.class.php';
-require_once __DIR__ . '/../src/classes/juegos.class.php';
+require_once __DIR__ . '/../src/classes/games.class.php';
 
 $auth = new Authentication();
 $auth->verify();
 
-$item = new JUEGOS();
+$item = new games();
 
 /**
  * Se mira el tipo de petición que ha llegado a la API y dependiendo de ello se realiza una u otra accción
@@ -65,7 +65,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
     case 'PUT':
         $params = json_decode(file_get_contents('php://input'), true);
 
-        if(!isset($params) || !isset($_GET['id_juego']) || empty($_GET['id_juego'])){
+        if(!isset($params) || !isset($_GET['id']) || empty($_GET['id'])){
             $response = array(
                 'result' => 'error',
                 'details' => 'Error en la solicitud'
@@ -91,7 +91,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
     case 'PATCH':
         $params = json_decode(file_get_contents('php://input'), true);
 
-        if(!isset($params) || !isset($_GET['id_juego']) || empty($_GET['id_juego'])){
+        if(!isset($params) || !isset($_GET['id']) || empty($_GET['id'])){
             $response = array(
                 'result' => 'error',
                 'details' => 'Error en la solicitud'
@@ -101,7 +101,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
             exit;
         }
 
-        $item->updatePatch($_GET['id_juego'], $params);
+        $item->updatePatch($_GET['id'], $params);
 
         $response = array(
             'result' => 'ok'
@@ -114,7 +114,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
      * Cuando se solicita un DELETE se comprueba que se envíe un id de juego. En caso afirmativo se utiliza el método delete() del modelo.
      */
     case 'DELETE':
-        if(!isset($_GET['id_juego']) || empty($_GET['id_juego'])){
+        if(!isset($_GET['id']) || empty($_GET['id'])){
             $response = array(
                 'result' => 'error',
                 'details' => 'Error en la solicitud'
@@ -124,7 +124,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
             exit;
         }
 
-        $item->delete($_GET['id_juego']);
+        $item->delete($_GET['id']);
 
         $response = array(
             'result' => 'ok'

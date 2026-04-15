@@ -15,11 +15,11 @@ class Database
 
 	public function __construct()
 	{
-		$this->host = getenv('DB_HOST');
-		$this->db = getenv('DB_NAME');
-		$this->user = getenv('DB_USER');
+		$this->host     = getenv('DB_HOST');
+		$this->db       = getenv('DB_NAME');
+		$this->user     = getenv('DB_USER');
 		$this->password = getenv('DB_PASSWORD');
-		$this->port = getenv('DB_PORT');
+		$this->port     = getenv('DB_PORT');
 
 		//$this->connection = new mysqli('db', 'root', 'root', 'Proyecto_Final', '3306');
 		$this->connection = new mysqli(

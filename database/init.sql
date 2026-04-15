@@ -1,43 +1,147 @@
--- phpMyAdmin SQL Dump
--- version 5.2.3
--- https://www.phpmyadmin.net/
---
--- Servidor: db
--- Tiempo de generación: 10-04-2026 a las 17:07:49
--- Versión del servidor: 8.0.45
--- Versión de PHP: 8.3.30
-
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
---
--- Base de datos: `nebula_db`
---
-
+-- --------------------------------------------------------
+-- ESTRUCTURA DE TABLAS
 -- --------------------------------------------------------
 
---
--- Estructura de tabla para la tabla `avatares`
---
-
-CREATE TABLE `avatares` (
-  `id_avatar` int NOT NULL,
-  `nombre_avatar` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `imagen_avatar` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL
+-- Avatars
+CREATE TABLE `avatars` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL,
+  `image_url` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---
--- Volcado de datos para la tabla `avatares`
---
+-- Categories
+CREATE TABLE `categories` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-INSERT INTO `avatares` (`id_avatar`, `nombre_avatar`, `imagen_avatar`) VALUES
+-- Studios
+CREATE TABLE `studios` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `logo_url` varchar(500) DEFAULT NULL,
+  `website` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Pegi Ratings
+CREATE TABLE `pegi` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `image_url` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Roles
+CREATE TABLE `roles` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Subscription Plans
+CREATE TABLE `plans` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) DEFAULT NULL,
+  `description` text,
+  `price` decimal(10,2) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Games
+CREATE TABLE `games` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `developer_id` int DEFAULT NULL,
+  `publisher_id` int DEFAULT NULL,
+  `pegi_id` int DEFAULT NULL,
+  `steam_id` varchar(50) DEFAULT NULL,
+  `igdb_id` varchar(50) DEFAULT NULL,
+  `title` varchar(255) NOT NULL,
+  `summary` text,
+  `description` text,
+  `cover_url` varchar(255) DEFAULT NULL,
+  `banner_url` varchar(255) DEFAULT NULL,
+  `hero_url` varchar(255) DEFAULT NULL,
+  `logo_url` varchar(255) DEFAULT NULL,
+  `metacritic_score` int DEFAULT NULL,
+  `release_date` date DEFAULT NULL,
+  `publish_date` date DEFAULT NULL,
+  `is_featured` boolean DEFAULT 0,
+  PRIMARY KEY (`id`),
+  KEY `developer_id_idx` (`developer_id`),
+  KEY `publisher_id_idx` (`publisher_id`),
+  KEY `pegi_id_idx` (`pegi_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Users
+CREATE TABLE `users` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `plan_id` int DEFAULT NULL,
+  `role_id` int DEFAULT NULL,
+  `avatar_id` int DEFAULT NULL,
+  `username` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `token` varchar(255) DEFAULT NULL,
+  `first_name` varchar(100) DEFAULT NULL,
+  `last_name` varchar(100) DEFAULT NULL,
+  `email` varchar(150) NOT NULL,
+  `created_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `plan_id_idx` (`plan_id`),
+  KEY `role_id_idx` (`role_id`),
+  KEY `avatar_id_idx` (`avatar_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Screenshots
+CREATE TABLE `screenshots` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `game_id` int DEFAULT NULL,
+  `image_url` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `game_id_idx` (`game_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Favorites (Pivot Table)
+CREATE TABLE `favorites` (
+  `user_id` int NOT NULL,
+  `game_id` int NOT NULL,
+  PRIMARY KEY (`user_id`, `game_id`),
+  KEY `game_id_idx` (`game_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Game Categories (Pivot Table)
+CREATE TABLE `game_categories` (
+  `game_id` int NOT NULL,
+  `category_id` int NOT NULL,
+  PRIMARY KEY (`game_id`, `category_id`),
+  KEY `category_id_idx` (`category_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Play Sessions
+CREATE TABLE `sessions` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int DEFAULT NULL,
+  `game_id` int DEFAULT NULL,
+  `played_date` timestamp DEFAULT NULL,
+  `duration` time DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id_idx` (`user_id`),
+  KEY `game_id_idx` (`game_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+-- --------------------------------------------------------
+-- DATA
+-- --------------------------------------------------------
+
+-- Avatars
+INSERT INTO `avatars` (`id`, `name`, `image_url`) VALUES
 (1, 'Estrella', 'https://api.multiavatar.com/estrella.png'),
 (2, 'Gamer Pro', 'https://api.multiavatar.com/gamerpro.png'),
 (3, 'Noob', 'https://api.multiavatar.com/n00b.png'),
@@ -64,41 +168,8 @@ INSERT INTO `avatares` (`id_avatar`, `nombre_avatar`, `imagen_avatar`) VALUES
 (25, 'prueba23', 'https://api.multiavatar.com/estrella.png'),
 (27, 'prueba244', 'https://api.multiavatar.com/estrella.png');
 
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `capturas`
---
-
-CREATE TABLE `capturas` (
-  `id_captura` int NOT NULL,
-  `id_juego` int DEFAULT NULL,
-  `imagen_captura` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Volcado de datos para la tabla `capturas`
---
-
-INSERT INTO `capturas` (`id_captura`, `id_juego`, `imagen_captura`) VALUES
-(1, 1, 'prueba');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `categorias`
---
-
-CREATE TABLE `categorias` (
-  `id_categoria` int NOT NULL,
-  `nombre_categoria` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Volcado de datos para la tabla `categorias`
---
-
-INSERT INTO `categorias` (`id_categoria`, `nombre_categoria`) VALUES
+-- Categories
+INSERT INTO `categories` (`id`, `name`) VALUES
 (1, 'Acción'),
 (2, 'RPG'),
 (3, 'Aventura'),
@@ -123,23 +194,8 @@ INSERT INTO `categorias` (`id_categoria`, `nombre_categoria`) VALUES
 (23, 'prueba22'),
 (24, 'prueba33');
 
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `estudios`
---
-
-CREATE TABLE `estudios` (
-  `id_estudio` int NOT NULL,
-  `nombre_estudio` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `logo_estudio` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Volcado de datos para la tabla `estudios`
---
-
-INSERT INTO `estudios` (`id_estudio`, `nombre_estudio`, `logo_estudio`) VALUES
+-- Studios
+INSERT INTO `studios` (`id`, `name`, `logo_url`) VALUES
 (1, 'Insomniac Games', 'https://ui-avatars.com/api/?name=Insomniac+Games&size=256&background=0D8ABC&color=fff&bold=true'),
 (2, 'Colossal Order', 'https://ui-avatars.com/api/?name=Colossal+Order&size=256&background=0D8ABC&color=fff&bold=true'),
 (3, 'The Indie Stone', 'https://ui-avatars.com/api/?name=The+Indie+Stone&size=256&background=0D8ABC&color=fff&bold=true'),
@@ -244,80 +300,32 @@ INSERT INTO `estudios` (`id_estudio`, `nombre_estudio`, `logo_estudio`) VALUES
 (102, 'Eidos-Montréal', 'https://ui-avatars.com/api/?name=Eidos-Montréal&size=256&background=0D8ABC&color=fff&bold=true'),
 (103, 'Ubisoft Toronto', 'https://ui-avatars.com/api/?name=Ubisoft+Toronto&size=256&background=0D8ABC&color=fff&bold=true');
 
--- --------------------------------------------------------
+-- Pegi Ratings
+INSERT INTO `pegi` (`id`, `name`, `image_url`) VALUES
+(3, 'PEGI 3', 'https://rating.pegi.info/assets/images/games/age_threshold_icons/3.png'),
+(7, 'PEGI 7', 'https://rating.pegi.info/assets/images/games/age_threshold_icons/7.png'),
+(12, 'PEGI 12', 'https://rating.pegi.info/assets/images/games/age_threshold_icons/12.png'),
+(16, 'PEGI 16', 'https://rating.pegi.info/assets/images/games/age_threshold_icons/16.png'),
+(18, 'PEGI 18', 'https://rating.pegi.info/assets/images/games/age_threshold_icons/18.png');
 
---
--- Estructura de tabla para la tabla `favoritos`
---
+-- Roles
+INSERT INTO `roles` (`id`, `name`) VALUES
+(0, 'Administrador'),
+(1, 'Usuario');
 
-CREATE TABLE `favoritos` (
-  `id_usuario` int NOT NULL,
-  `id_juego` int NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+-- Subscription Plans
+INSERT INTO `plans` (`id`, `name`, `description`, `price`) VALUES
+(0, 'Gratis', 'Acceso limitado a juegos antiguos', 0.00),
+(1, 'Plata', 'Acceso a 200 juegos y descuentos exclusivos', 9.99),
+(2, 'Oro', 'Acceso total a todo el catálogo y betas', 14.99),
+(3, 'Bronce', 'Acceso a 50 juegos y guardado en la nube', 4.99),
+(4, 'Prueba', NULL, NULL),
+(9, 'prueba', 'Acceso limitado a juegos antiguos', 0.00),
+(11, 'Plan Premium', 'Acceso total a todos los juegos', 9.99),
+(12, 'Plan Premiumddd', 'Acceso total a todos los juegos', 9.99);
 
---
--- Volcado de datos para la tabla `favoritos`
---
-
-INSERT INTO `favoritos` (`id_usuario`, `id_juego`) VALUES
-(0, 1),
-(1, 2),
-(1, 3),
-(0, 4),
-(0, 7),
-(0, 9),
-(0, 10),
-(1, 11),
-(1, 13),
-(0, 15),
-(1, 17),
-(1, 18),
-(1, 95),
-(1, 98),
-(1, 99),
-(0, 101),
-(1, 102),
-(0, 105),
-(1, 108),
-(0, 110),
-(1, 115),
-(0, 120),
-(1, 122),
-(0, 125),
-(1, 129),
-(1, 131);
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `juegos`
---
-
-CREATE TABLE `juegos` (
-  `id_juego` int NOT NULL,
-  `id_desarrollador` int DEFAULT NULL,
-  `id_distribuidor` int DEFAULT NULL,
-  `id_pegi` int DEFAULT NULL,
-  `id_steam` varchar(50) DEFAULT NULL,
-  `id_igdb` varchar(50) DEFAULT NULL,
-  `titulo_juego` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `descripcion_corta` text,
-  `descripcion_larga` text,
-  `portada_v` varchar(255) DEFAULT NULL,
-  `portada_h` varchar(255) DEFAULT NULL,
-  `hero_juego` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
-  `logo_juego` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
-  `metacritic_juego` int DEFAULT NULL,
-  `fecha_lanzamiento_juego` date DEFAULT NULL,
-  `fecha_publicacion_juego` date DEFAULT NULL,
-  `destacado_juego` tinyint(1) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Volcado de datos para la tabla `juegos`
---
-
-INSERT INTO `juegos` (`id_juego`, `id_desarrollador`, `id_distribuidor`, `id_pegi`, `id_steam`, `id_igdb`, `titulo_juego`, `descripcion_corta`, `descripcion_larga`, `portada_v`, `portada_h`, `hero_juego`, `logo_juego`, `metacritic_juego`, `fecha_lanzamiento_juego`, `fecha_publicacion_juego`, `destacado_juego`) VALUES
+-- Games
+INSERT INTO `games` (`id`, `developer_id`, `publisher_id`, `pegi_id`, `steam_id`, `igdb_id`, `title`, `summary`, `description`, `cover_url`, `banner_url`, `hero_url`, `logo_url`, `metacritic_score`, `release_date`, `publish_date`, `is_featured`) VALUES
 (1, 3, 3, 18, '108600', NULL, 'Project Zomboid', '¿Cómo morirás? La supervivencia zombi definitiva en un mundo implacable.', 'Project Zomboid es la cima de la supervivencia zombi. En un mapa inmenso basado en la Kentucky rural, los jugadores deben saquear casas, construir defensas y luchar contra el hambre, la sed y la enfermedad mientras intentan evitar ser devorados por la horda implacable.', 'https://cdn.akamai.steamstatic.com/steam/apps/108600/library_600x900_2x.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/108600/header.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/108600/library_hero.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/108600/logo.png', 80, '2013-11-08', '2026-01-05', 1),
 (2, 4, 16, 16, '2677660', NULL, 'Indiana Jones and the Great Circle', 'Desentraña uno de los mayores misterios de la historia en esta aventura trotamundos.', 'Viaja al año 1937 y ponte el sombrero del arqueólogo más famoso del cine. Indiana Jones and the Great Circle es una experiencia de acción y aventura en primera persona.', 'https://cdn.akamai.steamstatic.com/steam/apps/2677660/library_600x900_2x.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/2677660/header.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/2677660/library_hero.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/2677660/logo.png', 85, '2024-12-09', '2026-01-05', 1),
 (3, 2, 69, 3, '949230', NULL, 'Cities: Skylines II', 'Crea una ciudad desde cero y transfórmala en una metrópolis próspera.', 'Alza una ciudad desde sus cimientos y transfórmala en la metrópolis próspera que solo tú puedes imaginar. Nunca has experimentado una construcción a esta escala. Con una simulación profunda y una economía viva, Cities: Skylines II te permite construir un mundo sin límites.', 'https://cdn.akamai.steamstatic.com/steam/apps/949230/library_600x900_2x.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/949230/header.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/949230/library_hero.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/949230/logo.png', 74, '2023-10-24', '2026-01-05', 1),
@@ -407,8 +415,7 @@ INSERT INTO `juegos` (`id_juego`, `id_desarrollador`, `id_distribuidor`, `id_peg
 (88, NULL, NULL, 18, '632470', NULL, 'Disco Elysium', 'Un RPG de mundo abierto revolucionario donde tú decides qué tipo de detective ser.', 'Disco Elysium es un innovador juego de rol. Eres un detective con un sistema de habilidades único a tu disposición.', 'https://cdn.akamai.steamstatic.com/steam/apps/632470/library_600x900_2x.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/632470/header.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/632470/library_hero.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/632470/logo.png', 97, '2019-10-15', '2024-03-22', 0),
 (89, NULL, NULL, 18, '2183900', NULL, 'Warhammer 40,000: Space Marine 2', 'Encarna la brutalidad sobrehumana de un Marine Espacial contra los Tiránidos.', 'La galaxia está en peligro. Mundos enteros están cayendo. Encarna la habilidad y brutalidad sobrehumana de un Marine Espacial.', 'https://cdn.akamai.steamstatic.com/steam/apps/2183900/library_600x900_2x.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/2183900/header.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/2183900/library_hero.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/2183900/logo.png', 82, '2024-09-09', '2024-11-20', 0),
 (90, NULL, NULL, 18, '8870', NULL, 'BioShock Infinite', 'Lleva a la chica y saldarás tu deuda. Una aventura en la ciudad aérea de Columbia.', 'Booker DeWitt solo tiene una oportunidad para limpiar su nombre: debe rescatar a Elizabeth en la ciudad flotante de Columbia.', 'https://cdn.akamai.steamstatic.com/steam/apps/8870/library_600x900_2x.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/8870/header.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/8870/library_hero.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/8870/logo.png', 94, '2013-03-25', '2023-01-10', 0),
-(91, NULL, NULL, 12, '1817230', NULL, 'Hi-Fi RUSH', 'Siente el ritmo mientras el aspirante a estrella de rock Chai lucha contra una megacorporación.', 'Siente el ritmo mientras Chai y su equipo se rebelan contra una malvada megacorporación en un mundo sincronizado con la música.', 'https://cdn.akamai.steamstatic.com/steam/apps/1817230/library_600x900_2x.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/1817230/header.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/1817230/library_hero.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/1817230/logo.png', 89, '2023-01-25', '2023-09-12', 0);
-INSERT INTO `juegos` (`id_juego`, `id_desarrollador`, `id_distribuidor`, `id_pegi`, `id_steam`, `id_igdb`, `titulo_juego`, `descripcion_corta`, `descripcion_larga`, `portada_v`, `portada_h`, `hero_juego`, `logo_juego`, `metacritic_juego`, `fecha_lanzamiento_juego`, `fecha_publicacion_juego`, `destacado_juego`) VALUES
+(91, NULL, NULL, 12, '1817230', NULL, 'Hi-Fi RUSH', 'Siente el ritmo mientras el aspirante a estrella de rock Chai lucha contra una megacorporación.', 'Siente el ritmo mientras Chai y su equipo se rebelan contra una malvada megacorporación en un mundo sincronizado con la música.', 'https://cdn.akamai.steamstatic.com/steam/apps/1817230/library_600x900_2x.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/1817230/header.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/1817230/library_hero.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/1817230/logo.png', 89, '2023-01-25', '2023-09-12', 0),
 (92, NULL, NULL, 7, '268910', NULL, 'Cuphead', 'Un juego de acción clásico de \"dispara y corre\" centrado en batallas contra jefes.', 'Cuphead es un juego de acción clásico inspirado en las caricaturas de la década de 1930.', 'https://cdn.akamai.steamstatic.com/steam/apps/268910/library_600x900_2x.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/268910/header.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/268910/library_hero.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/268910/logo.png', 88, '2017-09-29', '2023-04-12', 0),
 (93, NULL, NULL, 3, '2379780', NULL, 'Balatro', 'Un roguelike de póker hipnótico donde puedes crear combos ilegales.', 'Balatro es un constructor de mazos roguelike con temática de póker que trata de crear combos poderosos.', 'https://cdn.akamai.steamstatic.com/steam/apps/2379780/library_600x900_2x.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/2379780/header.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/2379780/library_hero.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/2379780/logo.png', 90, '2024-02-20', '2024-05-10', 0),
 (94, NULL, NULL, 18, '814380', NULL, 'Sekiro: Shadows Die Twice', 'Traza tu propio camino hacia la venganza en esta aventura de FromSoftware.', 'En Sekiro encarnas al \"lobo manco\", un guerrero desfigurado rescatado de las garras de la muerte.', 'https://cdn.akamai.steamstatic.com/steam/apps/814380/library_600x900_2x.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/814380/header.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/814380/library_hero.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/814380/logo.png', 88, '2019-03-22', '2023-10-20', 0),
@@ -449,22 +456,47 @@ INSERT INTO `juegos` (`id_juego`, `id_desarrollador`, `id_distribuidor`, `id_peg
 (129, NULL, NULL, 18, '235600', NULL, 'Splinter Cell Blacklist', 'Sam Fisher regresa para detener una amenaza global.', 'Detén ataques terroristas usando tecnología de vanguardia y el sigilo más letal.', 'https://cdn.akamai.steamstatic.com/steam/apps/235600/library_600x900_2x.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/235600/header.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/235600/library_hero.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/235600/logo.png', 82, '2013-08-20', '2026-01-01', 0),
 (131, 1, 1, 3, '123456', '99999', 'Nebula Adventure Test', 'Un juego de prueba para verificar el funcionamiento de la API.', 'En este juego de prueba exploramos las capacidades de inserción de la tabla juegos en la base de datos nebula_db.', 'https://via.placeholder.com/600x900', 'https://via.placeholder.com/460x215', 'https://via.placeholder.com/1920x1080', 'https://via.placeholder.com/400x100', 95, '2026-04-08', '2026-04-08', 1);
 
--- --------------------------------------------------------
+-- Users
+INSERT INTO `users` (`id`, `plan_id`, `role_id`, `username`, `password`, `token`, `first_name`, `last_name`, `email`, `created_date`, `avatar_id`) VALUES
+(0, 2, 0, 'admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzM5MTAsImRhdGEiOnsiaWQiOiIwIiwibm9tYnJlIjoiYWRtaW5AZWplbXBsby5jb20ifX0.CiryWHQbch2W2xS982JCjdQRbKs1lJo8NSwIVtOAlKU', 'Administrador', 'García', 'admin@ejemplo.com', '2026-04-03 19:34:55', 4),
+(1, 0, 1, 'usuario', '9250e222c4c71f0c58d4c54b50a880a312e9f9fed55d5c3aa0b0e860ded99165', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzQwMTIsImRhdGEiOnsiaWQiOiIxIiwibm9tYnJlIjoidXN1YXJpb0B0ZXN0LmNvbSJ9fQ.Qw6ybv4POr1QIauFET8F1KBemdKw5dY6m1UtaJPESZE', 'usuario nombre', 'usuario apellido', 'usuario@test.com', '2026-04-07 11:35:29', 5);
 
---
--- Estructura de tabla para la tabla `juegos_categorias`
---
 
-CREATE TABLE `juegos_categorias` (
-  `id_juego` int NOT NULL,
-  `id_categoria` int NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+-- Screenshots
+INSERT INTO `screenshots` (`id`, `game_id`, `image_url`) VALUES
+(1, 1, 'prueba');
 
---
--- Volcado de datos para la tabla `juegos_categorias`
---
+-- Favorites (Pivot Table)
+INSERT INTO `favorites` (`user_id`, `game_id`) VALUES
+(0, 1),
+(1, 2),
+(1, 3),
+(0, 4),
+(0, 7),
+(0, 9),
+(0, 10),
+(1, 11),
+(1, 13),
+(0, 15),
+(1, 17),
+(1, 18),
+(1, 95),
+(1, 98),
+(1, 99),
+(0, 101),
+(1, 102),
+(0, 105),
+(1, 108),
+(0, 110),
+(1, 115),
+(0, 120),
+(1, 122),
+(0, 125),
+(1, 129),
+(1, 131);
 
-INSERT INTO `juegos_categorias` (`id_juego`, `id_categoria`) VALUES
+-- Game Categories (Pivot Table)
+INSERT INTO `game_categories` (`game_id`, `category_id`) VALUES
 (2, 1),
 (4, 1),
 (5, 1),
@@ -567,25 +599,9 @@ INSERT INTO `juegos_categorias` (`id_juego`, `id_categoria`) VALUES
 (12, 15),
 (8, 18);
 
--- --------------------------------------------------------
 
---
--- Estructura de tabla para la tabla `partidas`
---
-
-CREATE TABLE `partidas` (
-  `id_partida` int NOT NULL,
-  `id_usuario` int DEFAULT NULL,
-  `id_juego` int DEFAULT NULL,
-  `fecha_partida` datetime DEFAULT NULL,
-  `tiempo_partida` time DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Volcado de datos para la tabla `partidas`
---
-
-INSERT INTO `partidas` (`id_partida`, `id_usuario`, `id_juego`, `fecha_partida`, `tiempo_partida`) VALUES
+-- Play Sessions
+INSERT INTO `sessions` (`id`, `user_id`, `game_id`, `played_date`, `duration`) VALUES
 (1, 0, 1, '2026-01-10 10:00:00', '05:30:00'),
 (2, 0, 2, '2026-01-12 15:30:00', '12:45:00'),
 (3, 0, 3, '2026-01-15 20:00:00', '45:20:00'),
@@ -634,299 +650,52 @@ INSERT INTO `partidas` (`id_partida`, `id_usuario`, `id_juego`, `fecha_partida`,
 (46, 1, 128, '2026-04-01 19:00:00', '02:30:00'),
 (47, 1, 129, '2026-04-02 21:00:00', '10:00:00');
 
--- --------------------------------------------------------
 
---
--- Estructura de tabla para la tabla `pegi`
---
 
-CREATE TABLE `pegi` (
-  `id_pegi` int NOT NULL,
-  `nombre_pegi` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `imagen_pegi` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---
--- Volcado de datos para la tabla `pegi`
---
 
-INSERT INTO `pegi` (`id_pegi`, `nombre_pegi`, `imagen_pegi`) VALUES
-(3, 'PEGI 3', 'https://rating.pegi.info/assets/images/games/age_threshold_icons/3.png'),
-(7, 'PEGI 7', 'https://rating.pegi.info/assets/images/games/age_threshold_icons/7.png'),
-(12, 'PEGI 12', 'https://rating.pegi.info/assets/images/games/age_threshold_icons/12.png'),
-(16, 'PEGI 16', 'https://rating.pegi.info/assets/images/games/age_threshold_icons/16.png'),
-(18, 'PEGI 18', 'https://rating.pegi.info/assets/images/games/age_threshold_icons/18.png');
+
+
 
 -- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `roles`
---
-
-CREATE TABLE `roles` (
-  `id_rol` int NOT NULL,
-  `nombre_rol` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Volcado de datos para la tabla `roles`
---
-
-INSERT INTO `roles` (`id_rol`, `nombre_rol`) VALUES
-(0, 'Administrador'),
-(1, 'Usuario');
-
+-- RELACIONES (FOREIGN KEYS)
 -- --------------------------------------------------------
 
---
--- Estructura de tabla para la tabla `suscripciones`
---
+-- Games Relations
+ALTER TABLE `games`
+  ADD CONSTRAINT `fk_games_developer` FOREIGN KEY (`developer_id`) REFERENCES `studios` (`id`),
+  ADD CONSTRAINT `fk_games_publisher` FOREIGN KEY (`publisher_id`) REFERENCES `studios` (`id`),
+  ADD CONSTRAINT `fk_games_pegi` FOREIGN KEY (`pegi_id`) REFERENCES `pegi` (`id`);
 
-CREATE TABLE `suscripciones` (
-  `id_suscripcion` int NOT NULL,
-  `nombre_suscripcion` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
-  `descripcion_suscripcion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
-  `precio_suscripcion` decimal(10,2) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+-- Users Relations
+ALTER TABLE `users`
+  ADD CONSTRAINT `fk_users_plan` FOREIGN KEY (`plan_id`) REFERENCES `plans` (`id`),
+  ADD CONSTRAINT `fk_users_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`),
+  ADD CONSTRAINT `fk_users_avatar` FOREIGN KEY (`avatar_id`) REFERENCES `avatars` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
---
--- Volcado de datos para la tabla `suscripciones`
---
+-- Screenshots Relations
+ALTER TABLE `screenshots`
+  ADD CONSTRAINT `fk_screenshots_game` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE;
 
-INSERT INTO `suscripciones` (`id_suscripcion`, `nombre_suscripcion`, `descripcion_suscripcion`, `precio_suscripcion`) VALUES
-(0, 'Gratis', 'Acceso limitado a juegos antiguos', 0.00),
-(1, 'Plata', 'Acceso a 200 juegos y descuentos exclusivos', 9.99),
-(2, 'Oro', 'Acceso total a todo el catálogo y betas', 14.99),
-(3, 'Bronce', 'Acceso a 50 juegos y guardado en la nube', 4.99),
-(4, 'Prueba', NULL, NULL),
-(9, 'prueba', 'Acceso limitado a juegos antiguos', 0.00),
-(11, 'Plan Premium', 'Acceso total a todos los juegos', 9.99),
-(12, 'Plan Premiumddd', 'Acceso total a todos los juegos', 9.99);
+-- Favorites Relations
+ALTER TABLE `favorites`
+  ADD CONSTRAINT `fk_favorites_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_favorites_game` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE;
+
+-- Game Categories Relations
+ALTER TABLE `game_categories`
+  ADD CONSTRAINT `fk_gc_game` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_gc_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE;
+
+-- Sessions Relations
+ALTER TABLE `sessions`
+  ADD CONSTRAINT `fk_sessions_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_sessions_game` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE;
+
+
 
 -- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `usuarios`
---
-
-CREATE TABLE `usuarios` (
-  `id_usuario` int NOT NULL,
-  `id_suscripcion` int DEFAULT '1',
-  `id_rol` int DEFAULT '4',
-  `alias_usuario` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `password_usuario` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
-  `nombre_usuario` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
-  `apellidos_usuario` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
-  `email_usuario` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `fecha_suscripcion` date DEFAULT NULL,
-  `fecha_creacion_usuario` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `id_avatar` int DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Volcado de datos para la tabla `usuarios`
---
-
-INSERT INTO `usuarios` (`id_usuario`, `id_suscripcion`, `id_rol`, `alias_usuario`, `password_usuario`, `token`, `nombre_usuario`, `apellidos_usuario`, `email_usuario`, `fecha_suscripcion`, `fecha_creacion_usuario`, `id_avatar`) VALUES
-(0, 2, 0, 'admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzM5MTAsImRhdGEiOnsiaWQiOiIwIiwibm9tYnJlIjoiYWRtaW5AZWplbXBsby5jb20ifX0.CiryWHQbch2W2xS982JCjdQRbKs1lJo8NSwIVtOAlKU', 'Administrador', 'García', 'admin@ejemplo.com', '2024-01-15', '2026-04-03 19:34:55', 4),
-(1, 0, 1, 'usuario', '9250e222c4c71f0c58d4c54b50a880a312e9f9fed55d5c3aa0b0e860ded99165', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzQwMTIsImRhdGEiOnsiaWQiOiIxIiwibm9tYnJlIjoidXN1YXJpb0B0ZXN0LmNvbSJ9fQ.Qw6ybv4POr1QIauFET8F1KBemdKw5dY6m1UtaJPESZE', 'usuario nombre', 'usuario apellido', 'usuario@test.com', NULL, '2026-04-07 11:35:29', 5);
-
---
--- Índices para tablas volcadas
---
-
---
--- Indices de la tabla `avatares`
---
-ALTER TABLE `avatares`
-  ADD PRIMARY KEY (`id_avatar`);
-
---
--- Indices de la tabla `capturas`
---
-ALTER TABLE `capturas`
-  ADD PRIMARY KEY (`id_captura`),
-  ADD KEY `id_juego` (`id_juego`);
-
---
--- Indices de la tabla `categorias`
---
-ALTER TABLE `categorias`
-  ADD PRIMARY KEY (`id_categoria`);
-
---
--- Indices de la tabla `estudios`
---
-ALTER TABLE `estudios`
-  ADD PRIMARY KEY (`id_estudio`);
-
---
--- Indices de la tabla `favoritos`
---
-ALTER TABLE `favoritos`
-  ADD PRIMARY KEY (`id_usuario`,`id_juego`),
-  ADD KEY `id_juego` (`id_juego`);
-
---
--- Indices de la tabla `juegos`
---
-ALTER TABLE `juegos`
-  ADD PRIMARY KEY (`id_juego`),
-  ADD KEY `id_desarrollador` (`id_desarrollador`),
-  ADD KEY `id_distribuidor` (`id_distribuidor`),
-  ADD KEY `id_pegi` (`id_pegi`);
-
---
--- Indices de la tabla `juegos_categorias`
---
-ALTER TABLE `juegos_categorias`
-  ADD PRIMARY KEY (`id_juego`,`id_categoria`),
-  ADD KEY `id_categoria` (`id_categoria`);
-
---
--- Indices de la tabla `partidas`
---
-ALTER TABLE `partidas`
-  ADD PRIMARY KEY (`id_partida`),
-  ADD KEY `id_usuario` (`id_usuario`),
-  ADD KEY `id_juego` (`id_juego`);
-
---
--- Indices de la tabla `pegi`
---
-ALTER TABLE `pegi`
-  ADD PRIMARY KEY (`id_pegi`);
-
---
--- Indices de la tabla `roles`
---
-ALTER TABLE `roles`
-  ADD PRIMARY KEY (`id_rol`);
-
---
--- Indices de la tabla `suscripciones`
---
-ALTER TABLE `suscripciones`
-  ADD PRIMARY KEY (`id_suscripcion`);
-
---
--- Indices de la tabla `usuarios`
---
-ALTER TABLE `usuarios`
-  ADD PRIMARY KEY (`id_usuario`),
-  ADD UNIQUE KEY `usuario` (`alias_usuario`),
-  ADD UNIQUE KEY `email` (`email_usuario`),
-  ADD KEY `id_suscripcion` (`id_suscripcion`),
-  ADD KEY `id_rol` (`id_rol`),
-  ADD KEY `fk_usuario_avatar` (`id_avatar`);
-
---
--- AUTO_INCREMENT de las tablas volcadas
---
-
---
--- AUTO_INCREMENT de la tabla `avatares`
---
-ALTER TABLE `avatares`
-  MODIFY `id_avatar` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
-
---
--- AUTO_INCREMENT de la tabla `capturas`
---
-ALTER TABLE `capturas`
-  MODIFY `id_captura` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- AUTO_INCREMENT de la tabla `categorias`
---
-ALTER TABLE `categorias`
-  MODIFY `id_categoria` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
-
---
--- AUTO_INCREMENT de la tabla `estudios`
---
-ALTER TABLE `estudios`
-  MODIFY `id_estudio` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=105;
-
---
--- AUTO_INCREMENT de la tabla `juegos`
---
-ALTER TABLE `juegos`
-  MODIFY `id_juego` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=132;
-
---
--- AUTO_INCREMENT de la tabla `partidas`
---
-ALTER TABLE `partidas`
-  MODIFY `id_partida` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
-
---
--- AUTO_INCREMENT de la tabla `roles`
---
-ALTER TABLE `roles`
-  MODIFY `id_rol` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- AUTO_INCREMENT de la tabla `suscripciones`
---
-ALTER TABLE `suscripciones`
-  MODIFY `id_suscripcion` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
-
---
--- AUTO_INCREMENT de la tabla `usuarios`
---
-ALTER TABLE `usuarios`
-  MODIFY `id_usuario` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
-
---
--- Restricciones para tablas volcadas
---
-
---
--- Filtros para la tabla `capturas`
---
-ALTER TABLE `capturas`
-  ADD CONSTRAINT `capturas_ibfk_1` FOREIGN KEY (`id_juego`) REFERENCES `juegos` (`id_juego`);
-
---
--- Filtros para la tabla `favoritos`
---
-ALTER TABLE `favoritos`
-  ADD CONSTRAINT `favoritos_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`),
-  ADD CONSTRAINT `favoritos_ibfk_2` FOREIGN KEY (`id_juego`) REFERENCES `juegos` (`id_juego`);
-
---
--- Filtros para la tabla `juegos`
---
-ALTER TABLE `juegos`
-  ADD CONSTRAINT `fk_juegos_pegi` FOREIGN KEY (`id_pegi`) REFERENCES `pegi` (`id_pegi`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  ADD CONSTRAINT `juegos_ibfk_1` FOREIGN KEY (`id_desarrollador`) REFERENCES `estudios` (`id_estudio`),
-  ADD CONSTRAINT `juegos_ibfk_2` FOREIGN KEY (`id_distribuidor`) REFERENCES `estudios` (`id_estudio`);
-
---
--- Filtros para la tabla `juegos_categorias`
---
-ALTER TABLE `juegos_categorias`
-  ADD CONSTRAINT `juegos_categorias_ibfk_1` FOREIGN KEY (`id_juego`) REFERENCES `juegos` (`id_juego`),
-  ADD CONSTRAINT `juegos_categorias_ibfk_2` FOREIGN KEY (`id_categoria`) REFERENCES `categorias` (`id_categoria`);
-
---
--- Filtros para la tabla `partidas`
---
-ALTER TABLE `partidas`
-  ADD CONSTRAINT `partidas_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id_usuario`),
-  ADD CONSTRAINT `partidas_ibfk_2` FOREIGN KEY (`id_juego`) REFERENCES `juegos` (`id_juego`);
-
---
--- Filtros para la tabla `usuarios`
---
-ALTER TABLE `usuarios`
-  ADD CONSTRAINT `fk_usuario_avatar` FOREIGN KEY (`id_avatar`) REFERENCES `avatares` (`id_avatar`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `usuarios_ibfk_1` FOREIGN KEY (`id_suscripcion`) REFERENCES `suscripciones` (`id_suscripcion`),
-  ADD CONSTRAINT `usuarios_ibfk_3` FOREIGN KEY (`id_rol`) REFERENCES `roles` (`id_rol`);
+-- COMMIT
+-- --------------------------------------------------------
 COMMIT;
 
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

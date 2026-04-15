@@ -14,11 +14,11 @@ class AuthModel
     
     public function __construct(){
         
-        $this->host     = getenv('DB_HOST')     ?: '127.0.0.1';
-    $this->db       = getenv('DB_NAME')     ?: 'nebula_db'; // Asegúrate que coincida con tu SQL
-    $this->user     = getenv('DB_USER')     ?: 'root';
-    $this->password = getenv('DB_PASSWORD') ?: 'root'; // En GitHub Actions es la que pongas en Secrets
-    $this->port     = getenv('DB_PORT')     ?: '3306';
+        $this->host     = getenv('DB_HOST');
+		$this->db       = getenv('DB_NAME');
+		$this->user     = getenv('DB_USER');
+		$this->password = getenv('DB_PASSWORD');
+		$this->port     = getenv('DB_PORT');
         // Ajustado a los datos de tu SQL y servidor db
         //$this->connection = new mysqli('db', 'root', 'root', 'Proyecto_Final', '3306');
         $this->connection = new mysqli(
@@ -26,11 +26,10 @@ class AuthModel
 			$this->user,
 			$this->password,
 			$this->db,
-			//$this->port
-            '3306'
+			$this->port
 		);
 
-        if($this->connection->connect_errno){
+        if ($this->connection->connect_errno){
             echo 'Error de conexión a la base de datos';
             exit;
         }
@@ -38,13 +37,13 @@ class AuthModel
 
     /**
      * Método para autentificarse en la API
-     * Corregido: nombre de tabla 'usuarios' y columna 'nombre'
+     * Corregido: nombre de tabla 'users' y columna 'email'
      */
-    public function login($usuario, $password)
+    public function login($email, $password)
     {
        
         // En tu SQL la tabla es usuarios y la columna es nombre (no nombres)
-        $query = "SELECT id_usuario, email_usuario FROM usuarios WHERE email_usuario = '$usuario' AND password_usuario = '$password'";
+        $query = "SELECT id, email FROM users WHERE email = '$email' AND password = '$password'";
 
         $results = $this->connection->query($query);
 
@@ -61,12 +60,12 @@ class AuthModel
 
     /**
      * Método para actualizar el token de un usuario con un determinado id
-     * Corregido: nombre de tabla 'usuarios' e 'id_usuario'
+     * Corregido: nombre de tabla 'users' e 'id'
      */
     public function update($id, $token)
     {
-        // Corregido: id_usuario y usuarios
-        $query = "UPDATE usuarios SET token = '$token' WHERE id_usuario = $id";
+        // Corregido: id y users
+        $query = "UPDATE users SET token = '$token' WHERE id = $id";
 
         $this->connection->query($query);
         
@@ -79,12 +78,12 @@ class AuthModel
 
     /**
      * Método para obtener el token de un determinado id
-     * Corregido: nombre de tabla 'USUARIOS' e 'id_usuario'
+     * Corregido: nombre de tabla 'users' e 'id'
      */
     public function getById($id)
     {
-        // Corregido: id_usuario y tabla USUARIOS
-        $query = "SELECT token FROM usuarios WHERE id_usuario = $id";
+        // Corregido: id y tabla users
+        $query = "SELECT token FROM users WHERE id = $id";
 
         $results = $this->connection->query($query);
 

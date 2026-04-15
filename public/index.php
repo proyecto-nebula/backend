@@ -31,19 +31,19 @@ $id = $parts[1] ?? null;       // 5 (opcional)
 
 // 4. Inyectar el ID en $_GET para que tus archivos actuales lo lean
 if ($id) {
-    if ($resource === 'usuarios') $_GET['id_usuario'] = $id;
-    if ($resource === 'juegos')   $_GET['id_juego'] = $id;
-    if ($resource === 'avatares')   $_GET['id_avatar'] = $id;
-    if ($resource === 'capturas')   $_GET['id_captura'] = $id;
-    if ($resource === 'categorias')   $_GET['id_categoria'] = $id;
-    if ($resource === 'estudios')   $_GET['id_estudio'] = $id;
-    if ($resource === 'favoritos')   $_GET['id_usuario'] = $id;
-    if ($resource === 'juegos_categoria')   $_GET['id_juego'] = $id;
-    if ($resource === 'juegos')   $_GET['id_juego'] = $id;
-    if ($resource === 'partidas')   $_GET['id_partida'] = $id;
-    if ($resource === 'pegi')   $_GET['id_pegi'] = $id;
-    if ($resource === 'roles')   $_GET['id_rol'] = $id;
-    if ($resource === 'suscripciones')   $_GET['id_suscripcion'] = $id;
+    if ($resource === 'users') $_GET['id'] = $id;
+    if ($resource === 'games')   $_GET['id'] = $id;
+    if ($resource === 'avatars')   $_GET['id'] = $id;
+    if ($resource === 'screenshots')   $_GET['id'] = $id;
+    if ($resource === 'categories')   $_GET['id'] = $id;
+    if ($resource === 'studios')   $_GET['id'] = $id;
+    if ($resource === 'favorites')   $_GET['id'] = $id;
+    if ($resource === 'game_categories')   $_GET['id'] = $id;
+    if ($resource === 'games')   $_GET['id'] = $id;
+    if ($resource === 'sessions')   $_GET['id'] = $id;
+    if ($resource === 'pegi')   $_GET['id'] = $id;
+    if ($resource === 'roles')   $_GET['id'] = $id;
+    if ($resource === 'plans')   $_GET['id'] = $id;
     // Añade aquí otros si tienes más recursos (ej: 'roles' => 'id_rol')
 }
 

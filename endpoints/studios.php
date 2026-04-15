@@ -1,14 +1,15 @@
 <?php
 /**
- * Script para trabajar con registros de la tabla FAVORITOS
+ * Script que se usa en los endpoints para trabajar con registros de la tabla STUDIOS
  */
 require_once  __DIR__ . '/../src/utils/response.php';
 require_once __DIR__ . '/../src/classes/auth.class.php';
-require_once __DIR__ . '/../src/classes/favoritos.class.php';
+require_once __DIR__ . '/../src/classes/studios.class.php';
 
 $auth = new Authentication();
 $auth->verify();
-$item = new favoritos();
+
+$item = new studios();
 
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
@@ -22,20 +23,25 @@ switch ($_SERVER['REQUEST_METHOD']) {
         Response::result(201, array('result' => 'ok', 'insert_id' => $insert_id));
         break;
 
+    case 'PUT':
+        $params = json_decode(file_get_contents('php://input'), true);
+        $item->updatePut($_GET['id'], $params);
+        Response::result(200, array('result' => 'ok'));
+        break;
+
+    case 'PATCH':
+        $params = json_decode(file_get_contents('php://input'), true);
+        $item->updatePatch($_GET['id'], $params);
+        Response::result(200, array('result' => 'ok'));
+        break;
 
     case 'DELETE':
-        // Validamos que vengan AMBOS parámetros
-        if(!isset($_GET['id_usuario']) || !isset($_GET['id_juego'])){
-            Response::result(400, array('result' => 'error', 'details' => 'Falta id_usuario o id_juego'));
-            exit;
-        }
-        
-        // Pasamos ambos al método delete
-        $item->deleteFavorito($_GET['id_usuario'], $_GET['id_juego']);
-        Response::result(200, array('result' => 'ok', 'details' => 'Favorito eliminado'));
+        $item->delete($_GET['id']);
+        Response::result(200, array('result' => 'ok'));
         break;
 
     default:
         Response::result(404, array('result' => 'error'));
         break;
 }
+?>

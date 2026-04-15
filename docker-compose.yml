@@ -1,5 +1,6 @@
 services:
   api:
+    container_name: api
     build: .
     ports:
       - "8000:80"
@@ -16,6 +17,7 @@ services:
       - db
 
   db:
+    container_name: db
     image: mysql:8.0
     restart: always
     environment:
@@ -27,8 +29,8 @@ services:
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   phpmyadmin:
+    container_name: phpmyadmin
     image: phpmyadmin:latest
-    container_name: phpmyadmin_container
     ports:
       - "8080:80"
     environment:

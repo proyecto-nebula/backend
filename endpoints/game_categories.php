@@ -1,15 +1,15 @@
 <?php
 /**
- * Script para trabajar con registros de la tabla JUEGOS_CATEGORIAS
+ * Script para trabajar con registros de la tabla game_categories
  */
 require_once  __DIR__ . '/../src/utils/response.php';
 require_once __DIR__ . '/../src/classes/auth.class.php';
-require_once __DIR__ . '/../src/classes/juegos_categorias.class.php';
+require_once __DIR__ . '/../src/classes/game_categories.class.php';
 
 $auth = new Authentication();
 $auth->verify();
 
-$item = new juegos_categorias();
+$item = new game_categories();
 
 
 switch ($_SERVER['REQUEST_METHOD']) {
@@ -22,13 +22,13 @@ switch ($_SERVER['REQUEST_METHOD']) {
         break;
     case 'DELETE':
         // Verificamos que lleguen ambos parámetros por la URL
-        if(!isset($_GET['id_juego']) || !isset($_GET['id_categoria'])){
-            Response::result(400, array('result' => 'error', 'details' => 'Faltan parámetros (id_juego e id_categoria)'));
+        if(!isset($_GET['game_id']) || !isset($_GET['category_id'])){
+            Response::result(400, array('result' => 'error', 'details' => 'Faltan parámetros (game_id e category_id)'));
             exit;
         }
         
         // Llamamos al método correcto que está en tu clase
-        $item->deleteRelacion($_GET['id_juego'], $_GET['id_categoria']);
+        $item->deleteRelacion($_GET['game_id'], $_GET['category_id']);
         
         Response::result(200, array('result' => 'ok'));
         break;
