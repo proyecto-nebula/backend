@@ -37,9 +37,9 @@ class ConnectionTest extends TestCase {
    /** @test */
     public function test_api_endpoints_health() {
         $endpoints = [
-            'avatares', 'capturas', 'categorias', 'estudios', 
-            'favoritos', 'juegos', 'juegos_categorias', 
-            'partidas', 'pegi', 'roles', 'suscripciones', 'usuarios'
+            'avatars', 'screenshots', 'categories', 'studios', 
+            'favorites', 'games', 'game_categories', 
+            'sessions', 'pegi', 'roles', 'plans', 'users'
         ];
 
         foreach ($endpoints as $resource) {

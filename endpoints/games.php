@@ -75,7 +75,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
             exit;
         }
 
-        $item->updatePut($_GET['id_juego'], $params);
+        $item->updatePut($_GET['id'], $params);
 
         $response = array(
             'result' => 'ok'

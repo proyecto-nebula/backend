@@ -5,32 +5,32 @@
 require_once __DIR__ . '/../utils/response.php';
 require_once __DIR__ . '/../models/database.php';
 
-class capturas extends Database {
+class screenshots extends Database {
     /**
      * Atributo que indica la tabla asociada a la clase del modelo
      */
-    private $table = 'capturas';
+    private $table = 'screenshots';
 
     /**
      * Atributo que indica la columna que es primary key en la tabla
      */
-    private $primary_key = 'id_captura';
+    private $primary_key = 'id';
 
 
     /**
      * Array con los campos de la tabla que se pueden usar como filtro para recuperar registros
      */
     private $allowedConditions_get = array(
-        'id_captura',
-        'id_juego'
+        'id',
+        'game_id'
     );
 
     /**
      * Array con los campos de la tabla que se pueden proporcionar para insertar registros
      */
     private $allowedConditions_insert = array(
-        'id_juego',
-        'imagen_captura'
+        'game_id',
+        'image_url'
     );
 
     /**
@@ -58,7 +58,7 @@ class capturas extends Database {
      */
     private function validate($data) {
 
-        if (!isset($data['id_juego']) || empty($data['id_juego']) || !isset($data['imagen_captura']) || empty($data['imagen_captura'])) {
+        if (!isset($data['game_id']) || empty($data['game_id']) || !isset($data['image_url']) || empty($data['image_url'])) {
             $response = array(
                 'result' => 'error',
                 'details' => 'Los campos id_juego e imagen son obligatorios'

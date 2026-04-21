@@ -15,7 +15,7 @@ class Authentication extends AuthModel
     /**
      * Tabla donde estarán los usuarios (Ajustado a tu SQL: USUARIOS)
      */
-    private $table = 'usuarios';
+    private $table = 'users';
 
     /**
      * Clave secreta para realizar la encriptación y desencriptación del token
@@ -38,7 +38,7 @@ public function __construct() {
      */
     public function signIn($user)
     {
-        if(!isset($user['email_usuario']) || !isset($user['password_usuario']) || empty($user['email_usuario']) || empty($user['password_usuario'])){
+        if(!isset($user['email']) || !isset($user['password']) || empty($user['email']) || empty($user['password'])){
             $response = array(
                 'result' => 'error',
                 'details' => 'Los campos password y el email son obligatorios'
@@ -50,7 +50,7 @@ public function __construct() {
 
         // Importante: En los datos random que insertamos, las contraseñas no tienen hash. 
         // Si vas a usar hash('sha256'...), asegúrate de que en la BD estén hasheadas.
-        $result = parent::login($user['email_usuario'], hash('sha256' , $user['password_usuario']));
+        $result = parent::login($user['email'], hash('sha256' , $user['password']));
 
         if(sizeof($result) == 0){
             $response = array(
@@ -66,15 +66,15 @@ public function __construct() {
         $dataToken = array(
             'iat' => time(),
             'data' => array(
-                'id' => $result[0]['id_usuario'],
-                'nombre' => $result[0]['email_usuario']
+                'id' => $result[0]['id'],
+                'email' => $result[0]['email']
             )
         );
 
         $jwt = JWT::encode($dataToken, $this->key);
 
         // Actualizamos el token en la base de datos usando el id_usuario
-        parent::update($result[0]['id_usuario'], $jwt);
+        parent::update($result[0]['id'], $jwt);
 
         return $jwt;
     }

@@ -5,12 +5,12 @@
 require_once __DIR__ . '/../utils/response.php';
 require_once __DIR__ . '/../models/database.php';
 
-class juegos_categorias extends Database {
-    private $table = 'juegos_categorias';
-    private $primary_key = 'id_juego';
+class game_categories extends Database {
+    private $table = 'game_categories';
+    private $primary_key = 'game_id';
 
-    private $allowedConditions_get = array('id_juego', 'id_categoria');
-    private $allowedConditions_insert = array('id_juego', 'id_categoria');
+    private $allowedConditions_get = array('game_id', 'category_id');
+    private $allowedConditions_insert = array('game_id', 'category_id');
 
     /**
      * Mueve el método filtrarParametros arriba o asegúrate de que esté bien escrito
@@ -20,7 +20,7 @@ class juegos_categorias extends Database {
         
         foreach ($params as $key => $value) {
             // Ignoramos parámetros de sistema y IDs principales
-            if ($key === 'url' || $key === 'id_juego' || $key === 'id_categoria') continue;
+            if ($key === 'url' || $key === 'game_id' || $key === 'category_id') continue;
 
             if (!in_array($key, $allowed)) {
                 Response::result(400, array(
@@ -33,7 +33,7 @@ class juegos_categorias extends Database {
     }
 
     private function validate($data) {
-        if (!isset($data['id_juego']) || !isset($data['id_categoria'])) {
+        if (!isset($data['game_id']) || !isset($data['category_id'])) {
             Response::result(400, array('result' => 'error', 'details' => 'Faltan campos obligatorios'));
             exit;
         }
@@ -76,8 +76,8 @@ class juegos_categorias extends Database {
     /**
      * Método para borrar la relación específica
      */
-    public function deleteRelacion($id_juego, $id_categoria) {
-        $sql = "DELETE FROM $this->table WHERE id_juego = $id_juego AND id_categoria = $id_categoria";
+    public function deleteRelacion($game_id, $category_id) {
+        $sql = "DELETE FROM $this->table WHERE game_id = $game_id AND category_id = $category_id";
         $db = $this->getConnection();
         $db->query($sql);
 

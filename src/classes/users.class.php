@@ -5,41 +5,41 @@
 require_once __DIR__ . '/../utils/response.php';
 require_once __DIR__ . '/../models/database.php';
 
-class usuarios extends Database {
+class users extends Database {
     /**
      * Atributo que indica la tabla asociada a la clase del modelo
      */
-    private $table = 'usuarios';
+    private $table = 'users';
 
     /**
      * Atributo que indica la columna que es primary key en la tabla
      */
-    private $primary_key = 'id_usuario';
+    private $primary_key = 'id';
 
 
     /**
      * Array con los campos de la tabla que se pueden usar como filtro para recuperar registros
      */
     private $allowedConditions_get = array(
-        'id_usuario',
+        'id',
         'token',
-        'fecha_creacion_usuario'
+        'created_date'
     );
 
     /**
      * Array con los campos de la tabla que se pueden proporcionar para insertar registros
      */
     private $allowedConditions_insert = array(
-        'alias_usuario',
-        'id_rol',
-        'password_usuario',
-        'nombre_usuario',
-        'apellidos_usuario',
-        'email_usuario',
-        'fecha_suscripcion_usuario',
-        'id_avatar',
-        'id_suscripcion',
-        'fecha_creacion_usuario'
+        'username',
+        'role_id',
+        'password',
+        'first_name',
+        'last_name',
+        'email',
+        'subscription_date',
+        'avatar_id',
+        'plan_id',
+        'created_date'
     );
 
     /**
@@ -48,11 +48,11 @@ class usuarios extends Database {
     private function validate($data) {
         // Comprobamos que todos los campos requeridos existan y no estén vacíos
         if (
-            !isset($data['alias_usuario']) || empty($data['alias_usuario']) ||
-            !isset($data['password_usuario']) || empty($data['password_usuario']) ||
-            !isset($data['nombre_usuario']) || empty($data['nombre_usuario']) ||
-            !isset($data['apellidos_usuario']) || empty($data['apellidos_usuario']) ||
-            !isset($data['email_usuario']) || empty($data['email_usuario']) 
+            !isset($data['username']) || empty($data['username']) ||
+            !isset($data['password']) || empty($data['password']) ||
+            !isset($data['first_name']) || empty($data['first_name']) ||
+            !isset($data['last_name']) || empty($data['last_name']) ||
+            !isset($data['email']) || empty($data['email']) 
         ) {
             $response = array(
                 'result' => 'error',
@@ -64,7 +64,7 @@ class usuarios extends Database {
         }
 
         // Encriptamos la contraseña en formato sha256 antes de guardarla en la base de datos
-        $data['password_usuario'] = hash('sha256', $data['password_usuario']);
+        $data['password'] = hash('sha256', $data['password']);
 
         return $data;
     }
@@ -204,20 +204,20 @@ class usuarios extends Database {
      */
     public function getPerfilCompleto($id) {
         $sql = "SELECT 
-                    u.id_usuario, 
-                    u.alias_usuario, 
-                    u.nombre_usuario, 
-                    u.apellidos_usuario, 
-                    u.email_usuario,
-                    r.id_rol,
-                    r.nombre_rol,
-                    a.imagen_avatar,
-                    s.nombre_suscripcion 
-                FROM usuarios u
-                INNER JOIN roles r ON u.id_rol = r.id_rol
-                LEFT JOIN avatares a ON u.id_avatar = a.id_avatar
-                INNER JOIN suscripciones s ON u.id_suscripcion = s.id_suscripcion
-                WHERE u.id_usuario = $id";
+                    u.id, 
+                    u.username, 
+                    u.first_name, 
+                    u.last_name, 
+                    u.email,
+                    r.id AS role_id,
+                    r.name AS role_name,
+                    a.image_url AS avatar_image,
+                    p.name AS plan_name
+                FROM users u
+                INNER JOIN roles r ON u.role_id = r.id
+                LEFT JOIN avatars a ON u.avatar_id = a.id
+                INNER JOIN plans p ON u.plan_id = p.id
+                WHERE u.id = $id";
                 
         // Obtenemos la conexión mysqli de la clase padre
         $db = $this->getConnection();

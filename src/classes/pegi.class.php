@@ -14,23 +14,23 @@ class pegi extends Database {
     /**
      * Atributo que indica la columna que es primary key en la tabla
      */
-    private $primary_key = 'id_pegi';
+    private $primary_key = 'id';
 
 
     /**
      * Array con los campos de la tabla que se pueden usar como filtro para recuperar registros
      */
     private $allowedConditions_get = array(
-        'id_pegi'
+        'id'
     );
 
     /**
      * Array con los campos de la tabla que se pueden proporcionar para insertar registros
      */
     private $allowedConditions_insert = array(
-        'id_pegi',
-        'nombre_pegi',
-        'imagen_pegi'
+        'id',
+        'name',
+        'image_url'
     );
 
     /**
@@ -56,7 +56,7 @@ class pegi extends Database {
      */
     private function validate($data) {
 
-        if (!isset($data['imagen_pegi']) || empty($data['imagen_pegi']) || !isset($data['nombre_pegi']) || empty($data['nombre_pegi'])) {
+        if (!isset($data['image_url']) || empty($data['image_url']) || !isset($data['name']) || empty($data['name'])) {
             $response = array(
                 'result' => 'error',
                 'details' => 'El campo imagen y/o nombre es obligatorio'

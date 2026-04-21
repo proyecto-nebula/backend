@@ -5,31 +5,31 @@
 require_once __DIR__ . '/../utils/response.php';
 require_once __DIR__ . '/../models/database.php';
 
-class estudios extends Database {
+class studios extends Database {
     /**
      * Atributo que indica la tabla asociada a la clase del modelo
      */
-    private $table = 'estudios';
+    private $table = 'studios';
 
     /**
      * Atributo que indica la columna que es primary key en la tabla
      */
-    private $primary_key = 'id_estudio';
+    private $primary_key = 'id';
 
 
     /**
      * Array con los campos de la tabla que se pueden usar como filtro para recuperar registros
      */
     private $allowedConditions_get = array(
-        'id_estudio',
+        'id',
     );
 
     /**
      * Array con los campos de la tabla que se pueden proporcionar para insertar registros
      */
     private $allowedConditions_insert = array(
-        'nombre_estudio',
-        'logo_estudio'
+        'name',
+        'logo_url'
     );
 
     /**
@@ -38,7 +38,7 @@ class estudios extends Database {
     private function filtrarParametros($params, $allowed) {
         foreach ($params as $key => $value) {
             // Ignoramos 'url' y cualquier parámetro que empiece por 'id' o sea 'nombre'
-            if ($key === 'url' || strpos($key, 'id_estudio') === 0 || $key === 'nombre_estudio') continue;
+            if ($key === 'url' || strpos($key, 'id') === 0 || $key === 'name') continue;
 
             if (!in_array($key, $allowed)) {
                 Response::result(400, array(
@@ -55,7 +55,7 @@ class estudios extends Database {
      */
     private function validate($data) {
 
-        if (!isset($data['nombre_estudio']) || empty($data['nombre_estudio'])) {
+        if (!isset($data['name']) || empty($data['name'])) {
             $response = array(
                 'result' => 'error',
                 'details' => 'El campo nombre es obligatorio'

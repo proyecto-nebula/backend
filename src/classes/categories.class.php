@@ -5,31 +5,31 @@
 require_once __DIR__ . '/../utils/response.php';
 require_once __DIR__ . '/../models/database.php';
 
-class categorias extends Database {
+class categories extends Database {
     /**
      * Atributo que indica la tabla asociada a la clase del modelo
      */
-    private $table = 'categorias';
+    private $table = 'categories';
 
     /**
      * Atributo que indica la columna que es primary key en la tabla
      */
-    private $primary_key = 'id_categoria';
+    private $primary_key = 'id';
 
 
     /**
      * Array con los campos de la tabla que se pueden usar como filtro para recuperar registros
      */
     private $allowedConditions_get = array(
-        'id_categoria',
-        'nombre_categoria'
+        'id',
+        'name'
     );
 
     /**
      * Array con los campos de la tabla que se pueden proporcionar para insertar registros
      */
     private $allowedConditions_insert = array(
-        'nombre_categoria'
+        'name'
     );
 
     /**
@@ -38,7 +38,7 @@ class categorias extends Database {
     private function filtrarParametros($params, $allowed) {
         foreach ($params as $key => $value) {
             // Ignoramos 'url' y cualquier ID o campo de búsqueda dinámico que venga del .htaccess
-            if ($key === 'url' || strpos($key, 'id_categoria') === 0 || $key === 'nombre_categoria') continue;
+            if ($key === 'url' || strpos($key, 'id') === 0 || $key === 'name') continue;
 
             if (!in_array($key, $allowed)) {
                 Response::result(400, array(
@@ -55,7 +55,7 @@ class categorias extends Database {
      */
     private function validate($data) {
 
-        if (!isset($data['nombre_categoria']) || empty(trim($data['nombre_categoria']))) {
+        if (!isset($data['name']) || empty(trim($data['name']))) {
             $response = array(
                 'result' => 'error',
                 'details' => 'El campo nombre es obligatorio'

@@ -5,19 +5,19 @@
 require_once __DIR__ . '/../utils/response.php';
 require_once __DIR__ . '/../models/database.php';
 
-class juegos extends Database {
-    private $table = 'juegos';
-    private $primary_key = 'id_juego';
+class games extends Database {
+    private $table = 'games';
+    private $primary_key = 'id';
 
     /**
      * He añadido los sufijos _min y _max para Metacritic y Fecha
      */
     private $allowedConditions_get = array(
-        'id_juego', 'titulo_juego', 'fecha_lanzamiento_juego', 'metacritic_juego', 'id_pegi', 'fecha_publicacion_juego', 'destacado_juego', 'id_desarollador', 'id_distribuidor'
+        'id', 'title', 'release_date', 'metacritic_score', 'pegi_id', 'publish_date', 'is_featured', 'developer_id', 'publisher_id'
     );
 
     private $allowedConditions_insert = array(
-        'id_desarrollador', 'id_distribuidor', 'id_pegi', 'id_steam', 'id_igdb', 'titulo_juego', 'descripcion_corta', 'descripcion_larga', 'portada_v', 'portada_h', 'hero_juego', 'logo_juego', 'metacritic_juego', 'fecha_lanzamiento_juego', 'fecha_publicacion_juego', 'destacado_juego'
+        'developer_id', 'publisher_id', 'pegi_id', 'steam_id', 'igdb_id', 'title', 'summary', 'description', 'cover_url', 'banner_url', 'hero_url', 'logo_url', 'metacritic_score', 'release_date', 'publish_date', 'is_featured'
     );
 
     /**
@@ -36,8 +36,8 @@ class juegos extends Database {
     }
 
     private function validate($data) {
-        if (!isset($data['titulo_juego']) || empty($data['titulo_juego'])) {
-            Response::result(400, array('result' => 'error', 'details' => 'El campo titulo es obligatorio'));
+        if (!isset($data['title']) || empty($data['title'])) {
+            Response::result(400, array('result' => 'error', 'details' => 'El campo title es obligatorio'));
             exit;
         }
         return true;

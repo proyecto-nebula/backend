@@ -5,31 +5,31 @@
 require_once __DIR__ . '/../utils/response.php';
 require_once __DIR__ . '/../models/database.php';
 
-class avatares extends Database {
+class avatars extends Database {
 	/**
 	 * Atributo que indica la tabla asociada a la clase del modelo
 	 */
-	private $table = 'avatares';
+	private $table = 'avatars';
 
 	/**
 	 * Atributo que indica la columna que es primary key en la tabla
 	 */
-	private $primary_key = 'id_avatar';
+	private $primary_key = 'id';
 
 
 	/**
 	 * Array con los campos de la tabla que se pueden usar como filtro para recuperar registros
 	 */
 	private $allowedConditions_get = array(
-		'id_avatar'
+		'id'
 	);
 
 	/**
 	 * Array con los campos de la tabla que se pueden proporcionar para insertar registros
 	 */
 	private $allowedConditions_insert = array(
-		'nombre_avatar',
-		'imagen_avatar'
+		'name',
+		'image_url'
 	);
 
 	/**
@@ -37,7 +37,7 @@ class avatares extends Database {
 	 */
 	private function validate($data) {
 
-		if (!isset($data['imagen_avatar']) || empty($data['imagen_avatar'])) {
+		if (!isset($data['image_url']) || empty($data['image_url'])) {
 			$response = array(
 				'result' => 'error',
 				'details' => 'El campo imagen es obligatorio'

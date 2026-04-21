@@ -5,32 +5,32 @@
 require_once __DIR__ . '/../utils/response.php';
 require_once __DIR__ . '/../models/database.php';
 
-class suscripcion extends Database {
+class plans extends Database {
 	/**
 	 * Atributo que indica la tabla asociada a la clase del modelo
 	 */
-	private $table = 'suscripciones';
+	private $table = 'plans';
 
 	/**
 	 * Atributo que indica la columna que es primary key en la tabla
 	 */
-	private $primary_key = 'id_suscripcion';
+	private $primary_key = 'id';
 
 
 	/**
 	 * Array con los campos de la tabla que se pueden usar como filtro para recuperar registros
 	 */
 	private $allowedConditions_get = array(
-		'id_suscripcion'
+		'id'
 	);
 
 	/**
 	 * Array con los campos de la tabla que se pueden proporcionar para insertar registros
 	 */
 	private $allowedConditions_insert = array(
-		'nombre_suscripcion',
-        'descripcion_suscripcion',
-        'precio_suscripcion'
+		'name',
+		'description',
+		'price'
 	);
 
 	/**
@@ -38,7 +38,7 @@ class suscripcion extends Database {
 	 */
 	private function validate($data) {
 
-		if (!isset($data['nombre_suscripcion']) || empty($data['nombre_suscripcion']) || !isset($data['descripcion_suscripcion']) || empty($data['descripcion_suscripcion']) || !isset($data['precio_suscripcion']) || empty($data['precio_suscripcion'])) {
+		if (!isset($data['name']) || empty($data['name']) || !isset($data['description']) || empty($data['description']) || !isset($data['price']) || empty($data['price'])) {
 			$response = array(
 				'result' => 'error',
 				'details' => 'El campo nombre, descripcion, y precio son obligatorio'

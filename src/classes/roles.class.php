@@ -14,21 +14,21 @@ class roles extends Database {
     /**
      * Atributo que indica la columna que es primary key en la tabla
      */
-    private $primary_key = 'id_rol';
+    private $primary_key = 'id';
 
 
     /**
      * Array con los campos de la tabla que se pueden usar como filtro para recuperar registros
      */
     private $allowedConditions_get = array(
-        'id_rol'
+        'id'
     );
 
     /**
      * Array con los campos de la tabla que se pueden proporcionar para insertar registros
      */
     private $allowedConditions_insert = array(
-        'nombre_rol'
+        'name'
     );
 
     /**
@@ -54,7 +54,7 @@ class roles extends Database {
      */
     private function validate($data) {
 
-        if (!isset($data['nombre_rol']) || empty($data['nombre_rol'])) {
+        if (!isset($data['name']) || empty($data['name'])) {
             $response = array(
                 'result' => 'error',
                 'details' => 'El campo nombre es obligatorio'

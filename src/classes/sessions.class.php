@@ -5,36 +5,36 @@
 require_once __DIR__ . '/../utils/response.php';
 require_once __DIR__ . '/../models/database.php';
 
-class partidas extends Database {
+class sessions extends Database {
     /**
      * Atributo que indica la tabla asociada a la clase del modelo
      */
-    private $table = 'partidas';
+    private $table = 'sessions';
 
     /**
      * Atributo que indica la columna que es primary key en la tabla
      */
-    private $primary_key = 'id_partida';
+    private $primary_key = 'id';
 
 
     /**
      * Array con los campos de la tabla que se pueden usar como filtro para recuperar registros
      */
     private $allowedConditions_get = array(
-        'id_partida',
-        'id_usuario',
-        'id_juego',
-        'fecha_partida'
+        'id',
+        'user_id',
+        'game_id',
+        'played_date'
     );
 
     /**
      * Array con los campos de la tabla que se pueden proporcionar para insertar registros
      */
     private $allowedConditions_insert = array(
-        'id_usuario',
-        'id_juego',
-        'fecha_partida',
-        'tiempo_partida'
+        'user_id',
+        'game_id',
+        'played_date',
+        'duration'
     );
 
     /**
@@ -60,7 +60,7 @@ class partidas extends Database {
      */
     private function validate($data) {
 
-        if (!isset($data['id_usuario']) || empty($data['id_usuario']) || !isset($data['id_juego']) || empty($data['id_juego'])) {
+        if (!isset($data['user_id']) || empty($data['user_id']) || !isset($data['game_id']) || empty($data['game_id'])) {
             $response = array(
                 'result' => 'error',
                 'details' => 'Los campos id_usuario e id_juego son obligatorios'
