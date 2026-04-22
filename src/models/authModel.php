@@ -1,4 +1,5 @@
 <?php
+namespace App\Models;
 /**
  * Clase del modelo para la tabla de usuarios
  * Representa un registro de la tabla de usuarios y permite hacer el login, obtener un token de un usuario y actualizar el token de un usuario
@@ -20,8 +21,8 @@ class AuthModel
 		$this->password = getenv('DB_PASSWORD');
 		$this->port     = getenv('DB_PORT');
         // Ajustado a los datos de tu SQL y servidor db
-        //$this->connection = new mysqli('db', 'root', 'root', 'Proyecto_Final', '3306');
-        $this->connection = new mysqli(
+        //$this->connection = new \mysqli('db', 'root', 'root', 'Proyecto_Final', '3306');
+        $this->connection = new \mysqli(
 			$this->host,
 			$this->user,
 			$this->password,

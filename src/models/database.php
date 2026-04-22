@@ -1,4 +1,5 @@
 <?php
+namespace App\Models;
 /**
  * Clase con la lógica para conectarse a la base de datos. 
  */
@@ -21,8 +22,8 @@ class Database
 		$this->password = getenv('DB_PASSWORD');
 		$this->port     = getenv('DB_PORT');
 
-		//$this->connection = new mysqli('db', 'root', 'root', 'Proyecto_Final', '3306');
-		$this->connection = new mysqli(
+		//$this->connection = new \mysqli('db', 'root', 'root', 'Proyecto_Final', '3306');
+		$this->connection = new \mysqli(
 			$this->host,
 			$this->user,
 			$this->password,

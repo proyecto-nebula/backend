@@ -1,4 +1,5 @@
 <?php
+namespace App\Utils;
 /**
  * Clase estática que se utiliza para generar la respuesta que se envía al cliente que hace uso de la API REST.
  */

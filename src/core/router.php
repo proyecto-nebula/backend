@@ -1,11 +1,12 @@
 <?php
+namespace App\Core;
 // Router.php
 
 class Router {
     private static $endpoints = [
         'users', 'games', 'avatars', 'screenshots', 'categories', 
         'studios', 'favorites', 'game_categories', 'sessions', 
-        'pegi', 'roles', 'plans', 'auth', 'login', 'test'
+        'pegi', 'roles', 'plans', 'auth', 'test'
     ];
 
     public static function dispatch($uri) {
@@ -32,8 +33,10 @@ class Router {
             $_GET['id'] = intval($id);
         }
 
+        AuthGuard::enforce((string) $resource);
+
         // Cargar el archivo del endpoint (ruta segura)
-        $endpointsDir = realpath(dirname(__DIR__, 2) . '/endpoints');
+        $endpointsDir = realpath(dirname(__DIR__) . '/Endpoints');
         if ($endpointsDir === false) {
             self::jsonResponse(500, ['error' => 'Configuración del servidor inválida']);
         }
