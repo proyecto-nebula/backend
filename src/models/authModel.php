@@ -34,6 +34,8 @@ class AuthModel
             echo 'Error de conexión a la base de datos';
             exit;
         }
+
+        $this->connection->set_charset('utf8mb4');
     }
 
     /**
@@ -65,8 +67,7 @@ class AuthModel
      */
     public function update($id, $token)
     {
-        // Corregido: id y users
-        $query = "UPDATE users SET token = '$token' WHERE id = $id";
+        $query = "UPDATE users SET token = '$token', last_login_at = CURRENT_TIMESTAMP WHERE id = $id";
 
         $this->connection->query($query);
         
@@ -83,8 +84,7 @@ class AuthModel
      */
     public function getById($id)
     {
-        // Corregido: id y tabla users
-        $query = "SELECT token FROM users WHERE id = $id";
+        $query = "SELECT token, last_login_at FROM users WHERE id = $id";
 
         $results = $this->connection->query($query);
 

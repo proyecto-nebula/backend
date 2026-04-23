@@ -13,25 +13,24 @@ class ConnectionTest extends TestCase {
         ]);
     }
     public function test_auth_endpoint_response() {
-        $client = new \GuzzleHttp\Client([
-            'base_uri' => 'http://127.0.0.1:8000',
-            'http_errors' => false // Evita que el test explote si devuelve 401 o 500
-        ]);
-
-        // Enviamos un POST simulando un intento de login
-        $response = $client->request('POST', '/api/v1/auth', [
-            'form_params' => [
-                'alias' => 'admin',
-                'password' => 'admin123'
+        // Enviamos un POST con JSON según el contrato actual del endpoint.
+        $response = $this->client->request('POST', '/api/v1/auth', [
+            'json' => [
+                'email' => 'admin@ejemplo.com',
+                'password' => 'admin'
             ]
         ]);
 
         $status = $response->getStatusCode();
 
-        // Consideramos "éxito" si el servidor responde algo coherente:
-        // 200 (Login OK), 401 (No autorizado), o 400 (Faltan datos)
-        // Lo que NO queremos es un 500 (Error de código) o 404 (No encontrado)
-        $this->assertContains($status, [200, 401, 400], "El endpoint de Auth devolvió un error crítico: $status");
+        $this->assertContains($status, [201, 403, 400], "El endpoint de Auth devolvió un estado inesperado: $status");
+
+        if ($status === 201) {
+            $payload = json_decode((string) $response->getBody(), true);
+            $this->assertIsArray($payload);
+            $this->assertArrayHasKey('token', $payload);
+            $this->assertNotEmpty($payload['token']);
+        }
     }
 
    /** @test */
@@ -46,16 +45,15 @@ class ConnectionTest extends TestCase {
             $response = $this->client->get("/api/v1/$resource");
             $status = $response->getStatusCode();
             
-            // AHORA aceptamos 200 o 403. 
-            // Si devuelve 403, significa que el código PHP funciona pero está protegido.
-            $this->assertContains($status, [200, 403], "Fallo en endpoint: /api/v1/$resource (Código: $status)");
+            // En endpoints protegidos, sin token deben devolver 401.
+            $this->assertContains($status, [200, 401], "Fallo en endpoint: /api/v1/$resource (Código: $status)");
         }
     }
 
     /** @test */
     public function test_auth_endpoint_exists() {
-        // Auth suele dar error si no envías POST, así que solo chequeamos que el archivo existe (no da 404)
+        // Auth permite solo POST; GET debe responder método no permitido.
         $response = $this->client->get("/api/v1/auth");
-        $this->assertNotEquals(404, $response->getStatusCode(), "El endpoint de Auth no existe o el router falla.");
+        $this->assertEquals(405, $response->getStatusCode(), "El endpoint de Auth debería responder 405 en GET.");
     }
 }

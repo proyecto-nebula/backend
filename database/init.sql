@@ -93,6 +93,7 @@ CREATE TABLE `users` (
   `token` varchar(255) DEFAULT NULL,
   `email` varchar(150) NOT NULL,
   `birth_date` date DEFAULT NULL,
+  `last_login_at` timestamp NULL DEFAULT NULL,
   `is_active` boolean DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -460,9 +461,9 @@ INSERT INTO `games` (`id`, `developer_id`, `publisher_id`, `pegi_id`, `steam_id`
 (131, 1, 1, 3, '123456', '99999', 'Nebula Adventure Test', 'Un juego de prueba para verificar el funcionamiento de la API.', 'En este juego de prueba exploramos las capacidades de inserción de la tabla juegos en la base de datos nebula_db.', 'https://via.placeholder.com/600x900', 'https://via.placeholder.com/460x215', 'https://via.placeholder.com/1920x1080', 'https://via.placeholder.com/400x100', 95, '2026-04-08', '2025-05-20 22:00:00', 1, 1, 'nebula-adventure-test');
 
 -- Users
-INSERT INTO `users` (`id`, `plan_id`, `role_id`, `username`, `password`, `token`, `email`, `birth_date`, `is_active`, `created_at`, `avatar_id`) VALUES
-(0, 2, 0, 'admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzM5MTAsImRhdGEiOnsiaWQiOiIwIiwibm9tYnJlIjoiYWRtaW5AZWplbXBsby5jb20ifX0.CiryWHQbch2W2xS982JCjdQRbKs1lJo8NSwIVtOAlKU', 'admin@ejemplo.com', '1990-05-15', 1, '2026-04-03 19:34:55', 4),
-(1, 0, 1, 'usuario', '9250e222c4c71f0c58d4c54b50a880a312e9f9fed55d5c3aa0b0e860ded99165', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzQwMTIsImRhdGEiOnsiaWQiOiIxIiwibm9tYnJlIjoidXN1YXJpb0B0ZXN0LmNvbSJ9fQ.Qw6ybv4POr1QIauFET8F1KBemdKw5dY6m1UtaJPESZE', 'usuario@test.com', '1995-08-22', 1, '2026-04-07 11:35:29', 5);
+INSERT INTO `users` (`id`, `plan_id`, `role_id`, `username`, `password`, `token`, `email`, `birth_date`, `last_login_at`, `is_active`, `created_at`, `avatar_id`) VALUES
+(0, 2, 0, 'admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzM5MTAsImRhdGEiOnsiaWQiOiIwIiwibm9tYnJlIjoiYWRtaW5AZWplbXBsby5jb20ifX0.CiryWHQbch2W2xS982JCjdQRbKs1lJo8NSwIVtOAlKU', 'admin@ejemplo.com', '1990-05-15', '2026-04-03 19:34:55', 1, '2026-04-03 19:34:55', 4),
+(1, 0, 1, 'usuario', '9250e222c4c71f0c58d4c54b50a880a312e9f9fed55d5c3aa0b0e860ded99165', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzQwMTIsImRhdGEiOnsiaWQiOiIxIiwibm9tYnJlIjoidXN1YXJpb0B0ZXN0LmNvbSJ9fQ.Qw6ybv4POr1QIauFET8F1KBemdKw5dY6m1UtaJPESZE', 'usuario@test.com', '1995-08-22', '2026-04-07 11:35:29', 1, '2026-04-07 11:35:29', 5);
 
 
 -- Screenshots

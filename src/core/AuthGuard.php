@@ -24,7 +24,7 @@ class AuthGuard
         }
 
         if (empty($authHeader) || !str_starts_with($authHeader, 'Bearer ')) {
-            Response::result(403, [
+            Response::result(401, [
                 'result'  => 'error',
                 'data'    => null,
                 'message' => 'Usted no tiene los permisos para esta solicitud (Falta Authorization Bearer)'
@@ -42,7 +42,7 @@ class AuthGuard
             $_SERVER['AUTH_USER_ID'] = (string) ($data['id'] ?? '');
             $_SERVER['AUTH_USER_EMAIL'] = (string) ($data['email'] ?? '');
         } catch (\Throwable $th) {
-            Response::result(403, [
+            Response::result(401, [
                 'result'  => 'error',
                 'data'    => null,
                 'message' => 'Token invalido o expirado'

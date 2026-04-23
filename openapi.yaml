@@ -1,14 +1,23 @@
 openapi: 3.0.3
 info:
   title: Nebula API
-  version: 1.0.0
-  description: API REST de Nebula con payloads directos en éxito y code/message en error.
+  version: 1.1.0
+  description: |
+    API REST de Nebula.
+
+    Notas importantes de contrato:
+    - En respuestas OK, el backend devuelve directamente el payload (sin envoltorio result/data).
+    - En errores, el backend devuelve `{ code, message }`.
+    - Las claves se devuelven en camelCase y con reglas de acronimos: `id` -> `ID`, `url` -> `URL`.
+    - Los endpoints protegidos requieren `Authorization: Bearer <token>`.
+
 servers:
   - url: http://localhost:8000/api/v1
     description: Local
 
 tags:
   - name: Auth
+  - name: Health
   - name: Users
   - name: Games
   - name: Avatars
@@ -21,7 +30,6 @@ tags:
   - name: Pegi
   - name: Roles
   - name: Plans
-  - name: Health
 
 security:
   - bearerAuth: []
@@ -30,7 +38,11 @@ paths:
   /auth:
     post:
       tags: [Auth]
-      summary: Login y emisión de token JWT
+      summary: Login y emision de JWT
+      description: |
+        Valida email/password y devuelve un token JWT.
+        Si el login es correcto, tambien actualiza `users.last_login_at`.
+      operationId: authLogin
       security: []
       requestBody:
         required: true
@@ -38,67 +50,115 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/AuthLoginRequest'
+            examples:
+              credencialesValidas:
+                value:
+                  email: admin@ejemplo.com
+                  password: admin
       responses:
         '201':
-          description: Token generado
+          description: Token generado correctamente
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthLoginResponse'
+              examples:
+                ok:
+                  value:
+                    token: <JWT_TOKEN>
         '400':
           $ref: '#/components/responses/Error400'
         '403':
-          $ref: '#/components/responses/Error403'
+          description: Credenciales invalidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                credencialesIncorrectas:
+                  value:
+                    code: FORBIDDEN
+                    message: El email y/o la contrasena son incorrectas
         '405':
           $ref: '#/components/responses/Error405'
 
   /test:
     get:
       tags: [Health]
-      summary: Comprobación rápida del router
+      summary: Comprobacion del router
+      operationId: healthCheck
       security: []
       responses:
         '200':
-          description: OK
+          description: API operativa
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: success
-                  message:
-                    type: string
-                    example: El Router MVC funciona correctamente
+                $ref: '#/components/schemas/HealthResponse'
+              examples:
+                ok:
+                  value:
+                    status: success
+                    message: El Router MVC funciona correctamente
 
   /users:
     get:
       tags: [Users]
       summary: Listar usuarios
+      operationId: usersList
       responses:
         '200':
-          $ref: '#/components/responses/SuccessArray'
+          description: Lista de usuarios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+              examples:
+                ok:
+                  value:
+                    - ID: 1
+                      username: usuario
+                      email: usuario@test.com
+                      planID: 0
+                      roleID: 1
+                      avatarID: 5
+                      birthDate: 1995-08-22
+                      isActive: true
+                      createdAt: 2026-04-07 11:35:29
+                      lastLoginAt: 2026-04-23 09:12:44
         '401':
           $ref: '#/components/responses/Error401'
-        '403':
-          $ref: '#/components/responses/Error403'
         '405':
           $ref: '#/components/responses/Error405'
     post:
       tags: [Users]
       summary: Crear usuario
+      operationId: usersCreate
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericInput'
+              $ref: '#/components/schemas/UserCreateRequest'
+            examples:
+              altaBasica:
+                value:
+                  username: nuevo_usuario
+                  password: secreto123
+                  email: nuevo@ejemplo.com
+                  roleID: 1
+                  planID: 0
+                  avatarID: 3
+                  birthDate: 2000-01-15
       responses:
         '201':
           $ref: '#/components/responses/CreatedID'
         '400':
           $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
         '405':
           $ref: '#/components/responses/Error405'
 
@@ -107,774 +167,560 @@ paths:
       - $ref: '#/components/parameters/ResourceID'
     get:
       tags: [Users]
-      summary: Obtener detalle de usuario
+      summary: Obtener usuario por ID
+      operationId: usersGetById
       responses:
         '200':
-          $ref: '#/components/responses/SuccessObject'
+          description: Usuario encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/Error401'
         '404':
           $ref: '#/components/responses/Error404'
     put:
       tags: [Users]
-      summary: Actualización completa de usuario
+      summary: Reemplazar usuario
+      operationId: usersPut
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericInput'
+              $ref: '#/components/schemas/UserUpdateRequest'
       responses:
         '204':
           $ref: '#/components/responses/NoContent'
         '400':
           $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
     patch:
       tags: [Users]
-      summary: Actualización parcial de usuario
+      summary: Actualizar usuario parcialmente
+      operationId: usersPatch
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericInput'
+              $ref: '#/components/schemas/UserPatchRequest'
       responses:
         '204':
           $ref: '#/components/responses/NoContent'
         '400':
           $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
     delete:
       tags: [Users]
       summary: Eliminar usuario
+      operationId: usersDelete
       responses:
         '204':
           $ref: '#/components/responses/NoContent'
         '400':
           $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
 
   /games:
     get:
       tags: [Games]
-      summary: Listar recursos
+      summary: Listar juegos
+      operationId: gamesList
       responses:
         '200':
-          $ref: '#/components/responses/SuccessArray'
+          description: Lista de juegos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Game'
+              examples:
+                ok:
+                  value:
+                    - ID: 1
+                      title: Project Zomboid
+                      slug: project-zomboid
+                      summary: Como moriras?
+                      pegiID: 18
+                      metacriticScore: 80
+                      releaseDate: 2013-11-08
+                      publishedAt: 2025-12-05 22:30:00
+                      isFeatured: true
+                      isActive: true
+                      coverURL: https://cdn.akamai.steamstatic.com/steam/apps/108600/library_600x900_2x.jpg
         '401':
           $ref: '#/components/responses/Error401'
-        '403':
-          $ref: '#/components/responses/Error403'
         '405':
           $ref: '#/components/responses/Error405'
     post:
       tags: [Games]
-      summary: Crear recurso
+      summary: Crear juego
+      operationId: gamesCreate
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericInput'
+              $ref: '#/components/schemas/GameCreateRequest'
       responses:
         '201':
           $ref: '#/components/responses/CreatedID'
         '400':
           $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
         '405':
           $ref: '#/components/responses/Error405'
+
   /games/{id}:
     parameters:
       - $ref: '#/components/parameters/ResourceID'
     get:
       tags: [Games]
-      summary: Obtener recurso por ID
+      summary: Obtener juego por ID
+      operationId: gamesGetById
       responses:
         '200':
-          $ref: '#/components/responses/SuccessObject'
+          description: Juego encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Game'
+        '401':
+          $ref: '#/components/responses/Error401'
         '404':
           $ref: '#/components/responses/Error404'
     put:
       tags: [Games]
-      summary: Reemplazar recurso por ID
+      summary: Reemplazar juego
+      operationId: gamesPut
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericInput'
+              $ref: '#/components/schemas/GameCreateRequest'
       responses:
         '204':
           $ref: '#/components/responses/NoContent'
         '400':
           $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
     patch:
       tags: [Games]
-      summary: Actualizar parcialmente recurso por ID
+      summary: Actualizar juego parcialmente
+      operationId: gamesPatch
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericInput'
+              $ref: '#/components/schemas/GamePatchRequest'
       responses:
         '204':
           $ref: '#/components/responses/NoContent'
         '400':
           $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
     delete:
       tags: [Games]
-      summary: Eliminar recurso por ID
+      summary: Eliminar juego
+      operationId: gamesDelete
       responses:
         '204':
           $ref: '#/components/responses/NoContent'
         '400':
           $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
 
   /avatars:
     get:
       tags: [Avatars]
-      summary: Listar recursos
+      summary: Listar avatars
+      operationId: avatarsList
       responses:
         '200':
-          $ref: '#/components/responses/SuccessArray'
+          description: Lista de avatars
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Avatar'
         '401':
           $ref: '#/components/responses/Error401'
-        '403':
-          $ref: '#/components/responses/Error403'
         '405':
           $ref: '#/components/responses/Error405'
     post:
       tags: [Avatars]
-      summary: Crear recurso
+      summary: Crear avatar
+      operationId: avatarsCreate
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericInput'
+              $ref: '#/components/schemas/AvatarWriteRequest'
       responses:
         '201':
           $ref: '#/components/responses/CreatedID'
         '400':
           $ref: '#/components/responses/Error400'
-        '405':
-          $ref: '#/components/responses/Error405'
+        '401':
+          $ref: '#/components/responses/Error401'
+
   /avatars/{id}:
     parameters:
       - $ref: '#/components/parameters/ResourceID'
     get:
       tags: [Avatars]
-      summary: Obtener recurso por ID
+      summary: Obtener avatar por ID
+      operationId: avatarsGetById
       responses:
         '200':
-          $ref: '#/components/responses/SuccessObject'
+          description: Avatar encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Avatar'
+        '401':
+          $ref: '#/components/responses/Error401'
         '404':
           $ref: '#/components/responses/Error404'
     put:
       tags: [Avatars]
-      summary: Reemplazar recurso por ID
+      summary: Reemplazar avatar
+      operationId: avatarsPut
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericInput'
+              $ref: '#/components/schemas/AvatarWriteRequest'
       responses:
         '204':
           $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/Error400'
     patch:
       tags: [Avatars]
-      summary: Actualizar parcialmente recurso por ID
+      summary: Actualizar avatar parcialmente
+      operationId: avatarsPatch
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericInput'
+              $ref: '#/components/schemas/AvatarWriteRequest'
       responses:
         '204':
           $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/Error400'
     delete:
       tags: [Avatars]
-      summary: Eliminar recurso por ID
+      summary: Eliminar avatar
+      operationId: avatarsDelete
       responses:
         '204':
           $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/Error400'
 
   /screenshots:
     get:
       tags: [Screenshots]
-      summary: Listar recursos
+      summary: Listar screenshots
+      operationId: screenshotsList
       responses:
         '200':
-          $ref: '#/components/responses/SuccessArray'
+          description: Lista de screenshots
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Screenshot'
         '401':
           $ref: '#/components/responses/Error401'
-        '403':
-          $ref: '#/components/responses/Error403'
-        '405':
-          $ref: '#/components/responses/Error405'
     post:
       tags: [Screenshots]
-      summary: Crear recurso
+      summary: Crear screenshot
+      operationId: screenshotsCreate
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericInput'
+              $ref: '#/components/schemas/ScreenshotWriteRequest'
       responses:
         '201':
           $ref: '#/components/responses/CreatedID'
-        '400':
-          $ref: '#/components/responses/Error400'
-        '405':
-          $ref: '#/components/responses/Error405'
+
   /screenshots/{id}:
     parameters:
       - $ref: '#/components/parameters/ResourceID'
     get:
       tags: [Screenshots]
-      summary: Obtener recurso por ID
+      summary: Obtener screenshot por ID
+      operationId: screenshotsGetById
       responses:
         '200':
-          $ref: '#/components/responses/SuccessObject'
+          description: Screenshot encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Screenshot'
         '404':
           $ref: '#/components/responses/Error404'
     put:
       tags: [Screenshots]
-      summary: Reemplazar recurso por ID
+      summary: Reemplazar screenshot
+      operationId: screenshotsPut
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericInput'
+              $ref: '#/components/schemas/ScreenshotWriteRequest'
       responses:
         '204':
           $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/Error400'
     patch:
       tags: [Screenshots]
-      summary: Actualizar parcialmente recurso por ID
+      summary: Actualizar screenshot parcialmente
+      operationId: screenshotsPatch
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericInput'
+              $ref: '#/components/schemas/ScreenshotWriteRequest'
       responses:
         '204':
           $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/Error400'
     delete:
       tags: [Screenshots]
-      summary: Eliminar recurso por ID
+      summary: Eliminar screenshot
+      operationId: screenshotsDelete
       responses:
         '204':
           $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/Error400'
 
   /categories:
     get:
       tags: [Categories]
-      summary: Listar recursos
+      summary: Listar categorias
+      operationId: categoriesList
       responses:
         '200':
-          $ref: '#/components/responses/SuccessArray'
+          description: Lista de categorias
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
         '401':
           $ref: '#/components/responses/Error401'
-        '403':
-          $ref: '#/components/responses/Error403'
-        '405':
-          $ref: '#/components/responses/Error405'
     post:
       tags: [Categories]
-      summary: Crear recurso
+      summary: Crear categoria
+      operationId: categoriesCreate
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericInput'
+              $ref: '#/components/schemas/CategoryWriteRequest'
       responses:
         '201':
           $ref: '#/components/responses/CreatedID'
-        '400':
-          $ref: '#/components/responses/Error400'
-        '405':
-          $ref: '#/components/responses/Error405'
+
   /categories/{id}:
     parameters:
       - $ref: '#/components/parameters/ResourceID'
     get:
       tags: [Categories]
-      summary: Obtener recurso por ID
+      summary: Obtener categoria por ID
+      operationId: categoriesGetById
       responses:
         '200':
-          $ref: '#/components/responses/SuccessObject'
+          description: Categoria encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
         '404':
           $ref: '#/components/responses/Error404'
     put:
       tags: [Categories]
-      summary: Reemplazar recurso por ID
+      summary: Reemplazar categoria
+      operationId: categoriesPut
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericInput'
+              $ref: '#/components/schemas/CategoryWriteRequest'
       responses:
         '204':
           $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/Error400'
     patch:
       tags: [Categories]
-      summary: Actualizar parcialmente recurso por ID
+      summary: Actualizar categoria parcialmente
+      operationId: categoriesPatch
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericInput'
+              $ref: '#/components/schemas/CategoryWriteRequest'
       responses:
         '204':
           $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/Error400'
     delete:
       tags: [Categories]
-      summary: Eliminar recurso por ID
+      summary: Eliminar categoria
+      operationId: categoriesDelete
       responses:
         '204':
           $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/Error400'
 
   /studios:
     get:
       tags: [Studios]
-      summary: Listar recursos
+      summary: Listar estudios
+      operationId: studiosList
       responses:
         '200':
-          $ref: '#/components/responses/SuccessArray'
+          description: Lista de estudios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Studio'
         '401':
           $ref: '#/components/responses/Error401'
-        '403':
-          $ref: '#/components/responses/Error403'
-        '405':
-          $ref: '#/components/responses/Error405'
     post:
       tags: [Studios]
-      summary: Crear recurso
+      summary: Crear estudio
+      operationId: studiosCreate
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericInput'
+              $ref: '#/components/schemas/StudioWriteRequest'
       responses:
         '201':
           $ref: '#/components/responses/CreatedID'
-        '400':
-          $ref: '#/components/responses/Error400'
-        '405':
-          $ref: '#/components/responses/Error405'
+
   /studios/{id}:
     parameters:
       - $ref: '#/components/parameters/ResourceID'
     get:
       tags: [Studios]
-      summary: Obtener recurso por ID
+      summary: Obtener estudio por ID
+      operationId: studiosGetById
       responses:
         '200':
-          $ref: '#/components/responses/SuccessObject'
+          description: Estudio encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Studio'
         '404':
           $ref: '#/components/responses/Error404'
     put:
       tags: [Studios]
-      summary: Reemplazar recurso por ID
+      summary: Reemplazar estudio
+      operationId: studiosPut
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericInput'
+              $ref: '#/components/schemas/StudioWriteRequest'
       responses:
         '204':
           $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/Error400'
     patch:
       tags: [Studios]
-      summary: Actualizar parcialmente recurso por ID
+      summary: Actualizar estudio parcialmente
+      operationId: studiosPatch
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericInput'
+              $ref: '#/components/schemas/StudioWriteRequest'
       responses:
         '204':
           $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/Error400'
     delete:
       tags: [Studios]
-      summary: Eliminar recurso por ID
+      summary: Eliminar estudio
+      operationId: studiosDelete
       responses:
         '204':
           $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/Error400'
-
-  /sessions:
-    get:
-      tags: [Sessions]
-      summary: Listar recursos
-      responses:
-        '200':
-          $ref: '#/components/responses/SuccessArray'
-        '401':
-          $ref: '#/components/responses/Error401'
-        '403':
-          $ref: '#/components/responses/Error403'
-        '405':
-          $ref: '#/components/responses/Error405'
-    post:
-      tags: [Sessions]
-      summary: Crear recurso
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GenericInput'
-      responses:
-        '201':
-          $ref: '#/components/responses/CreatedID'
-        '400':
-          $ref: '#/components/responses/Error400'
-        '405':
-          $ref: '#/components/responses/Error405'
-  /sessions/{id}:
-    parameters:
-      - $ref: '#/components/parameters/ResourceID'
-    get:
-      tags: [Sessions]
-      summary: Obtener recurso por ID
-      responses:
-        '200':
-          $ref: '#/components/responses/SuccessObject'
-        '404':
-          $ref: '#/components/responses/Error404'
-    put:
-      tags: [Sessions]
-      summary: Reemplazar recurso por ID
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GenericInput'
-      responses:
-        '204':
-          $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/Error400'
-    patch:
-      tags: [Sessions]
-      summary: Actualizar parcialmente recurso por ID
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GenericInput'
-      responses:
-        '204':
-          $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/Error400'
-    delete:
-      tags: [Sessions]
-      summary: Eliminar recurso por ID
-      responses:
-        '204':
-          $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/Error400'
-
-  /pegi:
-    get:
-      tags: [Pegi]
-      summary: Listar recursos
-      responses:
-        '200':
-          $ref: '#/components/responses/SuccessArray'
-        '401':
-          $ref: '#/components/responses/Error401'
-        '403':
-          $ref: '#/components/responses/Error403'
-        '405':
-          $ref: '#/components/responses/Error405'
-    post:
-      tags: [Pegi]
-      summary: Crear recurso
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GenericInput'
-      responses:
-        '201':
-          $ref: '#/components/responses/CreatedID'
-        '400':
-          $ref: '#/components/responses/Error400'
-        '405':
-          $ref: '#/components/responses/Error405'
-  /pegi/{id}:
-    parameters:
-      - $ref: '#/components/parameters/ResourceID'
-    get:
-      tags: [Pegi]
-      summary: Obtener recurso por ID
-      responses:
-        '200':
-          $ref: '#/components/responses/SuccessObject'
-        '404':
-          $ref: '#/components/responses/Error404'
-    put:
-      tags: [Pegi]
-      summary: Reemplazar recurso por ID
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GenericInput'
-      responses:
-        '204':
-          $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/Error400'
-    patch:
-      tags: [Pegi]
-      summary: Actualizar parcialmente recurso por ID
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GenericInput'
-      responses:
-        '204':
-          $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/Error400'
-    delete:
-      tags: [Pegi]
-      summary: Eliminar recurso por ID
-      responses:
-        '204':
-          $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/Error400'
-
-  /roles:
-    get:
-      tags: [Roles]
-      summary: Listar recursos
-      responses:
-        '200':
-          $ref: '#/components/responses/SuccessArray'
-        '401':
-          $ref: '#/components/responses/Error401'
-        '403':
-          $ref: '#/components/responses/Error403'
-        '405':
-          $ref: '#/components/responses/Error405'
-    post:
-      tags: [Roles]
-      summary: Crear recurso
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GenericInput'
-      responses:
-        '201':
-          $ref: '#/components/responses/CreatedID'
-        '400':
-          $ref: '#/components/responses/Error400'
-        '405':
-          $ref: '#/components/responses/Error405'
-  /roles/{id}:
-    parameters:
-      - $ref: '#/components/parameters/ResourceID'
-    get:
-      tags: [Roles]
-      summary: Obtener recurso por ID
-      responses:
-        '200':
-          $ref: '#/components/responses/SuccessObject'
-        '404':
-          $ref: '#/components/responses/Error404'
-    put:
-      tags: [Roles]
-      summary: Reemplazar recurso por ID
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GenericInput'
-      responses:
-        '204':
-          $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/Error400'
-    patch:
-      tags: [Roles]
-      summary: Actualizar parcialmente recurso por ID
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GenericInput'
-      responses:
-        '204':
-          $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/Error400'
-    delete:
-      tags: [Roles]
-      summary: Eliminar recurso por ID
-      responses:
-        '204':
-          $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/Error400'
-
-  /plans:
-    get:
-      tags: [Plans]
-      summary: Listar recursos
-      responses:
-        '200':
-          $ref: '#/components/responses/SuccessArray'
-        '401':
-          $ref: '#/components/responses/Error401'
-        '403':
-          $ref: '#/components/responses/Error403'
-        '405':
-          $ref: '#/components/responses/Error405'
-    post:
-      tags: [Plans]
-      summary: Crear recurso
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GenericInput'
-      responses:
-        '201':
-          $ref: '#/components/responses/CreatedID'
-        '400':
-          $ref: '#/components/responses/Error400'
-        '405':
-          $ref: '#/components/responses/Error405'
-  /plans/{id}:
-    parameters:
-      - $ref: '#/components/parameters/ResourceID'
-    get:
-      tags: [Plans]
-      summary: Obtener recurso por ID
-      responses:
-        '200':
-          $ref: '#/components/responses/SuccessObject'
-        '404':
-          $ref: '#/components/responses/Error404'
-    put:
-      tags: [Plans]
-      summary: Reemplazar recurso por ID
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GenericInput'
-      responses:
-        '204':
-          $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/Error400'
-    patch:
-      tags: [Plans]
-      summary: Actualizar parcialmente recurso por ID
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GenericInput'
-      responses:
-        '204':
-          $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/Error400'
-    delete:
-      tags: [Plans]
-      summary: Eliminar recurso por ID
-      responses:
-        '204':
-          $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/Error400'
 
   /favorites:
     get:
       tags: [Favorites]
       summary: Listar favoritos
+      operationId: favoritesList
       responses:
         '200':
-          $ref: '#/components/responses/SuccessArray'
+          description: Lista de favoritos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Favorite'
+              examples:
+                ok:
+                  value:
+                    - userID: 1
+                      gameID: 95
         '401':
           $ref: '#/components/responses/Error401'
-        '403':
-          $ref: '#/components/responses/Error403'
     post:
       tags: [Favorites]
       summary: Crear favorito
+      operationId: favoritesCreate
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericInput'
+              $ref: '#/components/schemas/FavoriteWriteRequest'
+            examples:
+              alta:
+                value:
+                  userID: 1
+                  gameID: 129
       responses:
         '201':
           $ref: '#/components/responses/CreatedID'
         '400':
           $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
 
   /favorites/{id}:
     parameters:
       - $ref: '#/components/parameters/ResourceID'
     delete:
       tags: [Favorites]
-      summary: Eliminar favorito por game ID del path y usuario autenticado
+      summary: Eliminar favorito por game ID (usuario tomado del token)
+      operationId: favoritesDeleteByGame
       responses:
         '204':
           $ref: '#/components/responses/NoContent'
@@ -886,19 +732,29 @@ paths:
   /game_categories:
     get:
       tags: [GameCategories]
-      summary: Listar relaciones game-category
+      summary: Listar relaciones juego-categoria
+      operationId: gameCategoriesList
       responses:
         '200':
-          $ref: '#/components/responses/SuccessArray'
+          description: Lista de relaciones
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GameCategory'
+        '401':
+          $ref: '#/components/responses/Error401'
     post:
       tags: [GameCategories]
-      summary: Crear relación game-category
+      summary: Crear relacion juego-categoria
+      operationId: gameCategoriesCreate
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GenericInput'
+              $ref: '#/components/schemas/GameCategoryWriteRequest'
       responses:
         '201':
           $ref: '#/components/responses/CreatedID'
@@ -906,23 +762,348 @@ paths:
           $ref: '#/components/responses/Error400'
     delete:
       tags: [GameCategories]
-      summary: Eliminar relación game-category
+      summary: Eliminar relacion juego-categoria
+      operationId: gameCategoriesDelete
       parameters:
         - name: game_id
           in: query
           required: true
           schema:
             type: integer
+            minimum: 1
+          example: 9
         - name: category_id
           in: query
           required: true
           schema:
             type: integer
+            minimum: 1
+          example: 1
       responses:
         '204':
           $ref: '#/components/responses/NoContent'
         '400':
           $ref: '#/components/responses/Error400'
+
+  /sessions:
+    get:
+      tags: [Sessions]
+      summary: Listar sesiones de juego
+      operationId: sessionsList
+      responses:
+        '200':
+          description: Lista de sesiones
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Session'
+        '401':
+          $ref: '#/components/responses/Error401'
+    post:
+      tags: [Sessions]
+      summary: Crear sesion
+      operationId: sessionsCreate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionWriteRequest'
+      responses:
+        '201':
+          $ref: '#/components/responses/CreatedID'
+
+  /sessions/{id}:
+    parameters:
+      - $ref: '#/components/parameters/ResourceID'
+    get:
+      tags: [Sessions]
+      summary: Obtener sesion por ID
+      operationId: sessionsGetById
+      responses:
+        '200':
+          description: Sesion encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        '404':
+          $ref: '#/components/responses/Error404'
+    put:
+      tags: [Sessions]
+      summary: Reemplazar sesion
+      operationId: sessionsPut
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionWriteRequest'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+    patch:
+      tags: [Sessions]
+      summary: Actualizar sesion parcialmente
+      operationId: sessionsPatch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionWriteRequest'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+    delete:
+      tags: [Sessions]
+      summary: Eliminar sesion
+      operationId: sessionsDelete
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+
+  /pegi:
+    get:
+      tags: [Pegi]
+      summary: Listar clasificaciones PEGI
+      operationId: pegiList
+      responses:
+        '200':
+          description: Lista PEGI
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pegi'
+        '401':
+          $ref: '#/components/responses/Error401'
+    post:
+      tags: [Pegi]
+      summary: Crear clasificacion PEGI
+      operationId: pegiCreate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PegiWriteRequest'
+      responses:
+        '201':
+          $ref: '#/components/responses/CreatedID'
+
+  /pegi/{id}:
+    parameters:
+      - $ref: '#/components/parameters/ResourceID'
+    get:
+      tags: [Pegi]
+      summary: Obtener PEGI por ID
+      operationId: pegiGetById
+      responses:
+        '200':
+          description: Registro PEGI encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pegi'
+        '404':
+          $ref: '#/components/responses/Error404'
+    put:
+      tags: [Pegi]
+      summary: Reemplazar PEGI
+      operationId: pegiPut
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PegiWriteRequest'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+    patch:
+      tags: [Pegi]
+      summary: Actualizar PEGI parcialmente
+      operationId: pegiPatch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PegiWriteRequest'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+    delete:
+      tags: [Pegi]
+      summary: Eliminar PEGI
+      operationId: pegiDelete
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+
+  /roles:
+    get:
+      tags: [Roles]
+      summary: Listar roles
+      operationId: rolesList
+      responses:
+        '200':
+          description: Lista de roles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Role'
+        '401':
+          $ref: '#/components/responses/Error401'
+    post:
+      tags: [Roles]
+      summary: Crear rol
+      operationId: rolesCreate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleWriteRequest'
+      responses:
+        '201':
+          $ref: '#/components/responses/CreatedID'
+
+  /roles/{id}:
+    parameters:
+      - $ref: '#/components/parameters/ResourceID'
+    get:
+      tags: [Roles]
+      summary: Obtener rol por ID
+      operationId: rolesGetById
+      responses:
+        '200':
+          description: Rol encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        '404':
+          $ref: '#/components/responses/Error404'
+    put:
+      tags: [Roles]
+      summary: Reemplazar rol
+      operationId: rolesPut
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleWriteRequest'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+    patch:
+      tags: [Roles]
+      summary: Actualizar rol parcialmente
+      operationId: rolesPatch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleWriteRequest'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+    delete:
+      tags: [Roles]
+      summary: Eliminar rol
+      operationId: rolesDelete
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+
+  /plans:
+    get:
+      tags: [Plans]
+      summary: Listar planes
+      operationId: plansList
+      responses:
+        '200':
+          description: Lista de planes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Plan'
+        '401':
+          $ref: '#/components/responses/Error401'
+    post:
+      tags: [Plans]
+      summary: Crear plan
+      operationId: plansCreate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlanWriteRequest'
+      responses:
+        '201':
+          $ref: '#/components/responses/CreatedID'
+
+  /plans/{id}:
+    parameters:
+      - $ref: '#/components/parameters/ResourceID'
+    get:
+      tags: [Plans]
+      summary: Obtener plan por ID
+      operationId: plansGetById
+      responses:
+        '200':
+          description: Plan encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Plan'
+        '404':
+          $ref: '#/components/responses/Error404'
+    put:
+      tags: [Plans]
+      summary: Reemplazar plan
+      operationId: plansPut
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlanWriteRequest'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+    patch:
+      tags: [Plans]
+      summary: Actualizar plan parcialmente
+      operationId: plansPatch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlanWriteRequest'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+    delete:
+      tags: [Plans]
+      summary: Eliminar plan
+      operationId: plansDelete
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
 
 components:
   securitySchemes:
@@ -939,70 +1120,86 @@ components:
       schema:
         type: integer
         minimum: 1
+      example: 1
 
   responses:
-    SuccessArray:
-      description: Operación correcta con lista
-      content:
-        application/json:
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/GenericObject'
-    SuccessObject:
-      description: Operación correcta con objeto
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/GenericObject'
     CreatedID:
       description: Recurso creado
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/CreatedIDResponse'
+          examples:
+            creado:
+              value:
+                ID: 123
+
     NoContent:
-      description: Operación correcta sin cuerpo
+      description: Operacion correcta sin contenido
+
     Error400:
-      description: Solicitud inválida
+      description: Solicitud invalida
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            validacion:
+              value:
+                code: VALIDATION_ERROR
+                message: Error en la solicitud
+
     Error401:
-      description: No autenticado
+      description: No autenticado o token invalido/expirado
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
-    Error403:
-      description: Sin permisos o token inválido
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            sinToken:
+              value:
+                code: UNAUTHORIZED
+                message: Usted no tiene los permisos para esta solicitud (Falta Authorization Bearer)
+            tokenInvalido:
+              value:
+                code: UNAUTHORIZED
+                message: Token invalido o expirado
+
     Error404:
       description: Recurso no encontrado
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            noEncontrado:
+              value:
+                code: NOT_FOUND
+                message: Usuario no encontrado
+
     Error405:
-      description: Método no permitido
+      description: Metodo no permitido
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            metodo:
+              value:
+                code: METHOD_NOT_ALLOWED
+                message: Metodo no permitido
 
   schemas:
-    GenericObject:
+    ErrorResponse:
       type: object
-      additionalProperties: true
-
-    GenericInput:
-      type: object
-      additionalProperties: true
-      description: Payload genérico. Se recomienda sustituir por DTOs concretos en una iteración posterior.
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          example: VALIDATION_ERROR
+        message:
+          type: string
+          example: Error en la solicitud
 
     CreatedIDResponse:
       type: object
@@ -1010,18 +1207,18 @@ components:
       properties:
         ID:
           type: integer
-          example: 123
+          example: 321
 
-    ErrorResponse:
+    HealthResponse:
       type: object
-      required: [code, message]
+      required: [status, message]
       properties:
-        code:
+        status:
           type: string
-          example: NOT_FOUND
+          example: success
         message:
           type: string
-          example: Error en la solicitud
+          example: El Router MVC funciona correctamente
 
     AuthLoginRequest:
       type: object
@@ -1034,7 +1231,7 @@ components:
         password:
           type: string
           format: password
-          example: secreto123
+          example: admin
 
     AuthLoginResponse:
       type: object
@@ -1042,4 +1239,420 @@ components:
       properties:
         token:
           type: string
-          example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
+          example: <JWT_TOKEN>
+
+    User:
+      type: object
+      properties:
+        ID:
+          type: integer
+        planID:
+          type: integer
+          nullable: true
+        roleID:
+          type: integer
+          nullable: true
+        avatarID:
+          type: integer
+          nullable: true
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        birthDate:
+          type: string
+          format: date
+          nullable: true
+        lastLoginAt:
+          type: string
+          nullable: true
+          description: Timestamp de ultimo login
+          example: 2026-04-23 09:12:44
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          example: 2026-04-07 11:35:29
+
+    UserCreateRequest:
+      type: object
+      required: [username, password, email]
+      properties:
+        username:
+          type: string
+          maxLength: 50
+        password:
+          type: string
+          minLength: 3
+        email:
+          type: string
+          format: email
+        roleID:
+          type: integer
+          nullable: true
+        planID:
+          type: integer
+          nullable: true
+        avatarID:
+          type: integer
+          nullable: true
+        birthDate:
+          type: string
+          format: date
+          nullable: true
+        isActive:
+          type: boolean
+          default: true
+
+    UserUpdateRequest:
+      allOf:
+        - $ref: '#/components/schemas/UserCreateRequest'
+
+    UserPatchRequest:
+      type: object
+      additionalProperties: true
+
+    Game:
+      type: object
+      properties:
+        ID:
+          type: integer
+        developerID:
+          type: integer
+          nullable: true
+        publisherID:
+          type: integer
+          nullable: true
+        pegiID:
+          type: integer
+          nullable: true
+        steamID:
+          type: string
+          nullable: true
+        igdbID:
+          type: string
+          nullable: true
+        title:
+          type: string
+        slug:
+          type: string
+          nullable: true
+        summary:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        coverURL:
+          type: string
+          nullable: true
+        bannerURL:
+          type: string
+          nullable: true
+        heroURL:
+          type: string
+          nullable: true
+        logoURL:
+          type: string
+          nullable: true
+        metacriticScore:
+          type: integer
+          nullable: true
+        releaseDate:
+          type: string
+          format: date
+          nullable: true
+        publishedAt:
+          type: string
+          nullable: true
+          example: 2025-12-05 22:30:00
+        isFeatured:
+          type: boolean
+        isActive:
+          type: boolean
+
+    GameCreateRequest:
+      type: object
+      required: [title]
+      properties:
+        developerID:
+          type: integer
+          nullable: true
+        publisherID:
+          type: integer
+          nullable: true
+        pegiID:
+          type: integer
+          nullable: true
+        steamID:
+          type: string
+          nullable: true
+        igdbID:
+          type: string
+          nullable: true
+        title:
+          type: string
+        slug:
+          type: string
+          nullable: true
+        summary:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        coverURL:
+          type: string
+          nullable: true
+        bannerURL:
+          type: string
+          nullable: true
+        heroURL:
+          type: string
+          nullable: true
+        logoURL:
+          type: string
+          nullable: true
+        metacriticScore:
+          type: integer
+          nullable: true
+        releaseDate:
+          type: string
+          format: date
+          nullable: true
+        publishedAt:
+          type: string
+          nullable: true
+          example: 2026-04-23 12:00:00
+        isFeatured:
+          type: boolean
+        isActive:
+          type: boolean
+
+    GamePatchRequest:
+      type: object
+      additionalProperties: true
+
+    Avatar:
+      type: object
+      properties:
+        ID:
+          type: integer
+        name:
+          type: string
+        imageURL:
+          type: string
+
+    AvatarWriteRequest:
+      type: object
+      required: [name, imageURL]
+      properties:
+        name:
+          type: string
+        imageURL:
+          type: string
+
+    Screenshot:
+      type: object
+      properties:
+        ID:
+          type: integer
+        gameID:
+          type: integer
+          nullable: true
+        imageURL:
+          type: string
+          nullable: true
+
+    ScreenshotWriteRequest:
+      type: object
+      required: [gameID, imageURL]
+      properties:
+        gameID:
+          type: integer
+        imageURL:
+          type: string
+
+    Category:
+      type: object
+      properties:
+        ID:
+          type: integer
+        name:
+          type: string
+        imageURL:
+          type: string
+          nullable: true
+
+    CategoryWriteRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        imageURL:
+          type: string
+          nullable: true
+
+    Studio:
+      type: object
+      properties:
+        ID:
+          type: integer
+        name:
+          type: string
+        logoURL:
+          type: string
+          nullable: true
+        website:
+          type: string
+          nullable: true
+
+    StudioWriteRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        logoURL:
+          type: string
+          nullable: true
+        website:
+          type: string
+          nullable: true
+
+    Favorite:
+      type: object
+      properties:
+        userID:
+          type: integer
+        gameID:
+          type: integer
+
+    FavoriteWriteRequest:
+      type: object
+      required: [userID, gameID]
+      properties:
+        userID:
+          type: integer
+        gameID:
+          type: integer
+
+    GameCategory:
+      type: object
+      properties:
+        gameID:
+          type: integer
+        categoryID:
+          type: integer
+
+    GameCategoryWriteRequest:
+      type: object
+      required: [gameID, categoryID]
+      properties:
+        gameID:
+          type: integer
+        categoryID:
+          type: integer
+
+    Session:
+      type: object
+      properties:
+        ID:
+          type: integer
+        userID:
+          type: integer
+          nullable: true
+        gameID:
+          type: integer
+          nullable: true
+        startedAt:
+          type: string
+          nullable: true
+          example: 2026-01-10 10:00:00
+        duration:
+          type: integer
+          nullable: true
+          description: Duracion en segundos
+
+    SessionWriteRequest:
+      type: object
+      required: [userID, gameID]
+      properties:
+        userID:
+          type: integer
+        gameID:
+          type: integer
+        startedAt:
+          type: string
+          nullable: true
+        duration:
+          type: integer
+          nullable: true
+
+    Pegi:
+      type: object
+      properties:
+        ID:
+          type: integer
+        name:
+          type: string
+        imageURL:
+          type: string
+          nullable: true
+
+    PegiWriteRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        imageURL:
+          type: string
+          nullable: true
+
+    Role:
+      type: object
+      properties:
+        ID:
+          type: integer
+        name:
+          type: string
+
+    RoleWriteRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+
+    Plan:
+      type: object
+      properties:
+        ID:
+          type: integer
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        price:
+          type: number
+          format: float
+          nullable: true
+
+    PlanWriteRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        price:
+          type: number
+          format: float
+          nullable: true

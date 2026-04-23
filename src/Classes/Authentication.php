@@ -10,10 +10,13 @@ class Authentication extends AuthModel
 {
     private $key;
     private $jwtService;
+    private int $tokenTtlSeconds;
 
     public function __construct()
     {
         $this->key = getenv('JWT_SECRET');
+        $ttl = (int) getenv('TOKEN_TTL_SECONDS');
+        $this->tokenTtlSeconds = $ttl > 0 ? $ttl : 86400;
         parent::__construct();
         $this->jwtService = new JwtService((string) $this->key);
     }
@@ -73,6 +76,20 @@ class Authentication extends AuthModel
         $user = parent::getById($claimData['id']);
         if (empty($user) || $user[0]['token'] != $jwt) {
             throw new \Exception('Token mismatch');
+        }
+
+        $lastLoginAt = $user[0]['last_login_at'] ?? null;
+        if (empty($lastLoginAt)) {
+            throw new \Exception('Missing last login timestamp');
+        }
+
+        $lastLoginTs = strtotime((string) $lastLoginAt);
+        if ($lastLoginTs === false) {
+            throw new \Exception('Invalid last login timestamp');
+        }
+
+        if ((time() - $lastLoginTs) > $this->tokenTtlSeconds) {
+            throw new \Exception('Token expired');
         }
 
         return [
