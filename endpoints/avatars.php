@@ -6,25 +6,26 @@ $item = new \App\Classes\Avatars();
 
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
-        \App\Utils\Response::ok($item->get($_GET));
+        $items = $item->get($_GET);
+        \App\Utils\Response::result(200, array('result' => 'ok', 'items' => $items));
         break;
     case 'POST':
-        \App\Utils\Response::ok(['id' => $item->insert(json_decode(file_get_contents('php://input'), true))], 201);
+        $insert_id = $item->insert(json_decode(file_get_contents('php://input'), true));
+        \App\Utils\Response::result(201, array('result' => 'ok', 'insert_id' => $insert_id));
         break;
     case 'PUT':
         $item->updatePut($_GET['id'], json_decode(file_get_contents('php://input'), true));
-        \App\Utils\Response::ok();
+        \App\Utils\Response::result(200, array('result' => 'ok'));
         break;
     case 'PATCH':
         $item->updatePatch($_GET['id'], json_decode(file_get_contents('php://input'), true));
-        \App\Utils\Response::ok();
+        \App\Utils\Response::result(200, array('result' => 'ok'));
         break;
     case 'DELETE':
         $item->delete($_GET['id']);
-        \App\Utils\Response::ok();
+        \App\Utils\Response::result(200, array('result' => 'ok'));
         break;
     default:
-        header('Allow: GET, POST, PUT, PATCH, DELETE');
-        \App\Utils\Response::error('Método no permitido', 405);
+        \App\Utils\Response::result(404, array('result' => 'error'));
         break;
 }

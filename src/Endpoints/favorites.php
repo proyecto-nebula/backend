@@ -6,30 +6,31 @@ $item = new \App\Classes\Favorites();
 
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
-        $items = $item->get($_GET);
-        \App\Utils\Response::result(200, array('result' => 'ok', 'items' => $items));
+        \App\Utils\Response::ok($item->get($_GET));
         break;
-        
+
     case 'POST':
         $params = json_decode(file_get_contents('php://input'), true);
-        $insert_id = $item->insert($params);
-        \App\Utils\Response::result(201, array('result' => 'ok', 'insert_id' => $insert_id));
+        \App\Utils\Response::ok(['id' => $item->insert($params)], 201);
         break;
 
-
     case 'DELETE':
-        // Validamos que vengan AMBOS parámetros
-        if(!isset($_GET['user_id']) || !isset($_GET['game_id'])){
-            \App\Utils\Response::result(400, array('result' => 'error', 'details' => 'Falta user_id o game_id'));
+        // game_id viene de la URL (/api/v1/favorites/{id}), user_id del token JWT
+        if (!isset($_GET['id']) || empty($_GET['id'])) {
+            \App\Utils\Response::error('Falta el id del juego en la ruta', 400);
             exit;
         }
-        
-        // Pasamos ambos al método delete
-        $item->deleteFavorito($_GET['user_id'], $_GET['game_id']);
-        \App\Utils\Response::result(200, array('result' => 'ok', 'details' => 'Favorito eliminado'));
+        $userId = $_SERVER['AUTH_USER_ID'] ?? null;
+        if (empty($userId)) {
+            \App\Utils\Response::error('No se pudo determinar el usuario autenticado', 401);
+            exit;
+        }
+        $item->deleteFavorito($userId, $_GET['id']);
+        \App\Utils\Response::ok();
         break;
 
     default:
-        \App\Utils\Response::result(404, array('result' => 'error'));
+        header('Allow: GET, POST, DELETE');
+        \App\Utils\Response::error('Método no permitido', 405);
         break;
 }

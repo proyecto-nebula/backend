@@ -25,7 +25,7 @@ class Sessions extends Database {
         'id',
         'user_id',
         'game_id',
-        'played_date'
+        'started_at'
     );
 
     /**
@@ -34,7 +34,7 @@ class Sessions extends Database {
     private $allowedConditions_insert = array(
         'user_id',
         'game_id',
-        'played_date',
+        'started_at',
         'duration'
     );
 

@@ -15,25 +15,37 @@ class AuthGuard
             return;
         }
 
-        if (!isset($_SERVER['HTTP_API_KEY']) || empty($_SERVER['HTTP_API_KEY'])) {
+        $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+
+        // Fallback: Apache a veces no pasa HTTP_AUTHORIZATION a $_SERVER
+        if (empty($authHeader) && function_exists('apache_request_headers')) {
+            $headers = apache_request_headers();
+            $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? '';
+        }
+
+        if (empty($authHeader) || !str_starts_with($authHeader, 'Bearer ')) {
             Response::result(403, [
-                'result' => 'error',
-                'details' => 'Usted no tiene los permisos para esta solicitud (Falta API-KEY)'
+                'result'  => 'error',
+                'data'    => null,
+                'message' => 'Usted no tiene los permisos para esta solicitud (Falta Authorization Bearer)'
             ]);
             exit;
         }
 
+        $token = substr($authHeader, 7);
+
         try {
             $auth = new Authentication();
-            $data = $auth->validateToken($_SERVER['HTTP_API_KEY']);
+            $data = $auth->validateToken($token);
 
             // Exponer datos de usuario autenticado para su uso en endpoints si hace falta.
             $_SERVER['AUTH_USER_ID'] = (string) ($data['id'] ?? '');
             $_SERVER['AUTH_USER_EMAIL'] = (string) ($data['email'] ?? '');
         } catch (\Throwable $th) {
             Response::result(403, [
-                'result' => 'error',
-                'details' => 'Token invalido o expirado'
+                'result'  => 'error',
+                'data'    => null,
+                'message' => 'Token invalido o expirado'
             ]);
             exit;
         }

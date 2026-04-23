@@ -23,14 +23,16 @@ class Categories extends Database {
      */
     private $allowedConditions_get = array(
         'id',
-        'name'
+        'name',
+        'image_url'
     );
 
     /**
      * Array con los campos de la tabla que se pueden proporcionar para insertar registros
      */
     private $allowedConditions_insert = array(
-        'name'
+        'name',
+        'image_url'
     );
 
     /**

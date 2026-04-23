@@ -24,7 +24,7 @@ class Users extends Database {
     private $allowedConditions_get = array(
         'id',
         'token',
-        'created_date'
+        'created_at'
     );
 
     /**
@@ -34,13 +34,12 @@ class Users extends Database {
         'username',
         'role_id',
         'password',
-        'first_name',
-        'last_name',
         'email',
-        'subscription_date',
+        'birth_date',
+        'is_active',
         'avatar_id',
         'plan_id',
-        'created_date'
+        'created_at'
     );
 
     /**
@@ -51,13 +50,11 @@ class Users extends Database {
         if (
             !isset($data['username']) || empty($data['username']) ||
             !isset($data['password']) || empty($data['password']) ||
-            !isset($data['first_name']) || empty($data['first_name']) ||
-            !isset($data['last_name']) || empty($data['last_name']) ||
-            !isset($data['email']) || empty($data['email']) 
+            !isset($data['email']) || empty($data['email'])
         ) {
             $response = array(
                 'result' => 'error',
-                'details' => 'Los campos alias, password, nombre, apellidos y email son obligatorios'
+                'details' => 'Los campos username, password y email son obligatorios'
             );
 
             Response::result(400, $response);

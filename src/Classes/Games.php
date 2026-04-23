@@ -14,11 +14,11 @@ class Games extends Database {
      * He añadido los sufijos _min y _max para Metacritic y Fecha
      */
     private $allowedConditions_get = array(
-        'id', 'title', 'release_date', 'metacritic_score', 'pegi_id', 'publish_date', 'is_featured', 'developer_id', 'publisher_id'
+        'id', 'title', 'slug', 'release_date', 'metacritic_score', 'pegi_id', 'published_at', 'is_featured', 'is_active', 'developer_id', 'publisher_id'
     );
 
     private $allowedConditions_insert = array(
-        'developer_id', 'publisher_id', 'pegi_id', 'steam_id', 'igdb_id', 'title', 'summary', 'description', 'cover_url', 'banner_url', 'hero_url', 'logo_url', 'metacritic_score', 'release_date', 'publish_date', 'is_featured'
+        'developer_id', 'publisher_id', 'pegi_id', 'steam_id', 'igdb_id', 'title', 'slug', 'summary', 'description', 'cover_url', 'banner_url', 'hero_url', 'logo_url', 'metacritic_score', 'release_date', 'published_at', 'is_featured', 'is_active'
     );
 
     /**

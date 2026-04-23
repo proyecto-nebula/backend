@@ -6,17 +6,14 @@
 $auth = new \App\Classes\Authentication();
 
 switch ($_SERVER['REQUEST_METHOD']) {
-	case 'POST':
-		$user = json_decode(file_get_contents('php://input'), true);
+    case 'POST':
+        $user = json_decode(file_get_contents('php://input'), true);
+        $token = $auth->signIn($user);
+        \App\Utils\Response::ok(['token' => $token], 201);
+        break;
 
-		$token = $auth->signIn($user);
-
-		$response = array(
-			'result' => 'ok',
-			'token' => $token
-		);
-
-		\App\Utils\Response::result(201, $response);
-
-		break;
+    default:
+        header('Allow: POST');
+        \App\Utils\Response::error('Método no permitido', 405);
+        break;
 }

@@ -2,6 +2,8 @@
 namespace App\Core;
 // Router.php
 
+use App\Utils\Response;
+
 class Router {
     private static $endpoints = [
         'users', 'games', 'avatars', 'screenshots', 'categories', 
@@ -15,7 +17,8 @@ class Router {
         $pos = strpos($path, $apiPrefix);
 
         if ($pos === false) {
-            self::jsonResponse(404, ['error' => 'Prefijo api/v1 no encontrado']);
+            Response::error('Prefijo api/v1 no encontrado', 404);
+            exit;
         }
 
         $route = substr($path, $pos + strlen($apiPrefix));
@@ -25,7 +28,8 @@ class Router {
         $id = $parts[1] ?? null;
 
         if (!in_array($resource, self::$endpoints)) {
-            self::jsonResponse(404, ['error' => 'Recurso no válido']);
+            Response::error('Recurso no válido', 404);
+            exit;
         }
 
         if ($id) {
@@ -38,7 +42,8 @@ class Router {
         // Cargar el archivo del endpoint (ruta segura)
         $endpointsDir = realpath(dirname(__DIR__) . '/Endpoints');
         if ($endpointsDir === false) {
-            self::jsonResponse(500, ['error' => 'Configuración del servidor inválida']);
+            Response::error('Configuración del servidor inválida', 500);
+            exit;
         }
 
         $file = $endpointsDir . DIRECTORY_SEPARATOR . $resource . '.php';
@@ -46,16 +51,10 @@ class Router {
 
         // Comprobar existencia y evitar traversal
         if ($realFile === false || strpos($realFile, $endpointsDir) !== 0 || !file_exists($realFile)) {
-            self::jsonResponse(404, ['error' => 'Endpoint no implementado']);
+            Response::error('Endpoint no implementado', 404);
+            exit;
         }
 
         require_once $realFile;
-    }
-
-    private static function jsonResponse($code, $data) {
-        http_response_code($code);
-        header('Content-Type: application/json');
-        echo json_encode($data);
-        exit;
     }
 }

@@ -7,26 +7,22 @@ $item = new \App\Classes\GameCategories();
 
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
-        \App\Utils\Response::result(200, array('result' => 'ok', 'items' => $item->get($_GET)));
+        \App\Utils\Response::ok($item->get($_GET));
         break;
     case 'POST':
-        $item->insert(json_decode(file_get_contents('php://input'), true));
-        \App\Utils\Response::result(201, array('result' => 'ok'));
+        \App\Utils\Response::ok(['id' => $item->insert(json_decode(file_get_contents('php://input'), true))], 201);
         break;
     case 'DELETE':
-        // Verificamos que lleguen ambos parámetros por la URL
-        if(!isset($_GET['game_id']) || !isset($_GET['category_id'])){
-            \App\Utils\Response::result(400, array('result' => 'error', 'details' => 'Faltan parámetros (game_id e category_id)'));
+        if (!isset($_GET['game_id']) || !isset($_GET['category_id'])) {
+            \App\Utils\Response::error('Faltan parámetros (game_id y category_id)', 400);
             exit;
         }
-        
-        // Llamamos al método correcto que está en tu clase
         $item->deleteRelacion($_GET['game_id'], $_GET['category_id']);
-        
-        \App\Utils\Response::result(200, array('result' => 'ok'));
+        \App\Utils\Response::ok();
         break;
     default:
-        \App\Utils\Response::result(404, array('result' => 'error'));
+        header('Allow: GET, POST, DELETE');
+        \App\Utils\Response::error('Método no permitido', 405);
         break;
 }
 ?>

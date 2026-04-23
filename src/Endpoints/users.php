@@ -10,66 +10,59 @@ $item = new \App\Classes\Users();
  */
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
-        $params = $_GET;
-        
-        // Si en la URL viene el parámetro id (ej: ?id=1)
-        if (isset($params['id']) && !empty($params['id'])) {
-            $userData = $item->getPerfilCompleto($params['id']);
-            
+        if (isset($_GET['id']) && !empty($_GET['id'])) {
+            $userData = $item->getPerfilCompleto($_GET['id']);
             if ($userData) {
-                \App\Utils\Response::result(200, array('result' => 'ok', 'user' => $userData));
+                \App\Utils\Response::ok($userData);
             } else {
-                \App\Utils\Response::result(404, array('result' => 'error', 'details' => 'Usuario no encontrado'));
+                \App\Utils\Response::error('Usuario no encontrado', 404);
             }
         } else {
-            // Si no viene ID, funciona como antes (lista general)
-            $items = $item->get($params);
-            $response = array('result' => 'ok', 'items' => $items);
-            \App\Utils\Response::result(200, $response);
+            \App\Utils\Response::ok($item->get($_GET));
         }
         break;
-        
+
     case 'POST':
         $params = json_decode(file_get_contents('php://input'), true);
-        if(!isset($params)){
-            \App\Utils\Response::result(400, array('result' => 'error', 'details' => 'Error en la solicitud'));
+        if (!isset($params)) {
+            \App\Utils\Response::error('Error en la solicitud', 400);
             exit;
         }
-        $insert_id = $item->insert($params);
-        \App\Utils\Response::result(201, array('result' => 'ok', 'insert_id' => $insert_id));
+        \App\Utils\Response::ok(['id' => $item->insert($params)], 201);
         break;
 
     case 'PUT':
         $params = json_decode(file_get_contents('php://input'), true);
-        if(!isset($params) || !isset($_GET['id']) || empty($_GET['id'])){
-            \App\Utils\Response::result(400, array('result' => 'error', 'details' => 'Error en la solicitud'));
+        if (!isset($params) || !isset($_GET['id']) || empty($_GET['id'])) {
+            \App\Utils\Response::error('Error en la solicitud', 400);
             exit;
         }
         $item->updatePut($_GET['id'], $params);
-        \App\Utils\Response::result(200, array('result' => 'ok'));
+        \App\Utils\Response::ok();
         break;
 
     case 'PATCH':
         $params = json_decode(file_get_contents('php://input'), true);
-        if(!isset($params) || !isset($_GET['id']) || empty($_GET['id'])){
-            \App\Utils\Response::result(400, array('result' => 'error', 'details' => 'Error en la solicitud'));
+        if (!isset($params) || !isset($_GET['id']) || empty($_GET['id'])) {
+            \App\Utils\Response::error('Error en la solicitud', 400);
             exit;
         }
         $item->updatePatch($_GET['id'], $params);
-        \App\Utils\Response::result(200, array('result' => 'ok'));
+        \App\Utils\Response::ok();
         break;
 
     case 'DELETE':
-        if(!isset($_GET['id']) || empty($_GET['id'])){
-            \App\Utils\Response::result(400, array('result' => 'error', 'details' => 'Error en la solicitud'));
+        if (!isset($_GET['id']) || empty($_GET['id'])) {
+            \App\Utils\Response::error('Error en la solicitud', 400);
             exit;
         }
         $item->delete($_GET['id']);
-        \App\Utils\Response::result(200, array('result' => 'ok'));
+        \App\Utils\Response::ok();
         break;
 
     default:
-        \App\Utils\Response::result(404, array('result' => 'error'));
+        header('Allow: GET, POST, PUT, PATCH, DELETE');
+        \App\Utils\Response::error('Método no permitido', 405);
         break;
 }
 ?>

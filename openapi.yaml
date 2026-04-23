@@ -1,0 +1,1045 @@
+openapi: 3.0.3
+info:
+  title: Nebula API
+  version: 1.0.0
+  description: API REST de Nebula con payloads directos en éxito y code/message en error.
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Local
+
+tags:
+  - name: Auth
+  - name: Users
+  - name: Games
+  - name: Avatars
+  - name: Screenshots
+  - name: Categories
+  - name: Studios
+  - name: Favorites
+  - name: GameCategories
+  - name: Sessions
+  - name: Pegi
+  - name: Roles
+  - name: Plans
+  - name: Health
+
+security:
+  - bearerAuth: []
+
+paths:
+  /auth:
+    post:
+      tags: [Auth]
+      summary: Login y emisión de token JWT
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthLoginRequest'
+      responses:
+        '201':
+          description: Token generado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthLoginResponse'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '405':
+          $ref: '#/components/responses/Error405'
+
+  /test:
+    get:
+      tags: [Health]
+      summary: Comprobación rápida del router
+      security: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: El Router MVC funciona correctamente
+
+  /users:
+    get:
+      tags: [Users]
+      summary: Listar usuarios
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessArray'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '405':
+          $ref: '#/components/responses/Error405'
+    post:
+      tags: [Users]
+      summary: Crear usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '201':
+          $ref: '#/components/responses/CreatedID'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '405':
+          $ref: '#/components/responses/Error405'
+
+  /users/{id}:
+    parameters:
+      - $ref: '#/components/parameters/ResourceID'
+    get:
+      tags: [Users]
+      summary: Obtener detalle de usuario
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        '404':
+          $ref: '#/components/responses/Error404'
+    put:
+      tags: [Users]
+      summary: Actualización completa de usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+    patch:
+      tags: [Users]
+      summary: Actualización parcial de usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+    delete:
+      tags: [Users]
+      summary: Eliminar usuario
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+
+  /games:
+    get:
+      tags: [Games]
+      summary: Listar recursos
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessArray'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '405':
+          $ref: '#/components/responses/Error405'
+    post:
+      tags: [Games]
+      summary: Crear recurso
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '201':
+          $ref: '#/components/responses/CreatedID'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '405':
+          $ref: '#/components/responses/Error405'
+  /games/{id}:
+    parameters:
+      - $ref: '#/components/parameters/ResourceID'
+    get:
+      tags: [Games]
+      summary: Obtener recurso por ID
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        '404':
+          $ref: '#/components/responses/Error404'
+    put:
+      tags: [Games]
+      summary: Reemplazar recurso por ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+    patch:
+      tags: [Games]
+      summary: Actualizar parcialmente recurso por ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+    delete:
+      tags: [Games]
+      summary: Eliminar recurso por ID
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+
+  /avatars:
+    get:
+      tags: [Avatars]
+      summary: Listar recursos
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessArray'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '405':
+          $ref: '#/components/responses/Error405'
+    post:
+      tags: [Avatars]
+      summary: Crear recurso
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '201':
+          $ref: '#/components/responses/CreatedID'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '405':
+          $ref: '#/components/responses/Error405'
+  /avatars/{id}:
+    parameters:
+      - $ref: '#/components/parameters/ResourceID'
+    get:
+      tags: [Avatars]
+      summary: Obtener recurso por ID
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        '404':
+          $ref: '#/components/responses/Error404'
+    put:
+      tags: [Avatars]
+      summary: Reemplazar recurso por ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+    patch:
+      tags: [Avatars]
+      summary: Actualizar parcialmente recurso por ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+    delete:
+      tags: [Avatars]
+      summary: Eliminar recurso por ID
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+
+  /screenshots:
+    get:
+      tags: [Screenshots]
+      summary: Listar recursos
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessArray'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '405':
+          $ref: '#/components/responses/Error405'
+    post:
+      tags: [Screenshots]
+      summary: Crear recurso
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '201':
+          $ref: '#/components/responses/CreatedID'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '405':
+          $ref: '#/components/responses/Error405'
+  /screenshots/{id}:
+    parameters:
+      - $ref: '#/components/parameters/ResourceID'
+    get:
+      tags: [Screenshots]
+      summary: Obtener recurso por ID
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        '404':
+          $ref: '#/components/responses/Error404'
+    put:
+      tags: [Screenshots]
+      summary: Reemplazar recurso por ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+    patch:
+      tags: [Screenshots]
+      summary: Actualizar parcialmente recurso por ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+    delete:
+      tags: [Screenshots]
+      summary: Eliminar recurso por ID
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+
+  /categories:
+    get:
+      tags: [Categories]
+      summary: Listar recursos
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessArray'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '405':
+          $ref: '#/components/responses/Error405'
+    post:
+      tags: [Categories]
+      summary: Crear recurso
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '201':
+          $ref: '#/components/responses/CreatedID'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '405':
+          $ref: '#/components/responses/Error405'
+  /categories/{id}:
+    parameters:
+      - $ref: '#/components/parameters/ResourceID'
+    get:
+      tags: [Categories]
+      summary: Obtener recurso por ID
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        '404':
+          $ref: '#/components/responses/Error404'
+    put:
+      tags: [Categories]
+      summary: Reemplazar recurso por ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+    patch:
+      tags: [Categories]
+      summary: Actualizar parcialmente recurso por ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+    delete:
+      tags: [Categories]
+      summary: Eliminar recurso por ID
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+
+  /studios:
+    get:
+      tags: [Studios]
+      summary: Listar recursos
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessArray'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '405':
+          $ref: '#/components/responses/Error405'
+    post:
+      tags: [Studios]
+      summary: Crear recurso
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '201':
+          $ref: '#/components/responses/CreatedID'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '405':
+          $ref: '#/components/responses/Error405'
+  /studios/{id}:
+    parameters:
+      - $ref: '#/components/parameters/ResourceID'
+    get:
+      tags: [Studios]
+      summary: Obtener recurso por ID
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        '404':
+          $ref: '#/components/responses/Error404'
+    put:
+      tags: [Studios]
+      summary: Reemplazar recurso por ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+    patch:
+      tags: [Studios]
+      summary: Actualizar parcialmente recurso por ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+    delete:
+      tags: [Studios]
+      summary: Eliminar recurso por ID
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+
+  /sessions:
+    get:
+      tags: [Sessions]
+      summary: Listar recursos
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessArray'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '405':
+          $ref: '#/components/responses/Error405'
+    post:
+      tags: [Sessions]
+      summary: Crear recurso
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '201':
+          $ref: '#/components/responses/CreatedID'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '405':
+          $ref: '#/components/responses/Error405'
+  /sessions/{id}:
+    parameters:
+      - $ref: '#/components/parameters/ResourceID'
+    get:
+      tags: [Sessions]
+      summary: Obtener recurso por ID
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        '404':
+          $ref: '#/components/responses/Error404'
+    put:
+      tags: [Sessions]
+      summary: Reemplazar recurso por ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+    patch:
+      tags: [Sessions]
+      summary: Actualizar parcialmente recurso por ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+    delete:
+      tags: [Sessions]
+      summary: Eliminar recurso por ID
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+
+  /pegi:
+    get:
+      tags: [Pegi]
+      summary: Listar recursos
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessArray'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '405':
+          $ref: '#/components/responses/Error405'
+    post:
+      tags: [Pegi]
+      summary: Crear recurso
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '201':
+          $ref: '#/components/responses/CreatedID'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '405':
+          $ref: '#/components/responses/Error405'
+  /pegi/{id}:
+    parameters:
+      - $ref: '#/components/parameters/ResourceID'
+    get:
+      tags: [Pegi]
+      summary: Obtener recurso por ID
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        '404':
+          $ref: '#/components/responses/Error404'
+    put:
+      tags: [Pegi]
+      summary: Reemplazar recurso por ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+    patch:
+      tags: [Pegi]
+      summary: Actualizar parcialmente recurso por ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+    delete:
+      tags: [Pegi]
+      summary: Eliminar recurso por ID
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+
+  /roles:
+    get:
+      tags: [Roles]
+      summary: Listar recursos
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessArray'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '405':
+          $ref: '#/components/responses/Error405'
+    post:
+      tags: [Roles]
+      summary: Crear recurso
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '201':
+          $ref: '#/components/responses/CreatedID'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '405':
+          $ref: '#/components/responses/Error405'
+  /roles/{id}:
+    parameters:
+      - $ref: '#/components/parameters/ResourceID'
+    get:
+      tags: [Roles]
+      summary: Obtener recurso por ID
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        '404':
+          $ref: '#/components/responses/Error404'
+    put:
+      tags: [Roles]
+      summary: Reemplazar recurso por ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+    patch:
+      tags: [Roles]
+      summary: Actualizar parcialmente recurso por ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+    delete:
+      tags: [Roles]
+      summary: Eliminar recurso por ID
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+
+  /plans:
+    get:
+      tags: [Plans]
+      summary: Listar recursos
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessArray'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+        '405':
+          $ref: '#/components/responses/Error405'
+    post:
+      tags: [Plans]
+      summary: Crear recurso
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '201':
+          $ref: '#/components/responses/CreatedID'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '405':
+          $ref: '#/components/responses/Error405'
+  /plans/{id}:
+    parameters:
+      - $ref: '#/components/parameters/ResourceID'
+    get:
+      tags: [Plans]
+      summary: Obtener recurso por ID
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessObject'
+        '404':
+          $ref: '#/components/responses/Error404'
+    put:
+      tags: [Plans]
+      summary: Reemplazar recurso por ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+    patch:
+      tags: [Plans]
+      summary: Actualizar parcialmente recurso por ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+    delete:
+      tags: [Plans]
+      summary: Eliminar recurso por ID
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+
+  /favorites:
+    get:
+      tags: [Favorites]
+      summary: Listar favoritos
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessArray'
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          $ref: '#/components/responses/Error403'
+    post:
+      tags: [Favorites]
+      summary: Crear favorito
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '201':
+          $ref: '#/components/responses/CreatedID'
+        '400':
+          $ref: '#/components/responses/Error400'
+
+  /favorites/{id}:
+    parameters:
+      - $ref: '#/components/parameters/ResourceID'
+    delete:
+      tags: [Favorites]
+      summary: Eliminar favorito por game ID del path y usuario autenticado
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+        '401':
+          $ref: '#/components/responses/Error401'
+
+  /game_categories:
+    get:
+      tags: [GameCategories]
+      summary: Listar relaciones game-category
+      responses:
+        '200':
+          $ref: '#/components/responses/SuccessArray'
+    post:
+      tags: [GameCategories]
+      summary: Crear relación game-category
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenericInput'
+      responses:
+        '201':
+          $ref: '#/components/responses/CreatedID'
+        '400':
+          $ref: '#/components/responses/Error400'
+    delete:
+      tags: [GameCategories]
+      summary: Eliminar relación game-category
+      parameters:
+        - name: game_id
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: category_id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/Error400'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    ResourceID:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+
+  responses:
+    SuccessArray:
+      description: Operación correcta con lista
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/GenericObject'
+    SuccessObject:
+      description: Operación correcta con objeto
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GenericObject'
+    CreatedID:
+      description: Recurso creado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreatedIDResponse'
+    NoContent:
+      description: Operación correcta sin cuerpo
+    Error400:
+      description: Solicitud inválida
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error401:
+      description: No autenticado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error403:
+      description: Sin permisos o token inválido
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error404:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Error405:
+      description: Método no permitido
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    GenericObject:
+      type: object
+      additionalProperties: true
+
+    GenericInput:
+      type: object
+      additionalProperties: true
+      description: Payload genérico. Se recomienda sustituir por DTOs concretos en una iteración posterior.
+
+    CreatedIDResponse:
+      type: object
+      required: [ID]
+      properties:
+        ID:
+          type: integer
+          example: 123
+
+    ErrorResponse:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          example: NOT_FOUND
+        message:
+          type: string
+          example: Error en la solicitud
+
+    AuthLoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          example: usuario@ejemplo.com
+        password:
+          type: string
+          format: password
+          example: secreto123
+
+    AuthLoginResponse:
+      type: object
+      required: [token]
+      properties:
+        token:
+          type: string
+          example: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...
