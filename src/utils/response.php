@@ -129,28 +129,12 @@ class Response
 
     private static function toCamelCase(string $key): string
     {
-        $camel = preg_replace_callback('/_([a-z])/', static function (array $matches): string {
+        return preg_replace_callback('/_([a-z])/', static function (array $matches): string {
             return strtoupper($matches[1]);
         }, $key) ?? $key;
-
-        return self::applyAcronymRules($camel);
     }
 
-    private static function applyAcronymRules(string $key): string
-    {
-        if ($key === 'id') {
-            return 'ID';
-        }
 
-        if ($key === 'url') {
-            return 'URL';
-        }
-
-        $key = preg_replace('/Id\b/', 'ID', $key) ?? $key;
-        $key = preg_replace('/Url\b/', 'URL', $key) ?? $key;
-
-        return $key;
-    }
 
     private static function isAssoc(array $array): bool
     {
