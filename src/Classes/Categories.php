@@ -1,4 +1,3 @@
-
 <?php
 namespace App\Classes;
 use App\Models\Database;
@@ -6,6 +5,7 @@ use App\Utils\Response;
 /**
  * Clase para el modelo que representa a la tabla "categories".
  */
+class Categories extends Database {
     /**
      * Realiza type casting de campos numéricos/bool en una categoría o lista de categorías
      */
@@ -22,8 +22,6 @@ use App\Utils\Response;
         }
         return $category;
     }
-
-class Categories extends Database {
     /**
      * Atributo que indica la tabla asociada a la clase del modelo
      */
