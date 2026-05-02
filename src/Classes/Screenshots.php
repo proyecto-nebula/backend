@@ -1,10 +1,28 @@
+
 <?php
 namespace App\Classes;
-/**
- * Clase para el modelo que representa a la tabla "CAPTURAS".
- */
 use App\Models\Database;
 use App\Utils\Response;
+/**
+ * Clase para el modelo que representa a la tabla "screenshots".
+ */
+    /**
+     * Realiza type casting de campos numéricos/bool en una captura o lista de capturas
+     */
+    public static function castScreenshotNumericFields($screenshot) {
+        if (is_array($screenshot) && isset($screenshot[0]) && is_array($screenshot[0])) {
+            // Lista de capturas
+            foreach ($screenshot as &$item) {
+                $item = self::castScreenshotNumericFields($item);
+            }
+            return $screenshot;
+        }
+        if (is_array($screenshot)) {
+            if (isset($screenshot['id'])) $screenshot['id'] = (int)$screenshot['id'];
+            if (isset($screenshot['game_id'])) $screenshot['game_id'] = (int)$screenshot['game_id'];
+        }
+        return $screenshot;
+    }
 
 class Screenshots extends Database {
     /**
@@ -79,9 +97,18 @@ class Screenshots extends Database {
         // Validación de parámetros permitidos y limpieza de basura del .htaccess
         $this->filtrarParametros($params, $this->allowedConditions_get);
 
-        $items = parent::getDB($this->table, $params);
+        // Si se pasa 'id', buscar por id y devolver solo el primer resultado
+        if (isset($params['id'])) {
+            $items = parent::getDB($this->table, ['id' => $params['id']]);
+            if (count($items) > 0) {
+                return self::castScreenshotNumericFields($items[0]);
+            } else {
+                return null;
+            }
+        }
 
-        return $items;
+        $items = parent::getDB($this->table, $params);
+        return self::castScreenshotNumericFields($items);
     }
 
     /**
@@ -92,7 +119,8 @@ class Screenshots extends Database {
         $this->filtrarParametros($params, $this->allowedConditions_insert);
 
         if ($this->validate($params)) {
-            return parent::insertDB($this->table, $params);
+            $result = parent::insertDB($this->table, $params);
+            return self::castScreenshotNumericFields($result);
         }
     }
 

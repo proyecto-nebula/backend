@@ -1,10 +1,27 @@
+
 <?php
 namespace App\Classes;
-/**
- * Clase para el modelo que representa a la tabla "ROLES".
- */
 use App\Models\Database;
 use App\Utils\Response;
+/**
+ * Clase para el modelo que representa a la tabla "roles".
+ */
+    /**
+     * Realiza type casting de campos numéricos/bool en un rol o lista de roles
+     */
+    public static function castRoleNumericFields($role) {
+        if (is_array($role) && isset($role[0]) && is_array($role[0])) {
+            // Lista de roles
+            foreach ($role as &$item) {
+                $item = self::castRoleNumericFields($item);
+            }
+            return $role;
+        }
+        if (is_array($role)) {
+            if (isset($role['id'])) $role['id'] = (int)$role['id'];
+        }
+        return $role;
+    }
 
 class Roles extends Database {
     /**
@@ -75,9 +92,18 @@ class Roles extends Database {
         // Validación de parámetros permitidos y limpieza de variables de ruta
         $this->filtrarParametros($params, $this->allowedConditions_get);
 
-        $items = parent::getDB($this->table, $params);
+        // Si se pasa 'id', buscar por id y devolver solo el primer resultado
+        if (isset($params['id'])) {
+            $items = parent::getDB($this->table, ['id' => $params['id']]);
+            if (count($items) > 0) {
+                return self::castRoleNumericFields($items[0]);
+            } else {
+                return null;
+            }
+        }
 
-        return $items;
+        $items = parent::getDB($this->table, $params);
+        return self::castRoleNumericFields($items);
     }
 
     /**
@@ -88,7 +114,8 @@ class Roles extends Database {
         $this->filtrarParametros($params, $this->allowedConditions_insert);
 
         if ($this->validate($params)) {
-            return parent::insertDB($this->table, $params);
+            $result = parent::insertDB($this->table, $params);
+            return self::castRoleNumericFields($result);
         }
     }
 

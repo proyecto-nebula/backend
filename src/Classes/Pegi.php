@@ -1,10 +1,27 @@
+
 <?php
 namespace App\Classes;
-/**
- * Clase para el modelo que representa a la tabla "PEGI".
- */
 use App\Models\Database;
 use App\Utils\Response;
+/**
+ * Clase para el modelo que representa a la tabla "pegi".
+ */
+    /**
+     * Realiza type casting de campos numéricos/bool en un registro PEGI o lista de PEGI
+     */
+    public static function castPegiNumericFields($pegi) {
+        if (is_array($pegi) && isset($pegi[0]) && is_array($pegi[0])) {
+            // Lista de PEGI
+            foreach ($pegi as &$item) {
+                $item = self::castPegiNumericFields($item);
+            }
+            return $pegi;
+        }
+        if (is_array($pegi)) {
+            if (isset($pegi['id'])) $pegi['id'] = (int)$pegi['id'];
+        }
+        return $pegi;
+    }
 
 class Pegi extends Database {
     /**
@@ -77,9 +94,18 @@ class Pegi extends Database {
         // Validación de parámetros permitidos y limpieza de variables de ruta
         $this->filtrarParametros($params, $this->allowedConditions_get);
 
-        $items = parent::getDB($this->table, $params);
+        // Si se pasa 'id', buscar por id y devolver solo el primer resultado
+        if (isset($params['id'])) {
+            $items = parent::getDB($this->table, ['id' => $params['id']]);
+            if (count($items) > 0) {
+                return self::castPegiNumericFields($items[0]);
+            } else {
+                return null;
+            }
+        }
 
-        return $items;
+        $items = parent::getDB($this->table, $params);
+        return self::castPegiNumericFields($items);
     }
 
   public function insert($params) {
@@ -90,7 +116,8 @@ class Pegi extends Database {
 
         if ($this->validate($params)) {
             try {
-                return parent::insertDB($this->table, $params);
+                $result = parent::insertDB($this->table, $params);
+                return self::castPegiNumericFields($result);
             } catch (\mysqli_sql_exception $e) {
                 // Error 1062: ID duplicado
                 if ($e->getCode() == 1062) {
@@ -100,7 +127,6 @@ class Pegi extends Database {
                     ));
                     exit;
                 }
-                
                 // Por si acaso hubiera alguna clave foránea en PEGI (Error 1452)
                 if ($e->getCode() == 1452) {
                     Response::result(404, array(
@@ -109,7 +135,6 @@ class Pegi extends Database {
                     ));
                     exit;
                 }
-
                 throw $e;
             }
         }

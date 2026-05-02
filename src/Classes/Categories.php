@@ -1,10 +1,27 @@
+
 <?php
 namespace App\Classes;
-/**
- * Clase para el modelo que representa a la tabla "CATEGORIAS".
- */
 use App\Models\Database;
 use App\Utils\Response;
+/**
+ * Clase para el modelo que representa a la tabla "categories".
+ */
+    /**
+     * Realiza type casting de campos numéricos/bool en una categoría o lista de categorías
+     */
+    public static function castCategoryNumericFields($category) {
+        if (is_array($category) && isset($category[0]) && is_array($category[0])) {
+            // Lista de categorías
+            foreach ($category as &$item) {
+                $item = self::castCategoryNumericFields($item);
+            }
+            return $category;
+        }
+        if (is_array($category)) {
+            if (isset($category['id'])) $category['id'] = (int)$category['id'];
+        }
+        return $category;
+    }
 
 class Categories extends Database {
     /**
@@ -78,9 +95,28 @@ class Categories extends Database {
         // Validación de parámetros permitidos
         $this->filtrarParametros($params, $this->allowedConditions_get);
 
-        $items = parent::getDB($this->table, $params);
+        // Si se pasa 'id', buscar por id y devolver solo el primer resultado
+        if (isset($params['id'])) {
+            $items = parent::getDB($this->table, ['id' => $params['id']]);
+            if (count($items) > 0) {
+                return self::castCategoryNumericFields($items[0]);
+            } else {
+                return null;
+            }
+        }
 
-        return $items;
+        // Si se pasa 'name', buscar por name y devolver solo el primer resultado
+        if (isset($params['name'])) {
+            $items = parent::getDB($this->table, ['name' => $params['name']]);
+            if (count($items) > 0) {
+                return self::castCategoryNumericFields($items[0]);
+            } else {
+                return null;
+            }
+        }
+
+        $items = parent::getDB($this->table, $params);
+        return self::castCategoryNumericFields($items);
     }
 
     /**
@@ -91,7 +127,8 @@ class Categories extends Database {
         $this->filtrarParametros($params, $this->allowedConditions_insert);
 
         if ($this->validate($params)) {
-            return parent::insertDB($this->table, $params);
+            $result = parent::insertDB($this->table, $params);
+            return self::castCategoryNumericFields($result);
         }
     }
 

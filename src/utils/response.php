@@ -8,6 +8,9 @@ class Response
 {
     public static function result($code, $response): void
     {
+        // Refuerzo: header siempre antes de cualquier salida
+        header('Content-Type: application/json; charset=utf-8');
+
         if (self::isSuccessEnvelope($response)) {
             $payload = $response['data'] ?? null;
             if ($payload === null) {
@@ -19,7 +22,6 @@ class Response
                 $payload = self::convertKeysToCamelCase($payload);
             }
 
-            header('Content-Type: application/json; charset=utf-8');
             http_response_code($code);
             echo json_encode($payload, JSON_UNESCAPED_UNICODE);
             return;
@@ -33,7 +35,6 @@ class Response
             $response = self::convertKeysToCamelCase($response);
         }
 
-        header('Content-Type: application/json; charset=utf-8');
         http_response_code($code);
         echo json_encode($response, JSON_UNESCAPED_UNICODE);
     }
@@ -102,6 +103,7 @@ class Response
         return;
     }
 
+
     private static function convertKeysToCamelCase(array $value): array
     {
         if (!self::isAssoc($value)) {
@@ -110,10 +112,8 @@ class Response
                     $value[$index] = self::convertKeysToCamelCase($item);
                 }
             }
-
             return $value;
         }
-
         $converted = [];
         foreach ($value as $key => $item) {
             $newKey = is_string($key) ? self::toCamelCase($key) : $key;
@@ -123,7 +123,6 @@ class Response
                 $converted[$newKey] = $item;
             }
         }
-
         return $converted;
     }
 
@@ -132,6 +131,39 @@ class Response
         return preg_replace_callback('/_([a-z])/', static function (array $matches): string {
             return strtoupper($matches[1]);
         }, $key) ?? $key;
+    }
+
+    /**
+     * Convierte las claves de un array de camelCase a snake_case (recursivo)
+     */
+    public static function convertKeysToSnakeCase(array $value): array
+    {
+        if (!self::isAssoc($value)) {
+            foreach ($value as $index => $item) {
+                if (is_array($item)) {
+                    $value[$index] = self::convertKeysToSnakeCase($item);
+                }
+            }
+            return $value;
+        }
+        $converted = [];
+        foreach ($value as $key => $item) {
+            $newKey = is_string($key) ? self::toSnakeCase($key) : $key;
+            if (is_array($item)) {
+                $converted[$newKey] = self::convertKeysToSnakeCase($item);
+            } else {
+                $converted[$newKey] = $item;
+            }
+        }
+        return $converted;
+    }
+
+    /**
+     * Convierte una cadena camelCase a snake_case
+     */
+    private static function toSnakeCase(string $key): string
+    {
+        return strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $key));
     }
 
 

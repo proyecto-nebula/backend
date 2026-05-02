@@ -8,7 +8,7 @@ info:
     Notas importantes de contrato:
     - En respuestas OK, el backend devuelve directamente el payload (sin envoltorio result/data).
     - En errores, el backend devuelve `{ code, message }`.
-    - Las claves se devuelven en camelCase y con reglas de acronimos: `id` -> `ID`, `url` -> `URL`.
+    - Las claves se devuelven en camelCase: `id`, `url`, etc.
     - Los endpoints protegidos requieren `Authorization: Bearer <token>`.
 
 servers:
@@ -118,12 +118,12 @@ paths:
               examples:
                 ok:
                   value:
-                    - ID: 1
+                    - id: 1
                       username: usuario
                       email: usuario@test.com
-                      planID: 0
-                      roleID: 1
-                      avatarID: 5
+                      planId: 0
+                      roleId: 1
+                      avatarId: 5
                       birthDate: 1995-08-22
                       isActive: true
                       createdAt: 2026-04-07 11:35:29
@@ -243,17 +243,17 @@ paths:
               examples:
                 ok:
                   value:
-                    - ID: 1
+                    - id: 1
                       title: Project Zomboid
                       slug: project-zomboid
                       summary: Como moriras?
-                      pegiID: 18
+                      pegiId: 18
                       metacriticScore: 80
                       releaseDate: 2013-11-08
                       publishedAt: 2025-12-05 22:30:00
                       isFeatured: true
                       isActive: true
-                      coverURL: https://cdn.akamai.steamstatic.com/steam/apps/108600/library_600x900_2x.jpg
+                      coverUrl: https://cdn.akamai.steamstatic.com/steam/apps/108600/library_600x900_2x.jpg
         '401':
           $ref: '#/components/responses/Error401'
         '405':
@@ -687,8 +687,8 @@ paths:
               examples:
                 ok:
                   value:
-                    - userID: 1
-                      gameID: 95
+                    - userId: 1
+                      gameId: 95
         '401':
           $ref: '#/components/responses/Error401'
     post:
@@ -704,8 +704,8 @@ paths:
             examples:
               alta:
                 value:
-                  userID: 1
-                  gameID: 129
+                  userId: 1
+                  gameId: 129
       responses:
         '201':
           $ref: '#/components/responses/CreatedID'
@@ -1203,9 +1203,9 @@ components:
 
     CreatedIDResponse:
       type: object
-      required: [ID]
+      required: [id]
       properties:
-        ID:
+        id:
           type: integer
           example: 321
 
@@ -1244,15 +1244,15 @@ components:
     User:
       type: object
       properties:
-        ID:
+        id:
           type: integer
-        planID:
-          type: integer
-          nullable: true
-        roleID:
+        planId:
           type: integer
           nullable: true
-        avatarID:
+        roleId:
+          type: integer
+          nullable: true
+        avatarId:
           type: integer
           nullable: true
         username:
@@ -1316,21 +1316,21 @@ components:
     Game:
       type: object
       properties:
-        ID:
+        id:
           type: integer
-        developerID:
-          type: integer
-          nullable: true
-        publisherID:
+        developerId:
           type: integer
           nullable: true
-        pegiID:
+        publisherId:
           type: integer
           nullable: true
-        steamID:
+        pegiId:
+          type: integer
+          nullable: true
+        steamId:
           type: string
           nullable: true
-        igdbID:
+        igdbId:
           type: string
           nullable: true
         title:
@@ -1344,16 +1344,16 @@ components:
         description:
           type: string
           nullable: true
-        coverURL:
+        coverUrl:
           type: string
           nullable: true
-        bannerURL:
+        bannerUrl:
           type: string
           nullable: true
-        heroURL:
+        heroUrl:
           type: string
           nullable: true
-        logoURL:
+        logoUrl:
           type: string
           nullable: true
         metacriticScore:
@@ -1376,19 +1376,19 @@ components:
       type: object
       required: [title]
       properties:
-        developerID:
+        developerId:
           type: integer
           nullable: true
-        publisherID:
+        publisherId:
           type: integer
           nullable: true
-        pegiID:
+        pegiId:
           type: integer
           nullable: true
-        steamID:
+        steamId:
           type: string
           nullable: true
-        igdbID:
+        igdbId:
           type: string
           nullable: true
         title:
@@ -1402,16 +1402,16 @@ components:
         description:
           type: string
           nullable: true
-        coverURL:
+        coverUrl:
           type: string
           nullable: true
-        bannerURL:
+        bannerUrl:
           type: string
           nullable: true
-        heroURL:
+        heroUrl:
           type: string
           nullable: true
-        logoURL:
+        logoUrl:
           type: string
           nullable: true
         metacriticScore:
@@ -1437,51 +1437,51 @@ components:
     Avatar:
       type: object
       properties:
-        ID:
+        id:
           type: integer
         name:
           type: string
-        imageURL:
+        imageUrl:
           type: string
 
     AvatarWriteRequest:
       type: object
-      required: [name, imageURL]
+      required: [name, imageUrl]
       properties:
         name:
           type: string
-        imageURL:
+        imageUrl:
           type: string
 
     Screenshot:
       type: object
       properties:
-        ID:
+        id:
           type: integer
-        gameID:
+        gameId:
           type: integer
           nullable: true
-        imageURL:
+        imageUrl:
           type: string
           nullable: true
 
     ScreenshotWriteRequest:
       type: object
-      required: [gameID, imageURL]
+      required: [gameId, imageUrl]
       properties:
-        gameID:
+        gameId:
           type: integer
-        imageURL:
+        imageUrl:
           type: string
 
     Category:
       type: object
       properties:
-        ID:
+        id:
           type: integer
         name:
           type: string
-        imageURL:
+        imageUrl:
           type: string
           nullable: true
 
@@ -1491,18 +1491,18 @@ components:
       properties:
         name:
           type: string
-        imageURL:
+        imageUrl:
           type: string
           nullable: true
 
     Studio:
       type: object
       properties:
-        ID:
+        id:
           type: integer
         name:
           type: string
-        logoURL:
+        logoUrl:
           type: string
           nullable: true
         website:
@@ -1515,7 +1515,7 @@ components:
       properties:
         name:
           type: string
-        logoURL:
+        logoUrl:
           type: string
           nullable: true
         website:
@@ -1525,46 +1525,46 @@ components:
     Favorite:
       type: object
       properties:
-        userID:
+        userId:
           type: integer
-        gameID:
+        gameId:
           type: integer
 
     FavoriteWriteRequest:
       type: object
-      required: [userID, gameID]
+      required: [userId, gameId]
       properties:
-        userID:
+        userId:
           type: integer
-        gameID:
+        gameId:
           type: integer
 
     GameCategory:
       type: object
       properties:
-        gameID:
+        gameId:
           type: integer
-        categoryID:
+        categoryId:
           type: integer
 
     GameCategoryWriteRequest:
       type: object
-      required: [gameID, categoryID]
+      required: [gameId, categoryId]
       properties:
-        gameID:
+        gameId:
           type: integer
-        categoryID:
+        categoryId:
           type: integer
 
     Session:
       type: object
       properties:
-        ID:
+        id:
           type: integer
-        userID:
+        userId:
           type: integer
           nullable: true
-        gameID:
+        gameId:
           type: integer
           nullable: true
         startedAt:
@@ -1578,11 +1578,11 @@ components:
 
     SessionWriteRequest:
       type: object
-      required: [userID, gameID]
+      required: [userId, gameId]
       properties:
-        userID:
+        userId:
           type: integer
-        gameID:
+        gameId:
           type: integer
         startedAt:
           type: string
@@ -1594,11 +1594,11 @@ components:
     Pegi:
       type: object
       properties:
-        ID:
+        id:
           type: integer
         name:
           type: string
-        imageURL:
+        imageUrl:
           type: string
           nullable: true
 
@@ -1608,33 +1608,17 @@ components:
       properties:
         name:
           type: string
-        imageURL:
+        imageUrl:
           type: string
           nullable: true
 
     Role:
       type: object
       properties:
-        ID:
+        id:
           type: integer
         name:
           type: string
-
-    RoleWriteRequest:
-      type: object
-      required: [name]
-      properties:
-        name:
-          type: string
-
-    Plan:
-      type: object
-      properties:
-        ID:
-          type: integer
-        name:
-          type: string
-          nullable: true
         description:
           type: string
           nullable: true

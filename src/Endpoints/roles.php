@@ -9,14 +9,20 @@ switch ($_SERVER['REQUEST_METHOD']) {
         \App\Utils\Response::ok($item->get($_GET));
         break;
     case 'POST':
-        \App\Utils\Response::ok(['id' => $item->insert(json_decode(file_get_contents('php://input'), true))], 201);
+        $params = json_decode(file_get_contents('php://input'), true);
+        $params = \App\Utils\Response::convertKeysToSnakeCase($params);
+        \App\Utils\Response::ok(['id' => $item->insert($params)], 201);
         break;
     case 'PUT':
-        $item->updatePut($_GET['id'], json_decode(file_get_contents('php://input'), true));
+        $params = json_decode(file_get_contents('php://input'), true);
+        $params = \App\Utils\Response::convertKeysToSnakeCase($params);
+        $item->updatePut($_GET['id'], $params);
         \App\Utils\Response::ok();
         break;
     case 'PATCH':
-        $item->updatePatch($_GET['id'], json_decode(file_get_contents('php://input'), true));
+        $params = json_decode(file_get_contents('php://input'), true);
+        $params = \App\Utils\Response::convertKeysToSnakeCase($params);
+        $item->updatePatch($_GET['id'], $params);
         \App\Utils\Response::ok();
         break;
     case 'DELETE':

@@ -36,7 +36,6 @@ class Database
 			exit;
 		}
 
-		$this->connection->set_charset('utf8mb4');
 	}
 
 	/**
@@ -79,7 +78,6 @@ class Database
 		foreach ($results as $value) {
 			$resultArray[] = $value;
 		}
-
 		return $resultArray;
 	}
 
@@ -88,15 +86,33 @@ class Database
 	 */
 	public function insertDB($table, $data)
 	{
-		$fields = implode(',', array_keys($data));
-		$values = '"';
-		$values .= implode('","', array_values($data));
-		$values .= '"';
-
-		$query = "INSERT INTO $table (" . $fields . ') VALUES (' . $values . ')';
-		$this->connection->query($query);
-
-		return $this->connection->insert_id;
+		$fields = array_keys($data);
+		$placeholders = implode(',', array_fill(0, count($fields), '?'));
+		$types = '';
+		$values = [];
+		foreach ($fields as $field) {
+			$value = $data[$field];
+			// Determinar el tipo para bind_param
+			if (is_int($value)) {
+				$types .= 'i';
+			} elseif (is_float($value)) {
+				$types .= 'd';
+			} else {
+				$types .= 's';
+			}
+			$values[] = $value;
+		}
+		$fields_sql = implode(',', $fields);
+		$query = "INSERT INTO $table ($fields_sql) VALUES ($placeholders)";
+		$stmt = $this->connection->prepare($query);
+		if (!$stmt) {
+			throw new \Exception('Error en prepare: ' . $this->connection->error);
+		}
+		$stmt->bind_param($types, ...$values);
+		$stmt->execute();
+		$insert_id = $stmt->insert_id;
+		$stmt->close();
+		return $insert_id;
 	}
 
 	/**

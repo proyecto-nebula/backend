@@ -28,6 +28,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
             \App\Utils\Response::error('Error en la solicitud', 400);
             exit;
         }
+        $params = \App\Utils\Response::convertKeysToSnakeCase($params);
         \App\Utils\Response::ok(['id' => $item->insert($params)], 201);
         break;
 
@@ -37,6 +38,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
             \App\Utils\Response::error('Error en la solicitud', 400);
             exit;
         }
+        $params = \App\Utils\Response::convertKeysToSnakeCase($params);
         $item->updatePut($_GET['id'], $params);
         \App\Utils\Response::ok();
         break;
@@ -47,6 +49,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
             \App\Utils\Response::error('Error en la solicitud', 400);
             exit;
         }
+        $params = \App\Utils\Response::convertKeysToSnakeCase($params);
         $item->updatePatch($_GET['id'], $params);
         \App\Utils\Response::ok();
         break;

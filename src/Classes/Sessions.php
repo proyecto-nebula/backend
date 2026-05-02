@@ -1,10 +1,30 @@
+
 <?php
 namespace App\Classes;
-/**
- * Clase para el modelo que representa a la tabla "PARTIDAS".
- */
 use App\Models\Database;
 use App\Utils\Response;
+/**
+ * Clase para el modelo que representa a la tabla "sessions".
+ */
+    /**
+     * Realiza type casting de campos numéricos/bool en una sesión o lista de sesiones
+     */
+    public static function castSessionNumericFields($session) {
+        if (is_array($session) && isset($session[0]) && is_array($session[0])) {
+            // Lista de sesiones
+            foreach ($session as &$item) {
+                $item = self::castSessionNumericFields($item);
+            }
+            return $session;
+        }
+        if (is_array($session)) {
+            if (isset($session['id'])) $session['id'] = (int)$session['id'];
+            if (isset($session['user_id'])) $session['user_id'] = (int)$session['user_id'];
+            if (isset($session['game_id'])) $session['game_id'] = (int)$session['game_id'];
+            if (isset($session['duration'])) $session['duration'] = (int)$session['duration'];
+        }
+        return $session;
+    }
 
 class Sessions extends Database {
     /**
@@ -81,9 +101,18 @@ class Sessions extends Database {
         // Validación de parámetros permitidos y limpieza de variables de ruta
         $this->filtrarParametros($params, $this->allowedConditions_get);
 
-        $items = parent::getDB($this->table, $params);
+        // Si se pasa 'id', buscar por id y devolver solo el primer resultado
+        if (isset($params['id'])) {
+            $items = parent::getDB($this->table, ['id' => $params['id']]);
+            if (count($items) > 0) {
+                return self::castSessionNumericFields($items[0]);
+            } else {
+                return null;
+            }
+        }
 
-        return $items;
+        $items = parent::getDB($this->table, $params);
+        return self::castSessionNumericFields($items);
     }
 
     /**
@@ -94,7 +123,8 @@ class Sessions extends Database {
         $this->filtrarParametros($params, $this->allowedConditions_insert);
 
         if ($this->validate($params)) {
-            return parent::insertDB($this->table, $params);
+            $result = parent::insertDB($this->table, $params);
+            return self::castSessionNumericFields($result);
         }
     }
 

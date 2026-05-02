@@ -7,6 +7,33 @@ use App\Models\Database;
 use App\Utils\Response;
 
 class Games extends Database {
+
+        /**
+         * Fuerza los campos numéricos/bool a su tipo en un juego o lista de juegos
+         */
+        public static function castGameNumericFields($game) {
+            $intFields = ['id', 'developer_id', 'publisher_id', 'pegi_id', 'metacritic_score'];
+            $boolFields = ['is_featured', 'is_active'];
+            if (is_array($game) && isset($game[0]) && is_array($game[0])) {
+                foreach ($game as &$item) {
+                    $item = self::castGameNumericFields($item);
+                }
+                return $game;
+            }
+            if (is_array($game)) {
+                foreach ($intFields as $field) {
+                    if (isset($game[$field])) {
+                        $game[$field] = is_numeric($game[$field]) ? (int)$game[$field] : $game[$field];
+                    }
+                }
+                foreach ($boolFields as $field) {
+                    if (isset($game[$field])) {
+                        $game[$field] = (bool)$game[$field];
+                    }
+                }
+            }
+            return $game;
+        }
     private $table = 'games';
     private $primary_key = 'id';
 
@@ -48,17 +75,36 @@ class Games extends Database {
      * Método GET actualizado para usar la nueva lógica de filtrado
      */
     public function get($params) {
-        // Usamos nuestra función de filtrado en lugar del bucle antiguo
         $this->filtrarParametros($params, $this->allowedConditions_get);
 
+        if (isset($params['slug'])) {
+            $items = parent::getDB($this->table, ['slug' => $params['slug']]);
+            if (count($items) > 0) {
+                return self::castGameNumericFields($items[0]);
+            } else {
+                return null;
+            }
+        }
+
+        if (isset($params['id'])) {
+            $items = parent::getDB($this->table, ['id' => $params['id']]);
+            if (count($items) > 0) {
+                return self::castGameNumericFields($items[0]);
+            } else {
+                return null;
+            }
+        }
+
         $items = parent::getDB($this->table, $params);
-        return $items;
+        return self::castGameNumericFields($items);
     }
+
 
     public function insert($params) {
         $this->filtrarParametros($params, $this->allowedConditions_insert);
         if ($this->validate($params)) {
-            return parent::insertDB($this->table, $params);
+            $result = parent::insertDB($this->table, $params);
+            return self::castGameNumericFields($result);
         }
     }
 

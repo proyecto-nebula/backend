@@ -68,7 +68,19 @@ class Favorites extends Database {
 
     public function get($params) {
         $this->filtrarParametros($params, $this->allowedConditions_get);
-        return parent::getDB($this->table, $params);
+
+        // Si se pasa user_id y game_id, devolver solo el primer resultado
+        if (isset($params['user_id']) && isset($params['game_id'])) {
+            $items = parent::getDB($this->table, ['user_id' => $params['user_id'], 'game_id' => $params['game_id']]);
+            if (count($items) > 0) {
+                return $items[0];
+            } else {
+                return null;
+            }
+        }
+
+        $items = parent::getDB($this->table, $params);
+        return $items;
     }
 
     public function updatePut($id, $params) {

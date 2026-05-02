@@ -8,6 +8,18 @@ use App\Utils\Response;
 
 class Users extends Database {
     /**
+     * Convierte los campos numéricos/bool a su tipo correcto
+     */
+    private function castUserNumericFields($user) {
+        if (!$user) return $user;
+        if (isset($user['id'])) $user['id'] = (int)$user['id'];
+        if (isset($user['role_id'])) $user['role_id'] = (int)$user['role_id'];
+        if (isset($user['plan_id'])) $user['plan_id'] = (int)$user['plan_id'];
+        if (isset($user['avatar_id'])) $user['avatar_id'] = (int)$user['avatar_id'];
+        if (isset($user['is_active'])) $user['is_active'] = (bool)$user['is_active'];
+        return $user;
+    }
+    /**
      * Atributo que indica la tabla asociada a la clase del modelo
      */
     private $table = 'users';
@@ -78,14 +90,35 @@ class Users extends Database {
                     'result' => 'error',
                     'details' => 'Error en la solicitud'
                 );
-
                 Response::result(400, $response);
                 exit;
             }
         }
 
-        $items = parent::getDB($this->table, $params);
+        // Si se pasa 'id', buscar por id y devolver solo el primer resultado
+        if (isset($params['id'])) {
+            $items = parent::getDB($this->table, ['id' => $params['id']]);
+            if (count($items) > 0) {
+                return $this->castUserNumericFields($items[0]);
+            } else {
+                return null;
+            }
+        }
 
+        // Si se pasa 'username', buscar por username y devolver solo el primer resultado
+        if (isset($params['username'])) {
+            $items = parent::getDB($this->table, ['username' => $params['username']]);
+            if (count($items) > 0) {
+                return $this->castUserNumericFields($items[0]);
+            } else {
+                return null;
+            }
+        }
+
+        $items = parent::getDB($this->table, $params);
+        foreach ($items as &$item) {
+            $item = $this->castUserNumericFields($item);
+        }
         return $items;
     }
 
@@ -223,7 +256,8 @@ class Users extends Database {
 
         // Si hay resultados, devolvemos la primera fila como array asociativo
         if ($result && $result->num_rows > 0) {
-            return $result->fetch_assoc();
+            $user = $result->fetch_assoc();
+            return $this->castUserNumericFields($user);
         }
 
         return null;

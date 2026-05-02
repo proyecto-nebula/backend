@@ -8,7 +8,7 @@ class Router {
     private static $endpoints = [
         'users', 'games', 'avatars', 'screenshots', 'categories', 
         'studios', 'favorites', 'game_categories', 'sessions', 
-        'pegi', 'roles', 'plans', 'auth', 'test'
+        'pegi', 'roles', 'plans', 'auth', 'test', 'test_encoding', 'test_db_encoding_api'
     ];
 
     public static function dispatch($uri) {
@@ -37,7 +37,10 @@ class Router {
             $_GET['id'] = intval($id);
         }
 
-        AuthGuard::enforce((string) $resource);
+        // Permitir acceso público a test y test_encoding
+        if (!in_array($resource, ['test', 'test_encoding'])) {
+            AuthGuard::enforce((string) $resource);
+        }
 
         // Cargar el archivo del endpoint (ruta segura)
         $endpointsDir = realpath(dirname(__DIR__) . '/Endpoints');

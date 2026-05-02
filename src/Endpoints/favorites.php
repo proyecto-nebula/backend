@@ -11,6 +11,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
 
     case 'POST':
         $params = json_decode(file_get_contents('php://input'), true);
+        $params = \App\Utils\Response::convertKeysToSnakeCase($params);
         \App\Utils\Response::ok(['id' => $item->insert($params)], 201);
         break;
 

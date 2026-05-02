@@ -7,7 +7,10 @@ use App\Utils\Response;
 
 class AuthGuard
 {
-    private const PUBLIC_ENDPOINTS = ['auth', 'test'];
+    // Endpoints públicos (no requieren autenticación)
+    private const PUBLIC_ENDPOINTS = [
+        'auth', 'test', 'games', 'studios', 'screenshots', 'roles', 'plans', 'pegi', 'game_categories', 'categories', 'avatars'
+    ];
 
     public static function enforce(string $resource): void
     {

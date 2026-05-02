@@ -1,10 +1,27 @@
+
 <?php
 namespace App\Classes;
-/**
- * Clase para el modelo que representa a la tabla "item".
- */
 use App\Models\Database;
 use App\Utils\Response;
+/**
+ * Clase para el modelo que representa a la tabla "avatars".
+ */
+	/**
+	 * Realiza type casting de campos numéricos/bool en un avatar o lista de avatares
+	 */
+	public static function castAvatarNumericFields($avatar) {
+		if (is_array($avatar) && isset($avatar[0]) && is_array($avatar[0])) {
+			// Lista de avatares
+			foreach ($avatar as &$item) {
+				$item = self::castAvatarNumericFields($item);
+			}
+			return $avatar;
+		}
+		if (is_array($avatar)) {
+			if (isset($avatar['id'])) $avatar['id'] = (int)$avatar['id'];
+		}
+		return $avatar;
+	}
 
 class Avatars extends Database {
 	/**
@@ -54,23 +71,31 @@ class Avatars extends Database {
 	/**
 	 * Método para recuperar registros, pudiendo indicar algunos filtros 
 	 */
-	public function get($params) {
-		foreach ($params as $key => $param) {
-			if (!in_array($key, $this->allowedConditions_get)) {
-				unset($params[$key]);
-				$response = array(
-					'result' => 'error',
-					'details' => 'Error en la solicitud'
-				);
+	   public function get($params) {
+		   foreach ($params as $key => $param) {
+			   if (!in_array($key, $this->allowedConditions_get)) {
+				   unset($params[$key]);
+				   $response = array(
+					   'result' => 'error',
+					   'details' => 'Error en la solicitud'
+				   );
+				   Response::result(400, $response);
+				   exit;
+			   }
+		   }
 
-				Response::result(400, $response);
-				exit;
-			}
-		}
+		   // Si se pasa 'id', buscar por id y devolver solo el primer resultado
+		   if (isset($params['id'])) {
+			   $items = parent::getDB($this->table, ['id' => $params['id']]);
+			   if (count($items) > 0) {
+				   return self::castAvatarNumericFields($items[0]);
+			   } else {
+				   return null;
+			   }
+		   }
 
-		$items = parent::getDB($this->table, $params);
-
-		return $items;
+		   $items = parent::getDB($this->table, $params);
+		   return self::castAvatarNumericFields($items);
 	}
 
 	/**
@@ -90,9 +115,10 @@ class Avatars extends Database {
 			}
 		}
 
-		if ($this->validate($params)) {
-			return parent::insertDB($this->table, $params);
-		}
+		   if ($this->validate($params)) {
+			   $result = parent::insertDB($this->table, $params);
+			   return self::castAvatarNumericFields($result);
+		   }
 	}
 
 	/**

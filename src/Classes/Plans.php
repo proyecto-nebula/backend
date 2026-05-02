@@ -1,10 +1,28 @@
+
 <?php
 namespace App\Classes;
-/**
- * Clase para el modelo que representa a la tabla "item".
- */
 use App\Models\Database;
 use App\Utils\Response;
+/**
+ * Clase para el modelo que representa a la tabla "plans".
+ */
+	/**
+	 * Realiza type casting de campos numéricos/bool en un plan o lista de planes
+	 */
+	public static function castPlanNumericFields($plan) {
+		if (is_array($plan) && isset($plan[0]) && is_array($plan[0])) {
+			// Lista de planes
+			foreach ($plan as &$item) {
+				$item = self::castPlanNumericFields($item);
+			}
+			return $plan;
+		}
+		if (is_array($plan)) {
+			if (isset($plan['id'])) $plan['id'] = (int)$plan['id'];
+			if (isset($plan['price'])) $plan['price'] = (float)$plan['price'];
+		}
+		return $plan;
+	}
 
 class Plans extends Database {
 	/**
@@ -55,23 +73,31 @@ class Plans extends Database {
 	/**
 	 * Método para recuperar registros, pudiendo indicar algunos filtros 
 	 */
-	public function get($params) {
-		foreach ($params as $key => $param) {
-			if (!in_array($key, $this->allowedConditions_get)) {
-				unset($params[$key]);
-				$response = array(
-					'result' => 'error',
-					'details' => 'Error en la solicitud'
-				);
+	   public function get($params) {
+		   foreach ($params as $key => $param) {
+			   if (!in_array($key, $this->allowedConditions_get)) {
+				   unset($params[$key]);
+				   $response = array(
+					   'result' => 'error',
+					   'details' => 'Error en la solicitud'
+				   );
+				   Response::result(400, $response);
+				   exit;
+			   }
+		   }
 
-				Response::result(400, $response);
-				exit;
-			}
-		}
+		   // Si se pasa 'id', buscar por id y devolver solo el primer resultado
+		   if (isset($params['id'])) {
+			   $items = parent::getDB($this->table, ['id' => $params['id']]);
+			   if (count($items) > 0) {
+				   return self::castPlanNumericFields($items[0]);
+			   } else {
+				   return null;
+			   }
+		   }
 
-		$items = parent::getDB($this->table, $params);
-
-		return $items;
+		   $items = parent::getDB($this->table, $params);
+		   return self::castPlanNumericFields($items);
 	}
 
 	/**
@@ -91,9 +117,10 @@ class Plans extends Database {
 			}
 		}
 
-		if ($this->validate($params)) {
-			return parent::insertDB($this->table, $params);
-		}
+		   if ($this->validate($params)) {
+			   $result = parent::insertDB($this->table, $params);
+			   return self::castPlanNumericFields($result);
+		   }
 	}
 
 	/**

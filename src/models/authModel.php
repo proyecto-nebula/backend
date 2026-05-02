@@ -35,7 +35,6 @@ class AuthModel
             exit;
         }
 
-        $this->connection->set_charset('utf8mb4');
     }
 
     /**

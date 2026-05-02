@@ -1,10 +1,27 @@
+
 <?php
 namespace App\Classes;
-/**
- * Clase para el modelo que representa a la tabla "ESTUDIOS".
- */
 use App\Models\Database;
 use App\Utils\Response;
+/**
+ * Clase para el modelo que representa a la tabla "studios".
+ */
+    /**
+     * Realiza type casting de campos numéricos/bool en un estudio o lista de estudios
+     */
+    public static function castStudioNumericFields($studio) {
+        if (is_array($studio) && isset($studio[0]) && is_array($studio[0])) {
+            // Lista de estudios
+            foreach ($studio as &$item) {
+                $item = self::castStudioNumericFields($item);
+            }
+            return $studio;
+        }
+        if (is_array($studio)) {
+            if (isset($studio['id'])) $studio['id'] = (int)$studio['id'];
+        }
+        return $studio;
+    }
 
 class Studios extends Database {
     /**
@@ -76,9 +93,28 @@ class Studios extends Database {
         // Validación de parámetros permitidos y limpieza de basura del .htaccess
         $this->filtrarParametros($params, $this->allowedConditions_get);
 
-        $items = parent::getDB($this->table, $params);
+        // Si se pasa 'id', buscar por id y devolver solo el primer resultado
+        if (isset($params['id'])) {
+            $items = parent::getDB($this->table, ['id' => $params['id']]);
+            if (count($items) > 0) {
+                return self::castStudioNumericFields($items[0]);
+            } else {
+                return null;
+            }
+        }
 
-        return $items;
+        // Si se pasa 'name', buscar por name y devolver solo el primer resultado
+        if (isset($params['name'])) {
+            $items = parent::getDB($this->table, ['name' => $params['name']]);
+            if (count($items) > 0) {
+                return self::castStudioNumericFields($items[0]);
+            } else {
+                return null;
+            }
+        }
+
+        $items = parent::getDB($this->table, $params);
+        return self::castStudioNumericFields($items);
     }
 
     /**
@@ -89,7 +125,8 @@ class Studios extends Database {
         $this->filtrarParametros($params, $this->allowedConditions_insert);
 
         if ($this->validate($params)) {
-            return parent::insertDB($this->table, $params);
+            $result = parent::insertDB($this->table, $params);
+            return self::castStudioNumericFields($result);
         }
     }
 
