@@ -148,31 +148,31 @@ CREATE TABLE `sessions` (
 
 -- Avatars
 INSERT INTO `avatars` (`id`, `name`, `image_url`) VALUES
-(1, 'Estrella', 'https://api.multiavatar.com/estrella.png'),
-(2, 'Gamer Pro', 'https://api.multiavatar.com/gamerpro.png'),
-(3, 'Noob', 'https://api.multiavatar.com/n00b.png'),
-(4, 'Admin', 'https://api.multiavatar.com/admin.png'),
-(5, 'Anónimo', 'https://api.multiavatar.com/anonimo.png'),
-(6, 'Soporte', 'https://api.multiavatar.com/soporte.png'),
-(7, 'Tester', 'https://api.multiavatar.com/tester1.png'),
-(8, 'Speedrunner', 'https://api.multiavatar.com/speedrunner.png'),
-(9, 'Coleccionista', 'https://api.multiavatar.com/coleccionista.png'),
-(10, 'Crítico', 'https://api.multiavatar.com/critico.png'),
-(11, 'Logros', 'https://api.multiavatar.com/achievements.png'),
-(12, 'Indie', 'https://api.multiavatar.com/indie.png'),
-(13, 'Lobo', 'https://api.multiavatar.com/wolf.png'),
-(14, 'Mundo', 'https://api.multiavatar.com/world.png'),
-(15, 'Estratega', 'https://api.multiavatar.com/strategy.png'),
-(16, 'Piloto', 'https://api.multiavatar.com/pilot.png'),
-(17, 'Mercenario', 'https://api.multiavatar.com/mercenary.png'),
-(18, 'Mago', 'https://api.multiavatar.com/wizard.png'),
-(19, 'Constructor', 'https://api.multiavatar.com/build.png'),
-(20, 'Leyenda', 'https://api.multiavatar.com/legend.png'),
-(22, 'prueba23', 'https://api.multiavatar.com/estrella.png'),
-(23, 'prueba23', 'https://api.multiavatar.com/estrella.png'),
-(24, 'prueba23', 'https://api.multiavatar.com/estrella.png'),
-(25, 'prueba23', 'https://api.multiavatar.com/estrella.png'),
-(27, 'prueba244', 'https://api.multiavatar.com/estrella.png');
+(1, 'Estrella', 'https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Estrella&backgroundColor=ff5a5f'),
+(2, 'Gamer Pro', 'https://api.dicebear.com/7.x/bottts-neutral/svg?seed=GamerPro&backgroundColor=4e5ba6'),
+(3, 'Noob', 'https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Noob&backgroundColor=ffc857'),
+(4, 'Admin', 'https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Admin&backgroundColor=718096'),
+(5, 'Anónimo', 'https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Anonimo&backgroundColor=9f7aea'),
+(6, 'Soporte', 'https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Soporte&backgroundColor=48bb78'),
+(7, 'Tester', 'https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Tester&backgroundColor=f56565'),
+(8, 'Speedrunner', 'https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Speedrunner&backgroundColor=4299e1'),
+(9, 'Coleccionista', 'https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Coleccionista&backgroundColor=ecc94b'),
+(10, 'Crítico', 'https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Critico&backgroundColor=ed64a6'),
+(11, 'Logros', 'https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Logros&backgroundColor=a0aec0'),
+(12, 'Indie', 'https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Indie&backgroundColor=667eea'),
+(13, 'Lobo', 'https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Lobo&backgroundColor=f6ad55'),
+(14, 'Mundo', 'https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Mundo&backgroundColor=4fd1c5'),
+(15, 'Estratega', 'https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Estratega&backgroundColor=b794f4'),
+(16, 'Piloto', 'https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Piloto&backgroundColor=fc8181'),
+(17, 'Mercenario', 'https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Mercenario&backgroundColor=2d3748'),
+(18, 'Mago', 'https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Mago&backgroundColor=90cdf4'),
+(19, 'Constructor', 'https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Constructor&backgroundColor=f6e05e'),
+(20, 'Leyenda', 'https://api.dicebear.com/7.x/bottts-neutral/svg?seed=Leyenda&backgroundColor=d53f8c'),
+(22, 'prueba23', 'https://api.dicebear.com/7.x/bottts-neutral/svg?seed=p23a&backgroundColor=b2f5ea'),
+(23, 'prueba23_2', 'https://api.dicebear.com/7.x/bottts-neutral/svg?seed=p23b&backgroundColor=fed7e2'),
+(24, 'prueba23_3', 'https://api.dicebear.com/7.x/bottts-neutral/svg?seed=p23c&backgroundColor=feebc8'),
+(25, 'prueba23_4', 'https://api.dicebear.com/7.x/bottts-neutral/svg?seed=p23d&backgroundColor=c3dafe'),
+(27, 'prueba244', 'https://api.dicebear.com/7.x/bottts-neutral/svg?seed=p244&backgroundColor=e9d8fd');
 
 -- Categories
 INSERT INTO `categories` (`id`, `name`, `image_url`) VALUES
@@ -496,108 +496,137 @@ INSERT INTO `favorites` (`user_id`, `game_id`) VALUES
 (1, 131);
 
 -- Game Categories (Pivot Table)
+-- Categorías referencia: 1: Acción, 2: Aventura, 3: Estrategia, 4: RPG, 5: Simulación, 7: Indie, 8: Arcade
 INSERT INTO `game_categories` (`game_id`, `category_id`) VALUES
-(2, 1),
-(4, 1),
-(5, 1),
-(6, 1),
-(7, 1),
-(9, 1),
-(10, 1),
-(13, 1),
-(14, 1),
-(15, 1),
-(16, 1),
-(17, 1),
-(18, 1),
-(101, 1),
-(102, 1),
-(103, 1),
-(104, 1),
-(105, 1),
-(106, 1),
-(107, 1),
-(108, 1),
-(109, 1),
-(110, 1),
-(111, 1),
-(112, 1),
-(113, 1),
-(114, 1),
-(115, 1),
-(116, 1),
-(117, 1),
-(118, 1),
-(119, 1),
-(120, 1),
-(121, 1),
-(122, 1),
-(123, 1),
-(124, 1),
-(125, 1),
-(126, 1),
-(127, 1),
-(128, 1),
-(129, 1),
-(7, 2),
-(9, 2),
-(10, 2),
-(11, 2),
-(16, 2),
-(2, 3),
-(4, 3),
-(8, 3),
-(15, 3),
-(17, 3),
-(131, 3),
-(3, 4),
-(11, 4),
-(14, 5),
-(1, 6),
-(13, 6),
-(3, 7),
-(1, 8),
-(1, 9),
-(4, 10),
-(5, 10),
-(6, 10),
-(7, 10),
-(9, 10),
-(10, 10),
-(12, 10),
-(18, 10),
-(103, 10),
-(104, 10),
-(105, 10),
-(106, 10),
-(107, 10),
-(108, 10),
-(109, 10),
-(110, 10),
-(111, 10),
-(112, 10),
-(113, 10),
-(114, 10),
-(115, 10),
-(116, 10),
-(117, 10),
-(118, 10),
-(119, 10),
-(120, 10),
-(121, 10),
-(122, 10),
-(123, 10),
-(124, 10),
-(125, 10),
-(126, 10),
-(127, 10),
-(128, 10),
-(129, 10),
-(5, 11),
-(101, 11),
-(102, 11),
-(12, 15),
-(8, 18);
+(1, 5), (1, 7),  -- Project Zomboid (Simulación, Indie)
+(2, 2), (2, 1),  -- Indiana Jones and the Great Circle (Aventura, Acción)
+(3, 5), (3, 3),  -- Cities: Skylines II (Simulación, Estrategia)
+(4, 1), (4, 2),  -- Red Dead Redemption 2 (Acción, Aventura)
+(5, 1), (5, 2),  -- Star Wars Outlaws (Acción, Aventura)
+(6, 1), (6, 2),  -- Marvel's Spider-Man 2 (Acción, Aventura)
+(7, 4), (7, 2),  -- Hogwarts Legacy (RPG, Aventura)
+(8, 2), (8, 7),  -- The Wolf Among Us (Aventura, Indie)
+(9, 1), (9, 4),  -- Cyberpunk 2077 (Acción, RPG)
+(10, 4), (10, 1), -- Elden Ring (RPG, Acción)
+(11, 4), (11, 3), -- Baldur's Gate 3 (RPG, Estrategia)
+(12, 5), (12, 6), -- Forza Horizon 5 (Simulación, Deportes/Carreras)
+(13, 1), (13, 2), -- Resident Evil 4 (Acción, Aventura)
+(14, 1), (14, 3), -- ARC Raiders (Acción, Estrategia/Shooter)
+(15, 1), (15, 2), -- God of War Ragnarök (Acción, Aventura)
+(16, 1), (16, 2), -- Horizon Forbidden West (Acción, Aventura)
+(17, 1), (17, 2), -- The Last of Us Part II (Acción, Aventura)
+(18, 1), (18, 2), -- Ghost of Tsushima (Acción, Aventura)
+(19, 1), (19, 7), -- Returnal (Acción, Indie/Roguelike)
+(20, 4), (20, 1), -- Demon's Souls (RPG, Acción)
+(21, 2), (21, 7), -- Stray (Aventura, Indie)
+(22, 2), (22, 7), -- It Takes Two (Aventura, Indie)
+(23, 1), (23, 2), -- Deathloop (Acción, Aventura)
+(24, 1), (24, 2), -- Alan Wake 2 (Acción, Aventura)
+(25, 1), (25, 2), -- Control Ultimate Edition (Acción, Aventura)
+(26, 1), (26, 8),  -- Sifu (Acción, Arcade)
+(27, 1), (27, 2),  -- Dead Space (Acción, Aventura)
+(28, 1), (28, 8),  -- Hi-Fi RUSH (Acción, Arcade)
+(29, 1), (29, 2),  -- Resident Evil Village (Acción, Aventura)
+(30, 1), (30, 8),  -- DOOM Eternal (Acción, Arcade)
+(31, 2), (31, 7),  -- A Way Out (Aventura, Indie)
+(32, 1), (32, 2),  -- Half-Life: Alyx (Acción, Aventura)
+(33, 1), (33, 4),  -- Dying Light 2 Stay Human (Acción, RPG)
+(34, 1), (34, 3),  -- Portal 2 (Acción, Estrategia/Puzzle)
+(35, 4), (35, 1),  -- Mass Effect Legendary Edition (RPG, Acción)
+(36, 2), (36, 1),  -- Sea of Thieves (Aventura, Acción)
+(37, 4), (37, 1),  -- Assassin's Creed Valhalla (RPG, Acción)
+(38, 7), (38, 1),  -- Hades (Indie, Acción)
+(39, 1), (39, 2),  -- Sekiro: Shadows Die Twice (Acción, Aventura)
+(40, 7), (40, 2),  -- Hollow Knight (Indie, Aventura)
+(41, 7), (41, 2),  -- Ori and the Will of the Wisps (Indie, Aventura)
+(42, 1), (42, 2),  -- Resident Evil 2 (Acción, Aventura)
+(43, 1), (43, 2),  -- Resident Evil 3 (Acción, Aventura)
+(44, 3), (44, 5),  -- Civilization VI (Estrategia, Simulación)
+(45, 4), (45, 1),  -- Final Fantasy VII Remake Intergrade (RPG, Acción)
+(46, 8), (46, 2),  -- Crash Bandicoot 4: It's About Time (Arcade, Aventura)
+(47, 8), (47, 2),  -- Spyro Reignited Trilogy (Arcade, Aventura)
+(48, 3), (48, 5),  -- Age of Empires IV (Estrategia, Simulación)
+(49, 1), (49, 8),  -- Street Fighter 6 (Acción, Arcade)
+(50, 4), (50, 2),  -- Immortals Fenyx Rising (RPG, Aventura)
+(51, 1), (51, 3),  -- Tom Clancy's Rainbow Six Siege (Acción, Estrategia)
+(52, 1), (52, 2),  -- Mirror's Edge (Acción, Aventura)
+(53, 7), (53, 2),  -- GRIS (Indie, Aventura)
+(54, 1), (54, 2),  -- Alan Wake Remastered (Acción, Aventura)
+(55, 1), (55, 8),  -- Devil May Cry 5 (Acción, Arcade)
+(56, 5), (56, 6),  -- F1 25 (Simulación, Deportes)
+(57, 5), (57, 2),  -- Microsoft Flight Simulator (Simulación, Aventura)
+(58, 3), (58, 5),  -- Frostpunk 2 (Estrategia, Simulación)
+(59, 1), (59, 5),  -- Palworld (Acción, Simulación)
+(60, 1), (60, 2),  -- Star Wars Jedi: Survivor (Acción, Aventura)
+(61, 4), (61, 1),  -- Lords of the Fallen (RPG, Acción)
+(62, 4), (62, 1),  -- Lies of P (RPG, Acción)
+(63, 3), (63, 7),  -- Cult of the Lamb (Estrategia, Indie)
+(64, 1), (64, 2),  -- Ghost of Tsushima DIRECTOR'S CUT (Acción, Aventura)
+(65, 1), (65, 5),  -- Armored Core VI Fires of Rubicon (Acción, Simulación)
+(66, 2), (66, 7),  -- It Takes Two (Aventura, Indie)
+(67, 1), (67, 2),  -- The Callisto Protocol (Acción, Aventura)
+(68, 2), (68, 1),  -- A Plague Tale: Requiem (Aventura, Acción)
+(69, 2), (69, 1),  -- Silent Hill 2 (Aventura, Acción)
+(70, 6), (70, 8),  -- Need for Speed Unbound (Deportes, Arcade)
+(71, 3), (71, 5),  -- Manor Lords (Estrategia, Simulación)
+(72, 4), (72, 1),  -- Monster Hunter Rise (RPG, Acción)
+(73, 4), (73, 1),  -- Nioh 2 (RPG, Acción)
+(74, 5), (74, 6),  -- Forza Horizon 5 (ID duplicado en img, manteniendo coherencia)
+(75, 5), (75, 6),  -- Forza Horizon 5 (ID duplicado en img)
+(77, 5), (77, 6),  -- Forza Horizon 5 (ID duplicado en img)
+(78, 1), (78, 7),  -- Phasmophobia (Acción, Indie)
+(79, 7), (79, 1),  -- Hades II (Indie, Acción)
+(80, 4), (80, 1),  -- Granblue Fantasy: Relink (RPG, Acción)
+(81, 4), (81, 5),  -- Persona 5 Royal (RPG, Simulación)
+(82, 4), (82, 1),  -- Black Myth: Wukong (RPG, Acción)
+(83, 1), (83, 8),  -- DOOM Eternal (Acción, Arcade)
+(84, 7), (84, 2),  -- Outer Wilds (Indie, Aventura)
+(85, 4), (85, 2),  -- Dragon's Dogma 2 (RPG, Aventura)
+(86, 4), (86, 1),  -- NieR:Automata (RPG, Acción)
+(87, 1), (87, 3),  -- Helldivers 2 (Acción, Estrategia)
+(88, 4), (88, 7),  -- Disco Elysium (RPG, Indie)
+(89, 1), (89, 3),  -- Warhammer 40,000: Space Marine 2 (Acción, Estrategia)
+(90, 1), (90, 2),  -- BioShock Infinite (Acción, Aventura)
+(91, 1), (91, 8),  -- Hi-Fi RUSH (Acción, Arcade)
+(92, 1), (92, 7),  -- Cuphead (Acción, Indie)
+(93, 3), (93, 7),  -- Balatro (Estrategia, Indie)
+(94, 1), (94, 2),  -- Sekiro: Shadows Die Twice (Acción, Aventura)
+(95, 1), (95, 8),  -- Street Fighter 6 (Acción, Arcade)
+(96, 7), (96, 2),  -- Hollow Knight (Indie, Aventura)
+(97, 1), (97, 2),  -- Half-Life: Alyx (Acción, Aventura)
+(98, 6), (98, 5),  -- EA SPORTS FC 25 (Deportes, Simulación)
+(99, 6), (99, 5),  -- Madden NFL 25 (Deportes, Simulación)
+(100, 6), (100, 5), -- NBA 2K25 (Deportes, Simulación)
+(101, 1), (101, 7), -- Dead by Daylight (Acción, Indie)
+(102, 1), (102, 2), -- The Precinct (Acción, Aventura)
+(103, 3), (103, 5), -- Stellaris (Estrategia, Simulación)
+(104, 1), (104, 2),  -- Watch Dogs (Acción, Aventura)
+(105, 1), (105, 7),  -- Ghostrunner (Acción, Indie)
+(106, 1), (106, 8),  -- Dragon Ball: Sparking! ZERO (Acción, Arcade)
+(107, 5), (107, 2),  -- Euro Truck Simulator 2 (Simulación, Aventura)
+(108, 5), (108, 3),  -- Kerbal Space Program (Simulación, Estrategia)
+(109, 3), (109, 7),  -- Human Resource Machine (Estrategia, Indie)
+(110, 5), (110, 7),  -- PC Building Simulator (Simulación, Indie)
+(111, 3), (111, 7),  -- while True: learn() (Estrategia, Indie)
+(112, 2), (112, 5),  -- Discovery Tour: Viking Age (Aventura, Simulación)
+(113, 3), (113, 7),  -- Poly Bridge 3 (Estrategia, Indie)
+(114, 2), (114, 7),  -- Scribblenauts Unlimited (Aventura, Indie)
+(115, 2), (115, 8),  -- Super Mario Odyssey (Aventura, Arcade)
+(116, 8), (116, 7),  -- Fall Guys (Arcade, Indie)
+(117, 2), (117, 1),  -- LEGO Star Wars: The Skywalker Saga (Aventura, Acción)
+(118, 2), (118, 7),  -- Minecraft (Aventura, Indie)
+(119, 5), (119, 7),  -- Stardew Valley (Simulación, Indie)
+(120, 2), (120, 3),  -- Phoenix Wright: Ace Attorney Trilogy (Aventura, Estrategia)
+(121, 5), (121, 7),  -- VA-11 Hall-A (Simulación, Indie)
+(122, 5), (122, 7),  -- Coffee Talk (Simulación, Indie)
+(123, 2), (123, 7),  -- Doki Doki Literature Club Plus! (Aventura, Indie)
+(124, 4), (124, 3),  -- 13 Sentinels: Aegis Rim (RPG, Estrategia)
+(125, 2), (125, 3),  -- Zero Escape: The Nonary Games (Aventura, Estrategia)
+(126, 1), (126, 3),  -- Hitman World of Assassination (Acción, Estrategia)
+(127, 1), (127, 2),  -- Dishonored 2 (Acción, Aventura)
+(128, 1), (128, 3),  -- Metal Gear Solid V: The Phantom Pain (Acción, Estrategia)
+(129, 1), (129, 2),  -- Splinter Cell Blacklist (Acción, Aventura)
+(131, 2), (131, 3);  -- Nebula Adventure Test (Aventura, Estrategia)
 
 
 -- Play Sessions
