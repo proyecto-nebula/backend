@@ -23,13 +23,10 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
       - MYSQL_DATABASE=${DB_NAME}
-      - MYSQL_CHARSET=utf8mb4
-      - MYSQL_COLLATION=utf8mb4_unicode_ci
     ports:
       - "3306:3306"
     volumes:
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
-      - ./database/my.cnf:/etc/mysql/conf.d/my.cnf
 
   phpmyadmin:
     container_name: phpmyadmin

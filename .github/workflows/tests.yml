@@ -68,7 +68,7 @@ jobs:
           echo "Servidor listo!"
 
       - name: Ejecutar PHPUnit
-        run: ./vendor/bin/phpunit --colors=always tests/Feature/ConnectionTest.php
+        run: ./vendor/bin/phpunit --colors=always
 
       - name: Logs de error en caso de fallo
         if: failure()
