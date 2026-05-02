@@ -322,14 +322,8 @@ INSERT INTO `roles` (`id`, `name`) VALUES
 -- Subscription Plans
 INSERT INTO `plans` (`id`, `name`, `description`, `price`) VALUES
 (0, 'Gratis', 'Acceso limitado a juegos antiguos', 0.00),
-(1, 'Plata', 'Acceso a 200 juegos y descuentos exclusivos', 9.99),
-(2, 'Oro', 'Acceso total a todo el catálogo y betas', 14.99),
-(3, 'Bronce', 'Acceso a 50 juegos y guardado en la nube', 4.99),
-(4, 'Prueba', NULL, NULL),
-(9, 'prueba', 'Acceso limitado a juegos antiguos', 0.00),
-(11, 'Plan Premium', 'Acceso total a todos los juegos', 9.99),
-(12, 'Plan Premiumddd', 'Acceso total a todos los juegos', 9.99);
-
+(1, 'Standar', 'Acceso a 200 juegos y descuentos exclusivos', 9.99),
+(2, 'Premium', 'Acceso total a todo el catálogo y betas', 14.99);
 -- Games
 INSERT INTO `games` (`id`, `developer_id`, `publisher_id`, `pegi_id`, `steam_id`, `igdb_id`, `title`, `summary`, `description`, `cover_url`, `banner_url`, `hero_url`, `logo_url`, `metacritic_score`, `release_date`, `published_at`, `is_featured`, `is_active`, `slug`) VALUES
 (1, 3, 3, 18, '108600', NULL, 'Project Zomboid', '¿Cómo morirás? La supervivencia zombi definitiva en un mundo implacable.', 'Project Zomboid es la cima de la supervivencia zombi. En un mapa inmenso basado en la Kentucky rural, los jugadores deben saquear casas, construir defensas y luchar contra el hambre, la sed y la enfermedad mientras intentan evitar ser devorados por la horda implacable.', 'https://cdn.akamai.steamstatic.com/steam/apps/108600/library_600x900_2x.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/108600/header.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/108600/library_hero.jpg', 'https://cdn.akamai.steamstatic.com/steam/apps/108600/logo.png', 80, '2013-11-08', '2025-12-05 22:30:00', 1, 1, 'project-zomboid'),
