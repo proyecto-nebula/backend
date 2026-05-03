@@ -46,7 +46,7 @@ class Games extends Database {
          * Fuerza los campos numéricos/bool a su tipo en un juego o lista de juegos
          */
         public static function castGameNumericFields($game) {
-            $intFields = ['id', 'developer_id', 'publisher_id', 'pegi_id', 'metacritic_score'];
+            $intFields = ['id', 'developer_id', 'publisher_id', 'pegi_id', 'steam_id', 'igdb_id', 'metacritic_score'];
             $boolFields = ['is_featured', 'is_active'];
             if (is_array($game) && isset($game[0]) && is_array($game[0])) {
                 foreach ($game as &$item) {
@@ -75,7 +75,7 @@ class Games extends Database {
      * He añadido los sufijos _min y _max para Metacritic y Fecha
      */
     private $allowedConditions_get = array(
-        'id', 'title', 'slug', 'release_date', 'metacritic_score', 'pegi_id', 'published_at', 'is_featured', 'is_active', 'developer_id', 'publisher_id'
+        'id', 'title', 'slug', 'release_date', 'metacritic_score', 'pegi_id', 'published_at', 'is_featured', 'is_active', 'developer_id', 'publisher_id', 'steam_id', 'igdb_id'
     );
 
     private $allowedConditions_insert = array(
