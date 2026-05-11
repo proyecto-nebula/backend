@@ -1,4 +1,3 @@
-
 <?php
 namespace App\Classes;
 use App\Models\Database;
@@ -6,6 +5,7 @@ use App\Utils\Response;
 /**
  * Clase para el modelo que representa a la tabla "plans".
  */
+class Plans extends Database {
 	/**
 	 * Realiza type casting de campos numéricos/bool en un plan o lista de planes
 	 */
@@ -23,8 +23,6 @@ use App\Utils\Response;
 		}
 		return $plan;
 	}
-
-class Plans extends Database {
 	/**
 	 * Atributo que indica la tabla asociada a la clase del modelo
 	 */

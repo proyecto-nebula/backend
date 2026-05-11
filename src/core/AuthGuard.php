@@ -14,6 +14,11 @@ class AuthGuard
 
     public static function enforce(string $resource): void
     {
+        // Allow public registration: POST /api/v1/users should be accessible without token
+        if ($resource === 'users' && ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
+            return;
+        }
+
         if (in_array($resource, self::PUBLIC_ENDPOINTS, true)) {
             return;
         }

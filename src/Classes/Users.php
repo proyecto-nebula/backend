@@ -95,29 +95,30 @@ class Users extends Database {
             }
         }
 
-        // Si se pasa 'id', buscar por id y devolver solo el primer resultado
+        // Si se pasa 'id', devolver perfil completo (joins con role, avatar y plan)
         if (isset($params['id'])) {
-            $items = parent::getDB($this->table, ['id' => $params['id']]);
-            if (count($items) > 0) {
-                return $this->castUserNumericFields($items[0]);
-            } else {
-                return null;
-            }
+            $user = $this->getPerfilCompleto($params['id']);
+            return $user ?: null;
         }
 
-        // Si se pasa 'username', buscar por username y devolver solo el primer resultado
+        // Si se pasa 'username', buscar por username y devolver perfil completo
         if (isset($params['username'])) {
             $items = parent::getDB($this->table, ['username' => $params['username']]);
             if (count($items) > 0) {
-                return $this->castUserNumericFields($items[0]);
+                $id = $items[0]['id'];
+                return $this->getPerfilCompleto($id);
             } else {
                 return null;
             }
         }
 
+        // Para listados, obtener registros básicos y embeber role, avatar y plan
         $items = parent::getDB($this->table, $params);
         foreach ($items as &$item) {
             $item = $this->castUserNumericFields($item);
+            $item['role'] = $this->getRoleById($item['role_id']);
+            $item['avatar'] = $this->getAvatarById($item['avatar_id']);
+            $item['plan'] = $this->getPlanById($item['plan_id']);
         }
         return $items;
     }
@@ -234,33 +235,78 @@ class Users extends Database {
      * Método para recuperar toda la información vinculada del usuario
      */
     public function getPerfilCompleto($id) {
-        $sql = "SELECT 
-                    u.id, 
-                    u.username, 
-                    u.first_name, 
-                    u.last_name, 
-                    u.email,
-                    r.id AS role_id,
-                    r.name AS role_name,
-                    a.image_url AS avatar_image,
-                    p.name AS plan_name
-                FROM users u
-                INNER JOIN roles r ON u.role_id = r.id
-                LEFT JOIN avatars a ON u.avatar_id = a.id
-                INNER JOIN plans p ON u.plan_id = p.id
-                WHERE u.id = $id";
-                
-        // Obtenemos la conexión mysqli de la clase padre
-        $db = $this->getConnection();
-        $result = $db->query($sql);
+        // Recuperar datos básicos del usuario
+        $items = parent::getDB($this->table, ['id' => $id]);
+        if (count($items) === 0) return null;
 
-        // Si hay resultados, devolvemos la primera fila como array asociativo
-        if ($result && $result->num_rows > 0) {
-            $user = $result->fetch_assoc();
-            return $this->castUserNumericFields($user);
-        }
+        $user = $items[0];
+        $user = $this->castUserNumericFields($user);
 
-        return null;
+        // Adjuntar relaciones embebidas: role, avatar, plan
+        $user['role'] = $this->getRoleById($user['role_id'] ?? null);
+        $user['avatar'] = $this->getAvatarById($user['avatar_id'] ?? null);
+        $user['plan'] = $this->getPlanById($user['plan_id'] ?? null);
+
+        return $user;
+    }
+    
+    /**
+     * Devuelve la información del role por id
+     */
+    private function getRoleById($roleId) {
+        if (!$roleId) return null;
+        $conn = $this->getConnection();
+        $sql = "SELECT id, name FROM roles WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('i', $roleId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $role = $result->fetch_assoc();
+        $stmt->close();
+        return $role ?: null;
+    }
+
+    /**
+     * Devuelve la información del avatar por id
+     */
+    private function getAvatarById($avatarId) {
+        if (!$avatarId) return null;
+        $conn = $this->getConnection();
+        $sql = "SELECT id, name, image_url FROM avatars WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('i', $avatarId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $avatar = $result->fetch_assoc();
+        $stmt->close();
+        return $avatar ?: null;
+    }
+
+    /**
+     * Devuelve la información del plan por id
+     */
+    private function getPlanById($planId) {
+        if (!$planId) return null;
+        $conn = $this->getConnection();
+        $sql = "SELECT id, name, price FROM plans WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('i', $planId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $plan = $result->fetch_assoc();
+        $stmt->close();
+        return $plan ?: null;
+    }
+
+    /**
+     * Devuelve el perfil completo a partir de un token (lookup) o null
+     */
+    public function getByToken($token) {
+        if (!$token) return null;
+        $items = parent::getDB($this->table, ['token' => $token]);
+        if (count($items) === 0) return null;
+        $id = $items[0]['id'];
+        return $this->getPerfilCompleto($id);
     }
     
 }

@@ -212,4 +212,106 @@ class Games extends Database {
             exit;
         }
     }
+
+    /**
+     * Devuelve los juegos más reproducidos (por número de sesiones)
+     */
+    public function getMostPlayed($limit = 10) {
+        $conn = $this->getConnection();
+        $sql = "SELECT g.*, COUNT(s.id) AS play_count FROM {$this->table} g JOIN sessions s ON s.game_id = g.id GROUP BY g.id ORDER BY play_count DESC LIMIT ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('i', $limit);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $games = [];
+        while ($row = $result->fetch_assoc()) {
+            $games[] = $row;
+        }
+        $stmt->close();
+
+        $games = self::castGameNumericFields($games);
+        foreach ($games as &$game) {
+            $game['categories'] = $this->getCategoriesForGame($game['id']);
+            $game['developer'] = $this->getStudioById($game['developer_id']);
+            $game['publisher'] = $this->getStudioById($game['publisher_id']);
+        }
+        return $games;
+    }
+
+    /**
+     * Devuelve los juegos marcados como destacados
+     */
+    public function getFeatured($limit = 10) {
+        $conn = $this->getConnection();
+        $sql = "SELECT * FROM {$this->table} WHERE is_featured = 1 ORDER BY published_at DESC LIMIT ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('i', $limit);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $games = [];
+        while ($row = $result->fetch_assoc()) {
+            $games[] = $row;
+        }
+        $stmt->close();
+
+        $games = self::castGameNumericFields($games);
+        foreach ($games as &$game) {
+            $game['categories'] = $this->getCategoriesForGame($game['id']);
+            $game['developer'] = $this->getStudioById($game['developer_id']);
+            $game['publisher'] = $this->getStudioById($game['publisher_id']);
+        }
+        return $games;
+    }
+
+    /**
+     * Devuelve varias colecciones útiles en una sola respuesta
+     */
+    public function getCollections($limit = 10) {
+        $collections = [];
+
+        // Featured
+        $collections['featured'] = $this->getFeatured($limit);
+
+        // Novedades (ordenadas por published_at)
+        $conn = $this->getConnection();
+        $sql = "SELECT * FROM {$this->table} WHERE published_at IS NOT NULL ORDER BY published_at DESC LIMIT ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('i', $limit);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $novedades = [];
+        while ($row = $result->fetch_assoc()) {
+            $novedades[] = $row;
+        }
+        $stmt->close();
+        $collections['novedades'] = self::castGameNumericFields($novedades);
+        foreach ($collections['novedades'] as &$g) {
+            $g['categories'] = $this->getCategoriesForGame($g['id']);
+            $g['developer'] = $this->getStudioById($g['developer_id']);
+            $g['publisher'] = $this->getStudioById($g['publisher_id']);
+        }
+
+        // Nuevos juegos (ordenados por release_date)
+        $sql = "SELECT * FROM {$this->table} WHERE release_date IS NOT NULL ORDER BY release_date DESC LIMIT ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('i', $limit);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $nuevos = [];
+        while ($row = $result->fetch_assoc()) {
+            $nuevos[] = $row;
+        }
+        $stmt->close();
+        $collections['nuevos'] = self::castGameNumericFields($nuevos);
+        foreach ($collections['nuevos'] as &$g) {
+            $g['categories'] = $this->getCategoriesForGame($g['id']);
+            $g['developer'] = $this->getStudioById($g['developer_id']);
+            $g['publisher'] = $this->getStudioById($g['publisher_id']);
+        }
+
+        // Most played
+        $collections['most_played'] = $this->getMostPlayed($limit);
+
+        return $collections;
+    }
 }

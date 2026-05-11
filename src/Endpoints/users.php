@@ -17,6 +17,14 @@ switch ($_SERVER['REQUEST_METHOD']) {
             } else {
                 \App\Utils\Response::error('Usuario no encontrado', 404);
             }
+        } elseif (isset($_GET['token']) && !empty($_GET['token'])) {
+            // lookup by token and return full profile
+            $userData = $item->getByToken($_GET['token']);
+            if ($userData) {
+                \App\Utils\Response::ok($userData);
+            } else {
+                \App\Utils\Response::error('Usuario no encontrado', 404);
+            }
         } else {
             \App\Utils\Response::ok($item->get($_GET));
         }
