@@ -1,8 +1,11 @@
 <?php
 
 require_once __DIR__ . '/../bootstrap.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\Core\Router;
+
+$router = new Router();
 
 // CORS
 $frontendUrl = $_ENV['FRONTEND_URL'] ?? 'http://localhost:4200';
