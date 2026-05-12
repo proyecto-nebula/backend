@@ -464,8 +464,7 @@ INSERT INTO `favorites` (`user_id`, `game_id`) VALUES
 (1, 108),
 (0, 110),
 (1, 115),
-(0, 118),
-;
+(0, 118);
 
 -- Game Categories (Pivot Table)
 -- Categorías referencia: 1: Acción, 2: Aventura, 3: Estrategia, 4: RPG, 5: Simulación, 7: Indie, 8: Arcade
