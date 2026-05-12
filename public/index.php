@@ -13,4 +13,4 @@ header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Access-Control-Allow-Credentials: true");
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') { exit; } // Responder a preflight requests
 // Ejecutar Router
-\App\Core\Router::dispatch(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
+\src\core\router::dispatch(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
