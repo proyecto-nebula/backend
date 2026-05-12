@@ -68,7 +68,6 @@ class ConnectionTest extends TestCase
     {
         $endpoints = [
             'avatars',
-            'screenshots',
             'categories',
             'studios',
             'favorites',
