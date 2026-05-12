@@ -1,17 +1,27 @@
 <?php
+
 use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Client;
 
-class ConnectionTest extends TestCase {
-    private $client;
+class ConnectionTest extends TestCase
+{
+    private Client $client;
 
-    protected function setUp(): void {
+    protected function setUp(): void
+    {
         $this->client = new Client([
-            'base_uri' => 'http://127.0.0.1:8000',
-            'http_errors' => false, // IMPORTANTE: Esto evita que el test se detenga si hay un error 500
-            'timeout' => 10
+            'base_uri' => 'http://localhost:8000',
+            'http_errors' => false
         ]);
     }
+
+    public function test_api_connection()
+    {
+        $response = $this->client->request('GET', '/');
+
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
     public function test_auth_endpoint_response()
     {
         $response = $this->client->request('POST', '/api/v1/auth', [
@@ -29,17 +39,18 @@ class ConnectionTest extends TestCase {
             "El endpoint de Auth devolvió un estado inesperado: $status"
         );
 
-        // Solo validar token si autenticó correctamente
+        // Solo validar token si login correcto
         if ($status === 200 || $status === 201) {
 
             $body = (string) $response->getBody();
 
-            // Verificamos que no esté vacío
-            $this->assertNotEmpty($body, 'El body de la respuesta está vacío.');
+            $this->assertNotEmpty(
+                $body,
+                'El body de la respuesta está vacío.'
+            );
 
             $payload = json_decode($body, true);
 
-            // Verificamos JSON válido
             $this->assertNotNull(
                 $payload,
                 'La respuesta no contiene JSON válido.'
@@ -47,7 +58,6 @@ class ConnectionTest extends TestCase {
 
             $this->assertIsArray($payload);
 
-            // Solo comprobar token si existe
             $this->assertArrayHasKey('token', $payload);
 
             $this->assertNotEmpty($payload['token']);
