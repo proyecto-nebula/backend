@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/../bootstrap.php';
 
-use src\core\router.php;
+use src\core\router;
 
 // CORS
 $frontendUrl = $_ENV['FRONTEND_URL'] ?? 'http://localhost:4200';
