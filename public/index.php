@@ -3,7 +3,7 @@
 require_once __DIR__ . '/../bootstrap.php';
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use App\Core\Router;
+use src\core\router;
 
 // CORS
 $frontendUrl = $_ENV['FRONTEND_URL'] ?? 'http://localhost:4200';
