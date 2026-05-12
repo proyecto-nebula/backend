@@ -19,10 +19,10 @@ jobs:
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping"
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD"
           --health-interval=10s
           --health-timeout=5s
-          --health-retries=3
+          --health-retries=10
 
     steps:
       - name: Checkout del código
@@ -39,7 +39,7 @@ jobs:
         run: composer install --prefer-dist --no-progress
 
       - name: Generar autoload de Composer
-        run: composer dump-autoload -o
+        run: composer dump-autoload --optimize --classmap-authoritative
 
       - name: Crear archivo .env desde Secrets
         # Este paso es VITAL: toma tus Action Secrets y los mete en un .env temporal
@@ -62,8 +62,8 @@ jobs:
           DB_NAME: ${{ secrets.DB_NAME }}
           DB_USER: root
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }} # ¡Asegúrate de que esto esté aquí!
-        run: php -S 127.0.0.1:8000 -t public public/index.php > php_server.log 2>&1 &
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        run: php -S 127.0.0.1:8000 -t public > php_server.log 2>&1 &
 
       - name: Esperar a que el servidor responda
         run: |
