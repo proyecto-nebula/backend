@@ -13,6 +13,22 @@ class Router {
     ];
 
     public static function dispatch($uri) {
+
+         header('Content-Type: application/json');
+
+    // NORMALIZAR PATH
+    $path = rtrim($path, '/');
+
+    // 👇 AQUÍ EL FIX
+    if ($path === '' || $path === '/') {
+        http_response_code(200);
+        echo json_encode([
+            'status' => 'ok',
+            'message' => 'API running'
+        ]);
+        return;
+    }
+        
         $apiPrefix = '/api/v1/';
         $path = parse_url($uri, PHP_URL_PATH);
         $pos = strpos($path, $apiPrefix);
