@@ -3,6 +3,7 @@ namespace App\Core;
 // Router.php
 
 use App\Utils\Response;
+use App\Core\AuthGuard;
 
 class Router {
     private static $endpoints = [
