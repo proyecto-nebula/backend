@@ -38,6 +38,9 @@ jobs:
       - name: Instalación de Dependencias
         run: composer install --prefer-dist --no-progress
 
+      - name: Generar autoload de Composer
+        run: composer dump-autoload
+
       - name: Crear archivo .env desde Secrets
         # Este paso es VITAL: toma tus Action Secrets y los mete en un .env temporal
         # que solo existe durante el test en GitHub.
