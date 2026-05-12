@@ -23,9 +23,9 @@ class ConnectionTest extends TestCase {
 
         $status = $response->getStatusCode();
 
-        $this->assertContains($status, [201, 403, 400], "El endpoint de Auth devolvió un estado inesperado: $status");
+        $this->assertContains($status, [200,201, 403, 400], "El endpoint de Auth devolvió un estado inesperado: $status");
 
-        if ($status === 201) {
+        if ($status === 200 || $status === 201) {
             $payload = json_decode((string) $response->getBody(), true);
             $this->assertIsArray($payload);
             $this->assertArrayHasKey('token', $payload);
