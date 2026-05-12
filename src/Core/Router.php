@@ -77,4 +77,9 @@ class Router {
 
         require_once $realFile;
     }
+    http_response_code(404);
+echo json_encode([
+    'status' => 'error',
+    'message' => 'Route not found'
+]);
 }
