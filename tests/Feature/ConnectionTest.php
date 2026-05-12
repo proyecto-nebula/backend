@@ -15,14 +15,14 @@ class ConnectionTest extends TestCase
         ]);
     }
 
-    public function test_api_connection()
+    public function test_api_connection(): void
     {
         $response = $this->client->request('GET', '/');
 
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function test_auth_endpoint_response()
+    public function test_auth_endpoint_response(): void
     {
         $response = $this->client->request('POST', '/api/v1/auth', [
             'json' => [
@@ -64,38 +64,53 @@ class ConnectionTest extends TestCase
         }
     }
 
-    public function test_auth_endpoint_exists()
+    public function test_api_endpoints_health(): void
     {
-        $response = $this->client->request('GET', '/api/v1/auth');
+        $endpoints = [
+            'avatars',
+            'screenshots',
+            'categories',
+            'studios',
+            'favorites',
+            'games',
+            'game_categories',
+            'sessions',
+            'pegi',
+            'roles',
+            'plans',
+            'users'
+        ];
+
+        foreach ($endpoints as $resource) {
+
+            $response = $this->client->request(
+                'GET',
+                "/api/v1/$resource"
+            );
+
+            $status = $response->getStatusCode();
+
+            // Endpoints protegidos pueden devolver 401
+            $this->assertContains(
+                $status,
+                [200, 401],
+                "Fallo en endpoint: /api/v1/$resource (Código: $status)"
+            );
+        }
+    }
+
+    public function test_auth_endpoint_exists(): void
+    {
+        // Auth debe permitir solo POST
+        $response = $this->client->request(
+            'GET',
+            '/api/v1/auth'
+        );
 
         $this->assertEquals(
             405,
             $response->getStatusCode(),
             'El endpoint de Auth debería responder 405 en GET.'
         );
-    }
-}
-   /** @test */
-    public function test_api_endpoints_health() {
-        $endpoints = [
-            'avatars', 'screenshots', 'categories', 'studios', 
-            'favorites', 'games', 'game_categories', 
-            'sessions', 'pegi', 'roles', 'plans', 'users'
-        ];
-
-        foreach ($endpoints as $resource) {
-            $response = $this->client->get("/api/v1/$resource");
-            $status = $response->getStatusCode();
-            
-            // En endpoints protegidos, sin token deben devolver 401.
-            $this->assertContains($status, [200, 401], "Fallo en endpoint: /api/v1/$resource (Código: $status)");
-        }
-    }
-
-    /** @test */
-    public function test_auth_endpoint_exists() {
-        // Auth permite solo POST; GET debe responder método no permitido.
-        $response = $this->client->get("/api/v1/auth");
-        $this->assertEquals(405, $response->getStatusCode(), "El endpoint de Auth debería responder 405 en GET.");
     }
 }
