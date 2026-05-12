@@ -7,23 +7,6 @@ use App\Utils\Response;
  */
 class Plans extends Database {
 	/**
-	 * Realiza type casting de campos numéricos/bool en un plan o lista de planes
-	 */
-	public static function castPlanNumericFields($plan) {
-		if (is_array($plan) && isset($plan[0]) && is_array($plan[0])) {
-			// Lista de planes
-			foreach ($plan as &$item) {
-				$item = self::castPlanNumericFields($item);
-			}
-			return $plan;
-		}
-		if (is_array($plan)) {
-			if (isset($plan['id'])) $plan['id'] = (int)$plan['id'];
-			if (isset($plan['price'])) $plan['price'] = (float)$plan['price'];
-		}
-		return $plan;
-	}
-	/**
 	 * Atributo que indica la tabla asociada a la clase del modelo
 	 */
 	private $table = 'plans';
@@ -88,14 +71,14 @@ class Plans extends Database {
 		   if (isset($params['id'])) {
 			   $items = parent::getDB($this->table, ['id' => $params['id']]);
 			   if (count($items) > 0) {
-				   return self::castPlanNumericFields($items[0]);
+				   return $items[0];
 			   } else {
 				   return null;
 			   }
 		   }
 
 		   $items = parent::getDB($this->table, $params);
-		   return self::castPlanNumericFields($items);
+		   return $items;
 	}
 
 	/**
@@ -116,8 +99,7 @@ class Plans extends Database {
 		}
 
 		   if ($this->validate($params)) {
-			   $result = parent::insertDB($this->table, $params);
-			   return self::castPlanNumericFields($result);
+			   return parent::insertDB($this->table, $params);
 		   }
 	}
 

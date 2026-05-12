@@ -6,23 +6,6 @@ use App\Utils\Response;
 /**
  * Clase para el modelo que representa a la tabla "pegi".
  */
-    /**
-     * Realiza type casting de campos numéricos/bool en un registro PEGI o lista de PEGI
-     */
-    public static function castPegiNumericFields($pegi) {
-        if (is_array($pegi) && isset($pegi[0]) && is_array($pegi[0])) {
-            // Lista de PEGI
-            foreach ($pegi as &$item) {
-                $item = self::castPegiNumericFields($item);
-            }
-            return $pegi;
-        }
-        if (is_array($pegi)) {
-            if (isset($pegi['id'])) $pegi['id'] = (int)$pegi['id'];
-        }
-        return $pegi;
-    }
-
 class Pegi extends Database {
     /**
      * Atributo que indica la tabla asociada a la clase del modelo
@@ -98,14 +81,14 @@ class Pegi extends Database {
         if (isset($params['id'])) {
             $items = parent::getDB($this->table, ['id' => $params['id']]);
             if (count($items) > 0) {
-                return self::castPegiNumericFields($items[0]);
+                return $items[0];
             } else {
                 return null;
             }
         }
 
         $items = parent::getDB($this->table, $params);
-        return self::castPegiNumericFields($items);
+        return $items;
     }
 
   public function insert($params) {
@@ -116,8 +99,7 @@ class Pegi extends Database {
 
         if ($this->validate($params)) {
             try {
-                $result = parent::insertDB($this->table, $params);
-                return self::castPegiNumericFields($result);
+                return parent::insertDB($this->table, $params);
             } catch (\mysqli_sql_exception $e) {
                 // Error 1062: ID duplicado
                 if ($e->getCode() == 1062) {

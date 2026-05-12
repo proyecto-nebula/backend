@@ -8,18 +8,6 @@ use App\Utils\Response;
 
 class Users extends Database {
     /**
-     * Convierte los campos numéricos/bool a su tipo correcto
-     */
-    private function castUserNumericFields($user) {
-        if (!$user) return $user;
-        if (isset($user['id'])) $user['id'] = (int)$user['id'];
-        if (isset($user['role_id'])) $user['role_id'] = (int)$user['role_id'];
-        if (isset($user['plan_id'])) $user['plan_id'] = (int)$user['plan_id'];
-        if (isset($user['avatar_id'])) $user['avatar_id'] = (int)$user['avatar_id'];
-        if (isset($user['is_active'])) $user['is_active'] = (bool)$user['is_active'];
-        return $user;
-    }
-    /**
      * Atributo que indica la tabla asociada a la clase del modelo
      */
     private $table = 'users';
@@ -115,7 +103,6 @@ class Users extends Database {
         // Para listados, obtener registros básicos y embeber role, avatar y plan
         $items = parent::getDB($this->table, $params);
         foreach ($items as &$item) {
-            $item = $this->castUserNumericFields($item);
             $item['role'] = $this->getRoleById($item['role_id']);
             $item['avatar'] = $this->getAvatarById($item['avatar_id']);
             $item['plan'] = $this->getPlanById($item['plan_id']);
@@ -240,7 +227,6 @@ class Users extends Database {
         if (count($items) === 0) return null;
 
         $user = $items[0];
-        $user = $this->castUserNumericFields($user);
 
         // Adjuntar relaciones embebidas: role, avatar, plan
         $user['role'] = $this->getRoleById($user['role_id'] ?? null);

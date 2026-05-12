@@ -41,37 +41,10 @@ class Games extends Database {
         $result = $stmt->get_result();
         $categories = [];
         while ($row = $result->fetch_assoc()) {
-            $categories[] = \App\Classes\Categories::castCategoryNumericFields($row);
+            $categories[] = $row;
         }
         $stmt->close();
         return $categories;
-    }
-
-    /**
-     * Fuerza los campos numéricos/bool a su tipo en un juego o lista de juegos
-     */
-    public static function castGameNumericFields($game) {
-        $intFields = ['id', 'developer_id', 'publisher_id', 'pegi_id', 'steam_id', 'igdb_id', 'metacritic_score'];
-        $boolFields = ['is_featured', 'is_active'];
-        if (is_array($game) && isset($game[0]) && is_array($game[0])) {
-            foreach ($game as &$item) {
-                $item = self::castGameNumericFields($item);
-            }
-            return $game;
-        }
-        if (is_array($game)) {
-            foreach ($intFields as $field) {
-                if (isset($game[$field])) {
-                    $game[$field] = is_numeric($game[$field]) ? (int)$game[$field] : $game[$field];
-                }
-            }
-            foreach ($boolFields as $field) {
-                if (isset($game[$field])) {
-                    $game[$field] = (bool)$game[$field];
-                }
-            }
-        }
-        return $game;
     }
 
     /**
@@ -117,7 +90,7 @@ class Games extends Database {
         if (isset($params['slug'])) {
             $items = parent::getDB($this->table, ['slug' => $params['slug']]);
             if (count($items) > 0) {
-                $game = self::castGameNumericFields($items[0]);
+                $game = $items[0];
                 $game['categories'] = $this->getCategoriesForGame($game['id']);
                 $game['developer'] = $this->getStudioById($game['developer_id']);
                 $game['publisher'] = $this->getStudioById($game['publisher_id']);
@@ -135,7 +108,7 @@ class Games extends Database {
         if (isset($params['id'])) {
             $items = parent::getDB($this->table, ['id' => $params['id']]);
             if (count($items) > 0) {
-                $game = self::castGameNumericFields($items[0]);
+                $game = $items[0];
                 $game['categories'] = $this->getCategoriesForGame($game['id']);
                 $game['developer'] = $this->getStudioById($game['developer_id']);
                 $game['publisher'] = $this->getStudioById($game['publisher_id']);
@@ -150,7 +123,7 @@ class Games extends Database {
         }
 
         $items = parent::getDB($this->table, $params);
-        $games = self::castGameNumericFields($items);
+        $games = $items;
         // Embedding para lista
         foreach ($games as &$game) {
             $game['categories'] = $this->getCategoriesForGame($game['id']);
@@ -181,7 +154,7 @@ class Games extends Database {
         $this->filtrarParametros($params, $this->allowedConditions_insert);
         if ($this->validate($params)) {
             $result = parent::insertDB($this->table, $params);
-            return self::castGameNumericFields($result);
+            return $result;
         }
     }
 
@@ -229,7 +202,6 @@ class Games extends Database {
         }
         $stmt->close();
 
-        $games = self::castGameNumericFields($games);
         foreach ($games as &$game) {
             $game['categories'] = $this->getCategoriesForGame($game['id']);
             $game['developer'] = $this->getStudioById($game['developer_id']);
@@ -254,7 +226,6 @@ class Games extends Database {
         }
         $stmt->close();
 
-        $games = self::castGameNumericFields($games);
         foreach ($games as &$game) {
             $game['categories'] = $this->getCategoriesForGame($game['id']);
             $game['developer'] = $this->getStudioById($game['developer_id']);
@@ -284,7 +255,7 @@ class Games extends Database {
             $novedades[] = $row;
         }
         $stmt->close();
-        $collections['novedades'] = self::castGameNumericFields($novedades);
+        $collections['novedades'] = $novedades;
         foreach ($collections['novedades'] as &$g) {
             $g['categories'] = $this->getCategoriesForGame($g['id']);
             $g['developer'] = $this->getStudioById($g['developer_id']);
@@ -302,7 +273,7 @@ class Games extends Database {
             $nuevos[] = $row;
         }
         $stmt->close();
-        $collections['nuevos'] = self::castGameNumericFields($nuevos);
+        $collections['nuevos'] = $nuevos;
         foreach ($collections['nuevos'] as &$g) {
             $g['categories'] = $this->getCategoriesForGame($g['id']);
             $g['developer'] = $this->getStudioById($g['developer_id']);

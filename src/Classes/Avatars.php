@@ -7,22 +7,6 @@ use App\Utils\Response;
  */
 class Avatars extends Database {
 	/**
-	 * Realiza type casting de campos numéricos/bool en un avatar o lista de avatares
-	 */
-	public static function castAvatarNumericFields($avatar) {
-		if (is_array($avatar) && isset($avatar[0]) && is_array($avatar[0])) {
-			// Lista de avatares
-			foreach ($avatar as &$item) {
-				$item = self::castAvatarNumericFields($item);
-			}
-			return $avatar;
-		}
-		if (is_array($avatar)) {
-			if (isset($avatar['id'])) $avatar['id'] = (int)$avatar['id'];
-		}
-		return $avatar;
-	}
-	/**
 	 * Atributo que indica la tabla asociada a la clase del modelo
 	 */
 	private $table = 'avatars';
@@ -86,14 +70,14 @@ class Avatars extends Database {
 		   if (isset($params['id'])) {
 			   $items = parent::getDB($this->table, ['id' => $params['id']]);
 			   if (count($items) > 0) {
-				   return self::castAvatarNumericFields($items[0]);
+				   return $items[0];
 			   } else {
 				   return null;
 			   }
 		   }
 
 		   $items = parent::getDB($this->table, $params);
-		   return self::castAvatarNumericFields($items);
+		   return $items;
 	}
 
 	/**
@@ -114,8 +98,7 @@ class Avatars extends Database {
 		}
 
 		   if ($this->validate($params)) {
-			   $result = parent::insertDB($this->table, $params);
-			   return self::castAvatarNumericFields($result);
+			   return parent::insertDB($this->table, $params);
 		   }
 	}
 

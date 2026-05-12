@@ -7,22 +7,6 @@ use App\Utils\Response;
  */
 class Categories extends Database {
     /**
-     * Realiza type casting de campos numéricos/bool en una categoría o lista de categorías
-     */
-    public static function castCategoryNumericFields($category) {
-        if (is_array($category) && isset($category[0]) && is_array($category[0])) {
-            // Lista de categorías
-            foreach ($category as &$item) {
-                $item = self::castCategoryNumericFields($item);
-            }
-            return $category;
-        }
-        if (is_array($category)) {
-            if (isset($category['id'])) $category['id'] = (int)$category['id'];
-        }
-        return $category;
-    }
-    /**
      * Atributo que indica la tabla asociada a la clase del modelo
      */
     private $table = 'categories';
@@ -97,7 +81,7 @@ class Categories extends Database {
         if (isset($params['id'])) {
             $items = parent::getDB($this->table, ['id' => $params['id']]);
             if (count($items) > 0) {
-                return self::castCategoryNumericFields($items[0]);
+                return $items[0];
             } else {
                 return null;
             }
@@ -107,14 +91,14 @@ class Categories extends Database {
         if (isset($params['name'])) {
             $items = parent::getDB($this->table, ['name' => $params['name']]);
             if (count($items) > 0) {
-                return self::castCategoryNumericFields($items[0]);
+                return $items[0];
             } else {
                 return null;
             }
         }
 
         $items = parent::getDB($this->table, $params);
-        return self::castCategoryNumericFields($items);
+        return $items;
     }
 
     /**
@@ -125,8 +109,7 @@ class Categories extends Database {
         $this->filtrarParametros($params, $this->allowedConditions_insert);
 
         if ($this->validate($params)) {
-            $result = parent::insertDB($this->table, $params);
-            return self::castCategoryNumericFields($result);
+            return parent::insertDB($this->table, $params);
         }
     }
 

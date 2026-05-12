@@ -23,7 +23,9 @@ class Database
 		$this->port     = getenv('DB_PORT');
 
 		//$this->connection = new \mysqli('db', 'root', 'root', 'Proyecto_Final', '3306');
-		$this->connection = new \mysqli(
+		$this->connection = mysqli_init();
+		$this->connection->options(MYSQLI_OPT_INT_AND_FLOAT_NATIVE, 1);
+		$this->connection->real_connect(
 			$this->host,
 			$this->user,
 			$this->password,

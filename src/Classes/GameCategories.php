@@ -6,24 +6,6 @@ use App\Utils\Response;
 /**
  * Clase para el modelo que representa a la tabla "game_categories".
  */
-    /**
-     * Realiza type casting de campos numéricos/bool en una relación o lista de relaciones
-     */
-    public static function castGameCategoryNumericFields($item) {
-        if (is_array($item) && isset($item[0]) && is_array($item[0])) {
-            // Lista de relaciones
-            foreach ($item as &$rel) {
-                $rel = self::castGameCategoryNumericFields($rel);
-            }
-            return $item;
-        }
-        if (is_array($item)) {
-            if (isset($item['game_id'])) $item['game_id'] = (int)$item['game_id'];
-            if (isset($item['category_id'])) $item['category_id'] = (int)$item['category_id'];
-        }
-        return $item;
-    }
-
 class GameCategories extends Database {
     private $table = 'game_categories';
     private $primary_key = 'game_id';
@@ -66,14 +48,14 @@ class GameCategories extends Database {
         if (isset($params['game_id']) && isset($params['category_id'])) {
             $items = parent::getDB($this->table, ['game_id' => $params['game_id'], 'category_id' => $params['category_id']]);
             if (count($items) > 0) {
-                return self::castGameCategoryNumericFields($items[0]);
+                return $items[0];
             } else {
                 return null;
             }
         }
 
         $items = parent::getDB($this->table, $params);
-        return self::castGameCategoryNumericFields($items);
+        return $items;
     }
 
     public function insert($params) {
@@ -82,8 +64,7 @@ class GameCategories extends Database {
 
         if ($this->validate($params)) {
             try {
-                $result = parent::insertDB($this->table, $params);
-                return self::castGameCategoryNumericFields($result);
+                return parent::insertDB($this->table, $params);
             } catch (\mysqli_sql_exception $e) {
                 if ($e->getCode() == 1062) {
                     Response::result(400, array(

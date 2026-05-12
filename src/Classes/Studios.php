@@ -6,23 +6,6 @@ use App\Utils\Response;
 /**
  * Clase para el modelo que representa a la tabla "studios".
  */
-    /**
-     * Realiza type casting de campos numéricos/bool en un estudio o lista de estudios
-     */
-    public static function castStudioNumericFields($studio) {
-        if (is_array($studio) && isset($studio[0]) && is_array($studio[0])) {
-            // Lista de estudios
-            foreach ($studio as &$item) {
-                $item = self::castStudioNumericFields($item);
-            }
-            return $studio;
-        }
-        if (is_array($studio)) {
-            if (isset($studio['id'])) $studio['id'] = (int)$studio['id'];
-        }
-        return $studio;
-    }
-
 class Studios extends Database {
     /**
      * Atributo que indica la tabla asociada a la clase del modelo
@@ -97,7 +80,7 @@ class Studios extends Database {
         if (isset($params['id'])) {
             $items = parent::getDB($this->table, ['id' => $params['id']]);
             if (count($items) > 0) {
-                return self::castStudioNumericFields($items[0]);
+                return $items[0];
             } else {
                 return null;
             }
@@ -107,14 +90,14 @@ class Studios extends Database {
         if (isset($params['name'])) {
             $items = parent::getDB($this->table, ['name' => $params['name']]);
             if (count($items) > 0) {
-                return self::castStudioNumericFields($items[0]);
+                return $items[0];
             } else {
                 return null;
             }
         }
 
         $items = parent::getDB($this->table, $params);
-        return self::castStudioNumericFields($items);
+        return $items;
     }
 
     /**
@@ -125,8 +108,7 @@ class Studios extends Database {
         $this->filtrarParametros($params, $this->allowedConditions_insert);
 
         if ($this->validate($params)) {
-            $result = parent::insertDB($this->table, $params);
-            return self::castStudioNumericFields($result);
+            return parent::insertDB($this->table, $params);
         }
     }
 
