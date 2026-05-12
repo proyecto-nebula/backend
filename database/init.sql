@@ -652,7 +652,7 @@ ALTER TABLE `favorites`
 
 -- Game Categories Relations
 ALTER TABLE `game_categories`
-  ADD CONSTRAINT `fk_gc_game` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE,
+--  ADD CONSTRAINT `fk_gc_game` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_gc_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE;
 
 -- Sessions Relations
