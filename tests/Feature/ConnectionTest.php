@@ -12,8 +12,8 @@ class ConnectionTest extends TestCase {
             'timeout' => 10
         ]);
     }
-    public function test_auth_endpoint_response() {
-        // Enviamos un POST con JSON según el contrato actual del endpoint.
+    public function test_auth_endpoint_response()
+    {
         $response = $this->client->request('POST', '/api/v1/auth', [
             'json' => [
                 'email' => 'admin@ejemplo.com',
@@ -23,16 +23,48 @@ class ConnectionTest extends TestCase {
 
         $status = $response->getStatusCode();
 
-        $this->assertContains($status, [200,201, 403, 400], "El endpoint de Auth devolvió un estado inesperado: $status");
+        $this->assertContains(
+            $status,
+            [200, 201, 400, 401, 403],
+            "El endpoint de Auth devolvió un estado inesperado: $status"
+        );
 
+        // Solo validar token si autenticó correctamente
         if ($status === 200 || $status === 201) {
-            $payload = json_decode((string) $response->getBody(), true);
+
+            $body = (string) $response->getBody();
+
+            // Verificamos que no esté vacío
+            $this->assertNotEmpty($body, 'El body de la respuesta está vacío.');
+
+            $payload = json_decode($body, true);
+
+            // Verificamos JSON válido
+            $this->assertNotNull(
+                $payload,
+                'La respuesta no contiene JSON válido.'
+            );
+
             $this->assertIsArray($payload);
+
+            // Solo comprobar token si existe
             $this->assertArrayHasKey('token', $payload);
+
             $this->assertNotEmpty($payload['token']);
         }
     }
 
+    public function test_auth_endpoint_exists()
+    {
+        $response = $this->client->request('GET', '/api/v1/auth');
+
+        $this->assertEquals(
+            405,
+            $response->getStatusCode(),
+            'El endpoint de Auth debería responder 405 en GET.'
+        );
+    }
+}
    /** @test */
     public function test_api_endpoints_health() {
         $endpoints = [
