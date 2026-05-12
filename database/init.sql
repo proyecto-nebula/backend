@@ -464,11 +464,8 @@ INSERT INTO `favorites` (`user_id`, `game_id`) VALUES
 (1, 108),
 (0, 110),
 (1, 115),
-(0, 120),
-(1, 122),
-(0, 125),
-(1, 129),
-(1, 131);
+(0, 118),
+;
 
 -- Game Categories (Pivot Table)
 -- Categorías referencia: 1: Acción, 2: Aventura, 3: Estrategia, 4: RPG, 5: Simulación, 7: Indie, 8: Arcade
@@ -589,19 +586,7 @@ INSERT INTO `game_categories` (`game_id`, `category_id`) VALUES
 (115, 2), (115, 8),  -- Super Mario Odyssey (Aventura, Arcade)
 (116, 8), (116, 7),  -- Fall Guys (Arcade, Indie)
 (117, 2), (117, 1),  -- LEGO Star Wars: The Skywalker Saga (Aventura, Acción)
-(118, 2), (118, 7),  -- Minecraft (Aventura, Indie)
-(119, 5), (119, 7),  -- Stardew Valley (Simulación, Indie)
-(120, 2), (120, 3),  -- Phoenix Wright: Ace Attorney Trilogy (Aventura, Estrategia)
-(121, 5), (121, 7),  -- VA-11 Hall-A (Simulación, Indie)
-(122, 5), (122, 7),  -- Coffee Talk (Simulación, Indie)
-(123, 2), (123, 7),  -- Doki Doki Literature Club Plus! (Aventura, Indie)
-(124, 4), (124, 3),  -- 13 Sentinels: Aegis Rim (RPG, Estrategia)
-(125, 2), (125, 3),  -- Zero Escape: The Nonary Games (Aventura, Estrategia)
-(126, 1), (126, 3),  -- Hitman World of Assassination (Acción, Estrategia)
-(127, 1), (127, 2),  -- Dishonored 2 (Acción, Aventura)
-(128, 1), (128, 3),  -- Metal Gear Solid V: The Phantom Pain (Acción, Estrategia)
-(129, 1), (129, 2),  -- Splinter Cell Blacklist (Acción, Aventura)
-(131, 2), (131, 3);  -- Nebula Adventure Test (Aventura, Estrategia)
+(118, 2), (118, 7);  -- Nebula Adventure Test (Aventura, Estrategia)
 
 
 -- Play Sessions
@@ -641,18 +626,7 @@ INSERT INTO `sessions` (`id`, `user_id`, `game_id`, `started_at`, `duration`) VA
 (33, 1, 115, '2026-03-15 23:00:00', 1140),
 (34, 1, 116, '2026-03-20 10:00:00', 1800),
 (35, 1, 117, '2026-03-21 12:00:00', 720),
-(36, 1, 118, '2026-03-22 14:00:00', 480),
-(37, 1, 119, '2026-03-23 16:00:00', 900),
-(38, 1, 120, '2026-03-24 18:00:00', 2400),
-(39, 1, 121, '2026-03-25 20:00:00', 1320),
-(40, 1, 122, '2026-03-26 22:00:00', 300),
-(41, 1, 123, '2026-03-27 09:00:00', 660),
-(42, 1, 124, '2026-03-28 11:00:00', 240),
-(43, 1, 125, '2026-03-29 13:00:00', 480),
-(44, 1, 126, '2026-03-30 15:00:00', 900),
-(45, 1, 127, '2026-03-31 17:00:00', 1560),
-(46, 1, 128, '2026-04-01 19:00:00', 120),
-(47, 1, 129, '2026-04-02 21:00:00', 600);
+(36, 1, 118, '2026-03-22 14:00:00', 480);
 
 
 
