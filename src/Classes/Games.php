@@ -14,12 +14,28 @@ class Games extends Database {
     private $primary_key = 'id';
 
     /**
+     * Obtiene los datos de pegi por su id
+     */
+    private function getPegiById($pegiId) {
+        if (!$pegiId) return null;
+        $conn = $this->getConnection();
+        $sql = "SELECT id, name, image_url FROM pegi WHERE id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('i', $pegiId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $pegi = $result->fetch_assoc();
+        $stmt->close();
+        return $pegi ?: null;
+    }
+
+    /**
      * Obtiene los datos de un estudio por su id
      */
     private function getStudioById($studioId) {
         if (!$studioId) return null;
         $conn = $this->getConnection();
-        $sql = "SELECT id, name, logo_url, website FROM studios WHERE id = ?";
+        $sql = "SELECT id, name FROM studios WHERE id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param('i', $studioId);
         $stmt->execute();
@@ -85,6 +101,31 @@ class Games extends Database {
      * Método GET actualizado para usar la nueva lógica de filtrado
      */
     public function get($params) {
+        if (isset($params['collection'])) {
+            $limitRequested = isset($params['limit']);
+            $limit  = $limitRequested ? max(1, min(200, intval($params['limit']))) : 10;
+            $userId = isset($params['user_id']) ? intval($params['user_id']) : null;
+            $slug   = $params['slug'] ?? null;
+
+            switch ($params['collection']) {
+                case 'recently_published': return $this->getRecentlyPublished($limit);
+                case 'new_releases':       return $this->getNewReleases($limit);
+                case 'favorites':          return $userId !== null ? $this->getFavoriteGames($userId, $limitRequested ? $limit : null) : [];
+                case 'last_played':        return $userId !== null ? $this->getLastPlayedGames($userId, $limit)  : [];
+                case 'most_played_by':     return $userId !== null ? $this->getMostPlayedByUser($userId, $limit) : $this->getMostPlayed($limit);
+                case 'trending_today':     return $this->getMostPlayedInPeriod('24 HOUR', $limit);
+                case 'trending_week':      return $this->getMostPlayedInPeriod('7 DAY',   $limit);
+                case 'trending_month':     return $this->getMostPlayedInPeriod('30 DAY',  $limit);
+                case 'most_favorited':     return $this->getMostFavorited($limit);
+                case 'recommended':        return $userId !== null ? $this->getRecommended($userId, $limit) : [];
+                case 'similar':            return $slug   ? $this->getSimilarGames($slug, $limit)     : [];
+                case 'by_developer':       return $slug   ? $this->getGamesByDeveloper($slug, $limit) : [];
+                default:
+                    Response::error('Colecci\u00f3n no v\u00e1lida', 400);
+                    exit;
+            }
+        }
+
         $this->filtrarParametros($params, $this->allowedConditions_get);
 
         if (isset($params['slug'])) {
@@ -94,6 +135,7 @@ class Games extends Database {
                 $game['categories'] = $this->getCategoriesForGame($game['id']);
                 $game['developer'] = $this->getStudioById($game['developer_id']);
                 $game['publisher'] = $this->getStudioById($game['publisher_id']);
+                $game['pegi'] = $this->getPegiById($game['pegi_id']);
                 // Si pedimos la vista de detalle, adjuntar screenshots (limit fijo 10)
                 if (isset($params['view']) && $params['view'] === 'detail') {
                     $igdb = new IgdbService();
@@ -112,6 +154,7 @@ class Games extends Database {
                 $game['categories'] = $this->getCategoriesForGame($game['id']);
                 $game['developer'] = $this->getStudioById($game['developer_id']);
                 $game['publisher'] = $this->getStudioById($game['publisher_id']);
+                $game['pegi'] = $this->getPegiById($game['pegi_id']);
                 if (isset($params['view']) && $params['view'] === 'detail') {
                     $igdb = new IgdbService();
                     $game['screenshots'] = !empty($game['igdb_id']) ? $igdb->getScreenshots((int)$game['igdb_id'], 10) : [];
@@ -129,6 +172,7 @@ class Games extends Database {
             $game['categories'] = $this->getCategoriesForGame($game['id']);
             $game['developer'] = $this->getStudioById($game['developer_id']);
             $game['publisher'] = $this->getStudioById($game['publisher_id']);
+            $game['pegi'] = $this->getPegiById($game['pegi_id']);
         }
         // Si pedimos vista de detalle para una lista, hacemos un batch (limit fijo 10)
         if (isset($params['view']) && $params['view'] === 'detail') {
@@ -186,12 +230,175 @@ class Games extends Database {
         }
     }
 
+    private function getMostPlayedInPeriod(string $interval, int $limit = 10): array {
+        $conn = $this->getConnection();
+        $sql  = "SELECT g.*, SUM(COALESCE(s.duration, 0)) AS total_duration
+                 FROM {$this->table} g
+                 LEFT JOIN sessions s ON s.game_id = g.id
+                     AND s.started_at >= NOW() - INTERVAL $interval
+                 GROUP BY g.id
+                 ORDER BY total_duration DESC, RAND()
+                 LIMIT ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('i', $limit);
+        $stmt->execute();
+        $games = [];
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) $games[] = $row;
+        $stmt->close();
+        foreach ($games as &$g) {
+            $g['categories'] = $this->getCategoriesForGame($g['id']);
+            $g['developer']  = $this->getStudioById($g['developer_id']);
+            $g['publisher']  = $this->getStudioById($g['publisher_id']);
+            $g['pegi'] = $this->getPegiById($g['pegi_id']);
+}
+        return $games;
+    }
+
+    private function getMostFavorited(int $limit = 10): array {
+        $conn = $this->getConnection();
+        $sql  = "SELECT g.*, COUNT(f.user_id) AS favorite_count
+                 FROM {$this->table} g
+                 JOIN favorites f ON f.game_id = g.id
+                 GROUP BY g.id
+                 ORDER BY favorite_count DESC
+                 LIMIT ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('i', $limit);
+        $stmt->execute();
+        $games = [];
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) $games[] = $row;
+        $stmt->close();
+        foreach ($games as &$g) {
+            $g['categories'] = $this->getCategoriesForGame($g['id']);
+            $g['developer']  = $this->getStudioById($g['developer_id']);
+            $g['publisher']  = $this->getStudioById($g['publisher_id']);
+            $g['pegi'] = $this->getPegiById($g['pegi_id']);
+}
+        return $games;
+    }
+
+    private function getRecentlyPublished(int $limit = 10): array {
+        $conn = $this->getConnection();
+        $sql  = "SELECT * FROM {$this->table} WHERE published_at IS NOT NULL ORDER BY published_at DESC LIMIT ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('i', $limit);
+        $stmt->execute();
+        $games = [];
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) $games[] = $row;
+        $stmt->close();
+        foreach ($games as &$g) {
+            $g['categories'] = $this->getCategoriesForGame($g['id']);
+            $g['developer']  = $this->getStudioById($g['developer_id']);
+            $g['publisher']  = $this->getStudioById($g['publisher_id']);
+            $g['pegi'] = $this->getPegiById($g['pegi_id']);
+}
+        return $games;
+    }
+
+    private function getNewReleases(int $limit = 10): array {
+        $conn = $this->getConnection();
+        $sql  = "SELECT * FROM {$this->table} WHERE release_date IS NOT NULL ORDER BY release_date DESC LIMIT ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('i', $limit);
+        $stmt->execute();
+        $games = [];
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) $games[] = $row;
+        $stmt->close();
+        foreach ($games as &$g) {
+            $g['categories'] = $this->getCategoriesForGame($g['id']);
+            $g['developer']  = $this->getStudioById($g['developer_id']);
+            $g['publisher']  = $this->getStudioById($g['publisher_id']);
+            $g['pegi'] = $this->getPegiById($g['pegi_id']);
+}
+        return $games;
+    }
+
+    private function getFavoriteGames(int $userId, ?int $limit = null): array {
+        $conn = $this->getConnection();
+        $sql  = "SELECT g.* FROM {$this->table} g
+                 JOIN favorites f ON f.game_id = g.id
+                 WHERE f.user_id = ?";
+        if ($limit !== null) $sql .= ' LIMIT ?';
+        $stmt = $conn->prepare($sql);
+        if ($limit !== null) {
+            $stmt->bind_param('ii', $userId, $limit);
+        } else {
+            $stmt->bind_param('i', $userId);
+        }
+        $stmt->execute();
+        $games = [];
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) $games[] = $row;
+        $stmt->close();
+        foreach ($games as &$g) {
+            $g['categories'] = $this->getCategoriesForGame($g['id']);
+            $g['developer']  = $this->getStudioById($g['developer_id']);
+            $g['publisher']  = $this->getStudioById($g['publisher_id']);
+            $g['pegi'] = $this->getPegiById($g['pegi_id']);
+}
+        return $games;
+    }
+
+    private function getLastPlayedGames(int $userId, int $limit = 10): array {
+        $conn = $this->getConnection();
+        $sql  = "SELECT g.*, MAX(s.started_at) AS last_played
+                 FROM {$this->table} g
+                 JOIN sessions s ON s.game_id = g.id
+                 WHERE s.user_id = ?
+                 GROUP BY g.id
+                 ORDER BY last_played DESC
+                 LIMIT ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('ii', $userId, $limit);
+        $stmt->execute();
+        $games = [];
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) $games[] = $row;
+        $stmt->close();
+        foreach ($games as &$g) {
+            $g['categories'] = $this->getCategoriesForGame($g['id']);
+            $g['developer']  = $this->getStudioById($g['developer_id']);
+            $g['publisher']  = $this->getStudioById($g['publisher_id']);
+            $g['pegi'] = $this->getPegiById($g['pegi_id']);
+}
+        return $games;
+    }
+
+    private function getMostPlayedByUser(int $userId, int $limit = 10): array {
+        $conn = $this->getConnection();
+        $sql  = "SELECT g.*, SUM(COALESCE(s.duration, 0)) AS total_duration
+                 FROM {$this->table} g
+                 JOIN sessions s ON s.game_id = g.id
+                 WHERE s.user_id = ?
+                 GROUP BY g.id
+                 ORDER BY total_duration DESC
+                 LIMIT ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('ii', $userId, $limit);
+        $stmt->execute();
+        $games = [];
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) $games[] = $row;
+        $stmt->close();
+        foreach ($games as &$g) {
+            $g['categories'] = $this->getCategoriesForGame($g['id']);
+            $g['developer']  = $this->getStudioById($g['developer_id']);
+            $g['publisher']  = $this->getStudioById($g['publisher_id']);
+            $g['pegi'] = $this->getPegiById($g['pegi_id']);
+}
+        return $games;
+    }
+
     /**
-     * Devuelve los juegos más reproducidos (por número de sesiones)
+     * Devuelve los juegos más reproducidos (por duración total de sesiones)
      */
     public function getMostPlayed($limit = 10) {
         $conn = $this->getConnection();
-        $sql = "SELECT g.*, COUNT(s.id) AS play_count FROM {$this->table} g JOIN sessions s ON s.game_id = g.id GROUP BY g.id ORDER BY play_count DESC LIMIT ?";
+        $sql = "SELECT g.*, SUM(COALESCE(s.duration, 0)) AS total_duration FROM {$this->table} g JOIN sessions s ON s.game_id = g.id GROUP BY g.id ORDER BY total_duration DESC LIMIT ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param('i', $limit);
         $stmt->execute();
@@ -206,7 +413,123 @@ class Games extends Database {
             $game['categories'] = $this->getCategoriesForGame($game['id']);
             $game['developer'] = $this->getStudioById($game['developer_id']);
             $game['publisher'] = $this->getStudioById($game['publisher_id']);
+            $game['pegi']    = $this->getPegiById($game['pegi_id']);
         }
+        return $games;
+    }
+
+    private function getRecommended(int $userId, int $limit = 10): array {
+        $conn = $this->getConnection();
+        $sql = "
+            SELECT g.*,
+                COALESCE(SUM(cw.weight), 1)
+                * COALESCE(1 + (g.metacritic_score - 50) / 100.0, 1.0)
+                * IF(g.is_featured = 1, 1.3, 1.0) AS recommendation_score
+            FROM {$this->table} g
+            LEFT JOIN game_categories gc ON gc.game_id = g.id
+            LEFT JOIN (
+                SELECT category_id, SUM(w) AS weight
+                FROM (
+                    SELECT gc2.category_id, 3 AS w
+                    FROM favorites f
+                    JOIN game_categories gc2 ON gc2.game_id = f.game_id
+                    WHERE f.user_id = ?
+                    UNION ALL
+                    SELECT gc2.category_id, COALESCE(s.duration, 0) AS w
+                    FROM sessions s
+                    JOIN game_categories gc2 ON gc2.game_id = s.game_id
+                    WHERE s.user_id = ?
+                ) raw
+                GROUP BY category_id
+            ) cw ON cw.category_id = gc.category_id
+            WHERE g.id NOT IN (
+                SELECT game_id FROM favorites WHERE user_id = ?
+                UNION
+                SELECT game_id FROM sessions WHERE user_id = ?
+            )
+            GROUP BY g.id
+            ORDER BY recommendation_score DESC
+            LIMIT ?
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('iiiii', $userId, $userId, $userId, $userId, $limit);
+        $stmt->execute();
+        $games = [];
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) $games[] = $row;
+        $stmt->close();
+        foreach ($games as &$g) {
+            $g['categories'] = $this->getCategoriesForGame($g['id']);
+            $g['developer']  = $this->getStudioById($g['developer_id']);
+            $g['publisher']  = $this->getStudioById($g['publisher_id']);
+            $g['pegi'] = $this->getPegiById($g['pegi_id']);
+}
+        return $games;
+    }
+
+    private function getSimilarGames(string $slug, int $limit = 10): array {
+        $conn = $this->getConnection();
+        $stmt = $conn->prepare("SELECT id FROM {$this->table} WHERE slug = ?");
+        $stmt->bind_param('s', $slug);
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        if (!$row) return [];
+        $gameId = $row['id'];
+
+        $sql = "
+            SELECT g.*, COUNT(DISTINCT gc_match.category_id) AS shared_cats
+            FROM {$this->table} g
+            JOIN game_categories gc_match
+                ON gc_match.game_id = g.id
+                AND gc_match.category_id IN (SELECT category_id FROM game_categories WHERE game_id = ?)
+            WHERE g.id != ?
+            GROUP BY g.id
+            ORDER BY shared_cats DESC, RAND()
+            LIMIT ?
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('iii', $gameId, $gameId, $limit);
+        $stmt->execute();
+        $games = [];
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) $games[] = $row;
+        $stmt->close();
+        foreach ($games as &$g) {
+            $g['categories'] = $this->getCategoriesForGame($g['id']);
+            $g['developer']  = $this->getStudioById($g['developer_id']);
+            $g['publisher']  = $this->getStudioById($g['publisher_id']);
+            $g['pegi'] = $this->getPegiById($g['pegi_id']);
+}
+        return $games;
+    }
+
+    private function getGamesByDeveloper(string $slug, int $limit = 10): array {
+        $conn = $this->getConnection();
+        $stmt = $conn->prepare("SELECT id, developer_id FROM {$this->table} WHERE slug = ?");
+        $stmt->bind_param('s', $slug);
+        $stmt->execute();
+        $row = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        if (!$row || !$row['developer_id']) return [];
+        $gameId = (int)$row['id'];
+        $developerId = (int)$row['developer_id'];
+
+        $stmt = $conn->prepare(
+            "SELECT * FROM {$this->table} WHERE developer_id = ? AND id != ? ORDER BY RAND() LIMIT ?"
+        );
+        $stmt->bind_param('iii', $developerId, $gameId, $limit);
+        $stmt->execute();
+        $games = [];
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) $games[] = $row;
+        $stmt->close();
+        foreach ($games as &$g) {
+            $g['categories'] = $this->getCategoriesForGame($g['id']);
+            $g['developer']  = $this->getStudioById($g['developer_id']);
+            $g['publisher']  = $this->getStudioById($g['publisher_id']);
+            $g['pegi'] = $this->getPegiById($g['pegi_id']);
+}
         return $games;
     }
 
@@ -230,6 +553,7 @@ class Games extends Database {
             $game['categories'] = $this->getCategoriesForGame($game['id']);
             $game['developer'] = $this->getStudioById($game['developer_id']);
             $game['publisher'] = $this->getStudioById($game['publisher_id']);
+            $game['pegi']    = $this->getPegiById($game['pegi_id']);
         }
         return $games;
     }
@@ -260,7 +584,8 @@ class Games extends Database {
             $g['categories'] = $this->getCategoriesForGame($g['id']);
             $g['developer'] = $this->getStudioById($g['developer_id']);
             $g['publisher'] = $this->getStudioById($g['publisher_id']);
-        }
+            $g['pegi'] = $this->getPegiById($g['pegi_id']);
+}
 
         // Nuevos juegos (ordenados por release_date)
         $sql = "SELECT * FROM {$this->table} WHERE release_date IS NOT NULL ORDER BY release_date DESC LIMIT ?";
@@ -278,7 +603,8 @@ class Games extends Database {
             $g['categories'] = $this->getCategoriesForGame($g['id']);
             $g['developer'] = $this->getStudioById($g['developer_id']);
             $g['publisher'] = $this->getStudioById($g['publisher_id']);
-        }
+            $g['pegi'] = $this->getPegiById($g['pegi_id']);
+}
 
         // Most played
         $collections['most_played'] = $this->getMostPlayed($limit);

@@ -30,7 +30,9 @@ class Plans extends Database {
 	private $allowedConditions_insert = array(
 		'name',
 		'description',
-		'price'
+		'price',
+		'quality',
+		'gpu'
 	);
 
 	/**

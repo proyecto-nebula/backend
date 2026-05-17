@@ -1,4 +1,3 @@
-
 <?php
 namespace App\Classes;
 use App\Models\Database;
@@ -30,7 +29,8 @@ class Studios extends Database {
      */
     private $allowedConditions_insert = array(
         'name',
-        'logo_url'
+        'logo_url',
+        'website'
     );
 
     /**
@@ -96,7 +96,14 @@ class Studios extends Database {
             }
         }
 
-        $items = parent::getDB($this->table, $params);
+        // Sin filtros: devolver todos los estudios sin límite de paginación
+        $conn = $this->getConnection();
+        $sql = "SELECT * FROM {$this->table} ORDER BY name";
+        $result = $conn->query($sql);
+        $items = [];
+        while ($row = $result->fetch_assoc()) {
+            $items[] = $row;
+        }
         return $items;
     }
 
