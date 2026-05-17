@@ -10,8 +10,11 @@ switch ($_SERVER['REQUEST_METHOD']) {
         break;
 
     case 'POST':
-        $params = json_decode(file_get_contents('php://input'), true);
+        $params = json_decode(file_get_contents('php://input'), true) ?? [];
         $params = \App\Utils\Response::convertKeysToSnakeCase($params);
+        // user_id and started_at are set server-side — client cannot forge them
+        $params['user_id']    = $_SERVER['AUTH_USER_ID'];
+        $params['started_at'] = date('Y-m-d H:i:s');
         \App\Utils\Response::ok(['id' => $item->insert($params)], 201);
         break;
 

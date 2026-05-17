@@ -97,10 +97,37 @@ class Games extends Database {
         return true;
     }
 
+    private function searchGames(string $query, int $limit = 8): array {
+        if (strlen($query) < 2) return [];
+        $conn = $this->getConnection();
+        $like = '%' . $query . '%';
+        $sql  = "SELECT id, title, slug, banner_url, cover_url, release_date
+                 FROM {$this->table}
+                 WHERE title LIKE ? AND is_active = 1
+                 ORDER BY title ASC
+                 LIMIT ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('si', $like, $limit);
+        $stmt->execute();
+        $results = [];
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) {
+            $results[] = $row;
+        }
+        $stmt->close();
+        return $results;
+    }
+
     /**
      * Método GET actualizado para usar la nueva lógica de filtrado
      */
     public function get($params) {
+        // Quick search: ?search=query[&limit=N]
+        if (isset($params['search'])) {
+            $limit = isset($params['limit']) ? max(1, min(20, intval($params['limit']))) : 8;
+            return $this->searchGames(trim($params['search']), $limit);
+        }
+
         if (isset($params['collection'])) {
             $limitRequested = isset($params['limit']);
             $limit  = $limitRequested ? max(1, min(200, intval($params['limit']))) : 10;

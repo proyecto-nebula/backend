@@ -59,14 +59,14 @@ class Sessions extends Database {
      * Método para validar los datos que se mandan para insertar un registro, comprobar campos obligatorios, valores válidos, etc.
      */
     private function validate($data) {
+        $userId = $data['user_id'] ?? null;
+        $gameId = $data['game_id'] ?? null;
 
-        if (!isset($data['user_id']) || empty($data['user_id']) || !isset($data['game_id']) || empty($data['game_id'])) {
-            $response = array(
+        if ($userId === null || $userId === '' || $gameId === null || $gameId === '') {
+            Response::result(400, array(
                 'result' => 'error',
-                'details' => 'Los campos id_usuario e id_juego son obligatorios'
-            );
-
-            Response::result(400, $response);
+                'details' => 'Los campos user_id y game_id son obligatorios'
+            ));
             exit;
         }
 
