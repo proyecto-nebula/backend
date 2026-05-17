@@ -84,6 +84,31 @@ class Database
 	}
 
 	/**
+	 * Método para recuperar TODOS los datos sin límite de paginación
+	 */
+	public function getAllDB($table, $extra = null)
+	{
+		$query = "SELECT * FROM $table";
+
+		if ($extra != null) {
+			$query .= ' WHERE';
+			foreach ($extra as $key => $condition) {
+				$query .= ' ' . $key . ' = "' . $condition . '"';
+				if ($extra[$key] != end($extra)) {
+					$query .= " AND ";
+				}
+			}
+		}
+
+		$results = $this->connection->query($query);
+		$resultArray = [];
+		foreach ($results as $value) {
+			$resultArray[] = $value;
+		}
+		return $resultArray;
+	}
+
+	/**
 	 * Método para insertar un nuevo registro
 	 */
 	public function insertDB($table, $data)

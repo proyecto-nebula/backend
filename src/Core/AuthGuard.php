@@ -25,9 +25,21 @@ class AuthGuard
 
         $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
 
-        // Fallback: Apache a veces no pasa HTTP_AUTHORIZATION a $_SERVER
+        // Apache may deliver the header under several different keys depending on
+        // configuration (mod_rewrite REDIRECT_ prefix, CGI passthrough, etc.).
+        // Check all known variants before falling back to apache_request_headers().
+        if (empty($authHeader)) {
+            $authHeader = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
+        }
+        if (empty($authHeader)) {
+            $authHeader = $_SERVER['Authorization'] ?? '';
+        }
         if (empty($authHeader) && function_exists('apache_request_headers')) {
             $headers = apache_request_headers();
+            $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? '';
+        }
+        if (empty($authHeader) && function_exists('getallheaders')) {
+            $headers = getallheaders();
             $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? '';
         }
 

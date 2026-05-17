@@ -161,4 +161,149 @@ class IgdbService
             return [];
         }
     }
+
+    /**
+     * Devuelve datos extra de IGDB para un juego: modos, motores, perspectivas,
+     * puntuación, videos y websites.
+     *
+     * @return array{
+     *   game_modes: string[],
+     *   game_engines: string[],
+     *   multiplayer_modes: string[],
+     *   player_perspectives: string[],
+     *   total_rating: float|null,
+     *   videos: array<int, array{video_id:string, url:string, embed_url:string}>,
+     *   websites: array<int, array{url:string, type:int}>
+     * }
+     */
+    public function getGameDetails(int $igdbId): array
+    {
+        $empty = [
+            'game_modes'          => [],
+            'game_engines'        => [],
+            'multiplayer_modes'   => [],
+            'player_perspectives' => [],
+            'total_rating'        => null,
+            'videos'              => [],
+            'websites'            => [],
+        ];
+
+        if (empty($this->clientId) || empty($this->clientSecret)) {
+            return $empty;
+        }
+
+        try {
+            $token = $this->getToken();
+
+            $fields = implode(',', [
+                'game_modes.name',
+                'game_engines.name',
+                'multiplayer_modes.offlinecoop',
+                'multiplayer_modes.onlinecoop',
+                'multiplayer_modes.splitscreen',
+                'multiplayer_modes.lancoop',
+                'multiplayer_modes.campaigncoop',
+                'multiplayer_modes.dropin',
+                'player_perspectives.name',
+                'total_rating',
+                'videos.video_id',
+                'videos.name',
+                'websites.url',
+                'websites.type',
+            ]);
+
+            $response = $this->http->post('https://api.igdb.com/v4/games', [
+                'headers' => [
+                    'Client-ID'     => $this->clientId,
+                    'Authorization' => 'Bearer ' . $token,
+                    'Accept'        => 'application/json',
+                ],
+                'body' => "fields {$fields}; where id = {$igdbId}; limit 1;",
+            ]);
+
+            $items = json_decode((string) $response->getBody(), true);
+
+            if (!is_array($items) || count($items) === 0) {
+                return $empty;
+            }
+
+            $d = $items[0];
+
+            // game_modes → names
+            $gameModes = [];
+            foreach ($d['game_modes'] ?? [] as $m) {
+                if (!empty($m['name'])) $gameModes[] = $m['name'];
+            }
+
+            // game_engines → names
+            $gameEngines = [];
+            foreach ($d['game_engines'] ?? [] as $e) {
+                if (!empty($e['name'])) $gameEngines[] = $e['name'];
+            }
+
+            // multiplayer_modes → derive labels from boolean flags (deduplicated)
+            $mpLabels = [
+                'offlinecoop'  => 'Co-op offline',
+                'onlinecoop'   => 'Co-op online',
+                'splitscreen'  => 'Pantalla dividida',
+                'lancoop'      => 'Co-op LAN',
+                'campaigncoop' => 'Campaña co-op',
+                'dropin'       => 'Drop-in/out',
+            ];
+            $multiplayerModes = [];
+            foreach ($d['multiplayer_modes'] ?? [] as $mm) {
+                foreach ($mpLabels as $flag => $label) {
+                    if (!empty($mm[$flag]) && !in_array($label, $multiplayerModes, true)) {
+                        $multiplayerModes[] = $label;
+                    }
+                }
+            }
+
+            // player_perspectives → names
+            $playerPerspectives = [];
+            foreach ($d['player_perspectives'] ?? [] as $pp) {
+                if (!empty($pp['name'])) $playerPerspectives[] = $pp['name'];
+            }
+
+            // videos → YouTube URLs
+            $videos = [];
+            foreach ($d['videos'] ?? [] as $v) {
+                if (!empty($v['video_id'])) {
+                    $vid = $v['video_id'];
+                    $videos[] = [
+                        'video_id'  => $vid,
+                        'name'      => $v['name'] ?? '',
+                        'url'       => "https://www.youtube.com/watch?v={$vid}",
+                        'embed_url' => "https://www.youtube.com/embed/{$vid}",
+                    ];
+                }
+            }
+
+            // websites → url + type
+            $websites = [];
+            foreach ($d['websites'] ?? [] as $site) {
+                if (!empty($site['url'])) {
+                    $websites[] = [
+                        'url'  => $site['url'],
+                        'type' => (int) ($site['type'] ?? 0),
+                    ];
+                }
+            }
+            usort($websites, fn($a, $b) => $a['type'] <=> $b['type']);
+
+            return [
+                'game_modes'          => $gameModes,
+                'game_engines'        => $gameEngines,
+                'multiplayer_modes'   => $multiplayerModes,
+                'player_perspectives' => $playerPerspectives,
+                'total_rating'        => isset($d['total_rating']) ? round((float) $d['total_rating'], 1) : null,
+                'videos'              => $videos,
+                'websites'            => $websites,
+            ];
+
+        } catch (GuzzleException $e) {
+            error_log('[IgdbService] getGameDetails error: ' . $e->getMessage());
+            return $empty;
+        }
+    }
 }

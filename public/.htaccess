@@ -1,7 +1,9 @@
 RewriteEngine On
+
+# Pass Authorization header to PHP via environment variable (SetEnvIf has no REDIRECT_ prefix issue)
+# This works for ALL HTTP methods including DELETE/PUT/PATCH
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.php [L,QSA]
-
-# Pasar el header Authorization a PHP (Apache lo elimina por defecto)
-RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

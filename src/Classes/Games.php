@@ -67,7 +67,7 @@ class Games extends Database {
      * He añadido los sufijos _min y _max para Metacritic y Fecha
      */
     private $allowedConditions_get = array(
-        'id', 'title', 'slug', 'release_date', 'metacritic_score', 'pegi_id', 'published_at', 'is_featured', 'is_active', 'developer_id', 'publisher_id', 'steam_id', 'igdb_id', 'view'
+        'id', 'title', 'slug', 'release_date', 'metacritic_score', 'pegi_id', 'published_at', 'is_featured', 'is_active', 'developer_id', 'publisher_id', 'steam_id', 'igdb_id', 'view', 'all'
     );
 
     private $allowedConditions_insert = array(
@@ -136,10 +136,16 @@ class Games extends Database {
                 $game['developer'] = $this->getStudioById($game['developer_id']);
                 $game['publisher'] = $this->getStudioById($game['publisher_id']);
                 $game['pegi'] = $this->getPegiById($game['pegi_id']);
-                // Si pedimos la vista de detalle, adjuntar screenshots (limit fijo 10)
+                // Si pedimos la vista de detalle, adjuntar screenshots + datos IGDB
                 if (isset($params['view']) && $params['view'] === 'detail') {
-                    $igdb = new IgdbService();
-                    $game['screenshots'] = !empty($game['igdb_id']) ? $igdb->getScreenshots((int)$game['igdb_id'], 10) : [];
+                    $igdb   = new IgdbService();
+                    $igdbId = !empty($game['igdb_id']) ? (int)$game['igdb_id'] : null;
+                    $game['screenshots'] = $igdbId ? $igdb->getScreenshots($igdbId, 10) : [];
+                    if ($igdbId) {
+                        foreach ($igdb->getGameDetails($igdbId) as $k => $v) {
+                            $game[$k] = $v;
+                        }
+                    }
                 }
                 return $game;
             } else {
@@ -156,8 +162,14 @@ class Games extends Database {
                 $game['publisher'] = $this->getStudioById($game['publisher_id']);
                 $game['pegi'] = $this->getPegiById($game['pegi_id']);
                 if (isset($params['view']) && $params['view'] === 'detail') {
-                    $igdb = new IgdbService();
-                    $game['screenshots'] = !empty($game['igdb_id']) ? $igdb->getScreenshots((int)$game['igdb_id'], 10) : [];
+                    $igdb   = new IgdbService();
+                    $igdbId = !empty($game['igdb_id']) ? (int)$game['igdb_id'] : null;
+                    $game['screenshots'] = $igdbId ? $igdb->getScreenshots($igdbId, 10) : [];
+                    if ($igdbId) {
+                        foreach ($igdb->getGameDetails($igdbId) as $k => $v) {
+                            $game[$k] = $v;
+                        }
+                    }
                 }
                 return $game;
             } else {
@@ -165,7 +177,9 @@ class Games extends Database {
             }
         }
 
-        $items = parent::getDB($this->table, $params);
+        $fetchAll = isset($params['all']);
+        unset($params['all']);
+        $items = $fetchAll ? parent::getAllDB($this->table, $params) : parent::getDB($this->table, $params);
         $games = $items;
         // Embedding para lista
         foreach ($games as &$game) {

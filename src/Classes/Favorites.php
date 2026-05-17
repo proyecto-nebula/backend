@@ -95,11 +95,18 @@ class Favorites extends Database {
     }
 
     public function deleteFavorito($user_id, $game_id) {
-        $sql = "DELETE FROM $this->table WHERE user_id = $user_id AND game_id = $game_id";
         $db = $this->getConnection();
-        $db->query($sql);
+        $stmt = $db->prepare("DELETE FROM {$this->table} WHERE user_id = ? AND game_id = ?");
+        if (!$stmt) {
+            Response::result(500, array('result' => 'error', 'details' => 'Error al preparar la consulta'));
+            exit;
+        }
+        $stmt->bind_param('ii', $user_id, $game_id);
+        $stmt->execute();
+        $affected = $stmt->affected_rows;
+        $stmt->close();
 
-        if (!$db->affected_rows) {
+        if (!$affected) {
             Response::result(404, array('result' => 'error', 'details' => 'No se encontró ese favorito'));
             exit;
         }
