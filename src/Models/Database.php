@@ -149,23 +149,29 @@ class Database
 	 */
 	public function updateDB($table, $id, $pk, $data)
 	{
-		$query = "UPDATE $table SET ";
+		$conn = $this->connection;
+		$setParts = [];
 		foreach ($data as $key => $value) {
-			$query .= "$key = '$value'";
-			if (sizeof($data) > 1 && $key != array_key_last($data)) {
-				$query .= " , ";
+			if (is_null($value)) {
+				$setParts[] = "`$key` = NULL";
+			} else {
+				$escaped = $conn->real_escape_string((string) $value);
+				$setParts[] = "`$key` = '$escaped'";
 			}
 		}
 
-		$query .= ' WHERE ' . $pk . ' = ' . $id;
+		if (empty($setParts)) return 0;
 
-		$this->connection->query($query);
+		$query = 'UPDATE `' . $table . '` SET ' . implode(', ', $setParts) . ' WHERE `' . $pk . '` = ' . (int) $id;
 
-		if (!$this->connection->affected_rows) {
-			return 0;
+		$result = $conn->query($query);
+
+		if ($result === false) {
+			error_log('[updateDB] Error: ' . $conn->error . ' | Query: ' . $query);
+			return -1;
 		}
 
-		return $this->connection->affected_rows;
+		return $conn->affected_rows; // 0 = no rows changed, ≥1 = updated
 	}
 
 	/**

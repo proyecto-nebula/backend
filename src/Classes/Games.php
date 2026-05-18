@@ -247,10 +247,11 @@ class Games extends Database {
         $this->filtrarParametros($params, $this->allowedConditions_insert);
         if ($this->validate($params)) {
             $affected_rows = parent::updateDB($this->table, $id, $this->primary_key, $params);
-            if ($affected_rows == 0) {
-                Response::result(200, array('result' => 'error', 'details' => 'No hubo cambios'));
+            if ($affected_rows < 0) {
+                Response::error('Error al actualizar el juego en la base de datos', 500);
                 exit;
             }
+            // affected_rows === 0 means data was identical — still a valid success
         }
     }
 
