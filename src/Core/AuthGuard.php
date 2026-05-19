@@ -19,6 +19,16 @@ class AuthGuard
             return;
         }
 
+        // Allow unauthenticated listing of users (used by the dev debug panel; never shown in production)
+        if ($resource === 'users' && ($_SERVER['REQUEST_METHOD'] ?? '') === 'GET') {
+            return;
+        }
+
+        // Allow public report submission: POST /api/v1/reports
+        if ($resource === 'reports' && ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
+            return;
+        }
+
         if (in_array($resource, self::PUBLIC_ENDPOINTS, true)) {
             return;
         }

@@ -10,7 +10,8 @@ class Router {
     private static $endpoints = [
         'users', 'games', 'avatars', 'screenshots', 'categories',
         'studios', 'favorites', 'game_categories', 'sessions',
-        'pegi', 'roles', 'plans', 'auth', 'test', 'test_encoding', 'test_db_encoding_api'
+        'pegi', 'roles', 'plans', 'auth', 'reports',
+        'test', 'test_encoding', 'test_db_encoding_api'
     ];
 
     public static function dispatch($uri)

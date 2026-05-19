@@ -662,6 +662,22 @@ ALTER TABLE `sessions`
 
 
 
+-- Reports
+CREATE TABLE `reports` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `game_id` int NOT NULL,
+  `user_id` int DEFAULT NULL,
+  `type` tinyint NOT NULL DEFAULT 4,
+  `description` text DEFAULT NULL,
+  `is_solved` boolean NOT NULL DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `game_id_idx` (`game_id`),
+  KEY `user_id_idx` (`user_id`),
+  CONSTRAINT `fk_reports_game` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_reports_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 -- --------------------------------------------------------
 -- COMMIT
 -- --------------------------------------------------------
