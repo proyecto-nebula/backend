@@ -23,7 +23,7 @@ class Categories extends Database {
     private $allowedConditions_get = array(
         'id',
         'name',
-        'image_url'
+        'icon'
     );
 
     /**
@@ -31,7 +31,7 @@ class Categories extends Database {
      */
     private $allowedConditions_insert = array(
         'name',
-        'image_url'
+        'icon'
     );
 
     /**

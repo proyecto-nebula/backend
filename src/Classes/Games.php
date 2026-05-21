@@ -50,7 +50,7 @@ class Games extends Database {
      */
     private function getCategoriesForGame($gameId) {
         $conn = $this->getConnection();
-        $sql = "SELECT c.id, c.name, c.image_url FROM game_categories gc JOIN categories c ON gc.category_id = c.id WHERE gc.game_id = ?";
+        $sql = "SELECT c.id, c.name, c.icon FROM game_categories gc JOIN categories c ON gc.category_id = c.id WHERE gc.game_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param('i', $gameId);
         $stmt->execute();
