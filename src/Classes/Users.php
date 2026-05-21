@@ -24,7 +24,8 @@ class Users extends Database {
     private $allowedConditions_get = array(
         'id',
         'token',
-        'created_at'
+        'created_at',
+        'email'
     );
 
     /**
