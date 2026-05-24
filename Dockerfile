@@ -1,12 +1,11 @@
 FROM php:8.2-apache
 
-# Garantizar un único MPM: eliminar symlinks de mpm_event y mpm_worker directamente
-# (a2dismod no siempre es suficiente en entornos como Railway)
-RUN rm -f /etc/apache2/mods-enabled/mpm_event.conf \
-          /etc/apache2/mods-enabled/mpm_event.load \
-          /etc/apache2/mods-enabled/mpm_worker.conf \
-          /etc/apache2/mods-enabled/mpm_worker.load \
-    && a2enmod mpm_prefork rewrite
+# Garantizar un único MPM: eliminar TODOS los symlinks mpm_* y recrear solo prefork
+RUN rm -f /etc/apache2/mods-enabled/mpm_*.conf \
+          /etc/apache2/mods-enabled/mpm_*.load \
+    && ln -s /etc/apache2/mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/mpm_prefork.conf \
+    && ln -s /etc/apache2/mods-available/mpm_prefork.load /etc/apache2/mods-enabled/mpm_prefork.load \
+    && a2enmod rewrite
 
 # Cambiar el DocumentRoot a /var/www/html/public
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
