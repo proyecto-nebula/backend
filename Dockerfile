@@ -1,4 +1,4 @@
-FROM php:8.2-apache
+FROM php:8.2-apache-bullseye
 
 # Garantizar un único MPM: eliminar TODOS los symlinks mpm_* y recrear solo prefork
 RUN rm -f /etc/apache2/mods-enabled/mpm_*.conf \
