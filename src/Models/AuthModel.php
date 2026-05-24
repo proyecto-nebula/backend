@@ -45,19 +45,19 @@ class AuthModel
      */
     public function login($email, $password)
     {
-       
-        // En tu SQL la tabla es usuarios y la columna es nombre (no nombres)
-        $query = "SELECT id, email FROM users WHERE email = '$email' AND password = '$password'";
-
-        $results = $this->connection->query($query);
-
-        $resultArray = array();
-
-        if($results != false){
-            foreach ($results as $value) {
-                $resultArray[] = $value;
-            }
+        $stmt = $this->connection->prepare(
+            'SELECT id, email FROM users WHERE email = ? AND password = ?'
+        );
+        $stmt->bind_param('ss', $email, $password);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $resultArray = [];
+        while ($row = $result->fetch_assoc()) {
+            $resultArray[] = $row;
         }
+        $stmt->close();
+        return $resultArray;
+    }
 
         return $resultArray;
     }
@@ -68,15 +68,14 @@ class AuthModel
      */
     public function update($id, $token)
     {
-        $query = "UPDATE users SET token = '$token', last_login_at = CURRENT_TIMESTAMP WHERE id = $id";
-
-        $this->connection->query($query);
-        
-        if($this->connection->affected_rows <= 0){
-            return 0;
-        }
-
-        return $this->connection->affected_rows;
+        $stmt = $this->connection->prepare(
+            'UPDATE users SET token = ?, last_login_at = CURRENT_TIMESTAMP WHERE id = ?'
+        );
+        $stmt->bind_param('si', $token, $id);
+        $stmt->execute();
+        $affected = $this->connection->affected_rows;
+        $stmt->close();
+        return $affected > 0 ? $affected : 0;
     }
 
     /**
@@ -85,18 +84,17 @@ class AuthModel
      */
     public function getById($id)
     {
-        $query = "SELECT token, last_login_at FROM users WHERE id = $id";
-
-        $results = $this->connection->query($query);
-
-        $resultArray = array();
-
-        if($results != false){
-            foreach ($results as $value) {
-                $resultArray[] = $value;
-            }
+        $stmt = $this->connection->prepare(
+            'SELECT token, last_login_at FROM users WHERE id = ?'
+        );
+        $stmt->bind_param('i', $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $resultArray = [];
+        while ($row = $result->fetch_assoc()) {
+            $resultArray[] = $row;
         }
-
+        $stmt->close();
         return $resultArray;
     }
 }

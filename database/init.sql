@@ -88,9 +88,13 @@ CREATE TABLE `games` (
   `is_active` boolean DEFAULT 1,
   `slug` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `slug_idx` (`slug`),
   KEY `developer_id_idx` (`developer_id`),
   KEY `publisher_id_idx` (`publisher_id`),
-  KEY `pegi_id_idx` (`pegi_id`)
+  KEY `pegi_id_idx` (`pegi_id`),
+  KEY `published_at_idx` (`published_at`),
+  KEY `release_date_idx` (`release_date`),
+  KEY `is_featured_idx` (`is_featured`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Users
@@ -108,6 +112,8 @@ CREATE TABLE `users` (
   `is_active` boolean DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `email_idx` (`email`),
+  UNIQUE KEY `username_idx` (`username`),
   KEY `plan_id_idx` (`plan_id`),
   KEY `role_id_idx` (`role_id`),
   KEY `avatar_id_idx` (`avatar_id`)
@@ -138,7 +144,8 @@ CREATE TABLE `sessions` (
   `duration` int NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `user_id_idx` (`user_id`),
-  KEY `game_id_idx` (`game_id`)
+  KEY `game_id_idx` (`game_id`),
+  KEY `started_at_idx` (`started_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
