@@ -1,7 +1,7 @@
 FROM php:8.2-apache-bullseye
 
-# Habilitar mod_rewrite
-RUN a2enmod rewrite
+# Habilitar módulos Apache
+RUN a2enmod rewrite headers
 
 # Cambiar el DocumentRoot a /var/www/html/public
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
@@ -21,7 +21,9 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 
 RUN cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini \
-    && sed -i 's/variables_order = "GPCS"/variables_order = "EGPCS"/' /usr/local/etc/php/php.ini
+    && sed -i 's/variables_order = "GPCS"/variables_order = "EGPCS"/' /usr/local/etc/php/php.ini \
+    && docker-php-ext-enable opcache \
+    && printf '[opcache]\nopcache.enable=1\nopcache.memory_consumption=128\nopcache.max_accelerated_files=4000\nopcache.revalidate_freq=60\n' > /usr/local/etc/php/conf.d/opcache.ini
 
 # Instalar dependencias PHP (capa separada para aprovechar la caché de Docker)
 COPY composer.json composer.lock* ./
