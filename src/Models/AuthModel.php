@@ -24,12 +24,14 @@ class AuthModel
         //$this->connection = new \mysqli('db', 'root', 'root', 'Proyecto_Final', '3306');
         $this->connection = mysqli_init();
 		$this->connection->options(MYSQLI_OPT_INT_AND_FLOAT_NATIVE, 1);
+		$this->connection->options(MYSQLI_OPT_SSL_VERIFY_SERVER_CERT, false);
 		$this->connection->real_connect(
 			$this->host,
 			$this->user,
 			$this->password,
 			$this->db,
-			$this->port
+			$this->port, 
+    		MYSQLI_CLIENT_SSL
 		);
 
         if ($this->connection->connect_errno){

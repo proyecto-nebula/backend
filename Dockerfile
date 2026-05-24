@@ -20,7 +20,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-RUN cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini \
+RUN cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini \
     && sed -i 's/variables_order = "GPCS"/variables_order = "EGPCS"/' /usr/local/etc/php/php.ini
 
 # Instalar dependencias PHP (capa separada para aprovechar la caché de Docker)
