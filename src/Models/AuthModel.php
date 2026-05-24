@@ -59,9 +59,6 @@ class AuthModel
         return $resultArray;
     }
 
-        return $resultArray;
-    }
-
     /**
      * Método para actualizar el token de un usuario con un determinado id
      * Corregido: nombre de tabla 'users' e 'id'
