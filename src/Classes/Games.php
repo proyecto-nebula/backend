@@ -64,8 +64,72 @@ class Games extends Database {
     }
 
     /**
-     * He añadido los sufijos _min y _max para Metacritic y Fecha
+     * Enriquece un array de juegos en batch (evita el problema N+1).
+     * Ejecuta 3 queries en total en lugar de 4×N.
      */
+    private function enrichGames(array &$games): void {
+        if (empty($games)) return;
+
+        $gameIds   = array_values(array_column($games, 'id'));
+        $studioIds = array_values(array_unique(array_filter(array_merge(
+            array_column($games, 'developer_id'),
+            array_column($games, 'publisher_id')
+        ))));
+        $pegiIds   = array_values(array_unique(array_filter(array_column($games, 'pegi_id'))));
+        $conn      = $this->getConnection();
+
+        // Categorías: 1 query para todos los juegos
+        $categoriesMap = [];
+        $ph   = implode(',', array_fill(0, count($gameIds), '?'));
+        $sql  = "SELECT gc.game_id, c.id, c.name, c.icon
+                 FROM game_categories gc
+                 JOIN categories c ON gc.category_id = c.id
+                 WHERE gc.game_id IN ($ph)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param(str_repeat('i', count($gameIds)), ...$gameIds);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) {
+            $gid = $row['game_id'];
+            unset($row['game_id']);
+            $categoriesMap[$gid][] = $row;
+        }
+        $stmt->close();
+
+        // Estudios: 1 query para todos los juegos
+        $studiosMap = [];
+        if (!empty($studioIds)) {
+            $ph   = implode(',', array_fill(0, count($studioIds), '?'));
+            $sql  = "SELECT id, name FROM studios WHERE id IN ($ph)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param(str_repeat('i', count($studioIds)), ...$studioIds);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            while ($row = $result->fetch_assoc()) $studiosMap[$row['id']] = $row;
+            $stmt->close();
+        }
+
+        // PEGI: 1 query para todos los juegos
+        $pegiMap = [];
+        if (!empty($pegiIds)) {
+            $ph   = implode(',', array_fill(0, count($pegiIds), '?'));
+            $sql  = "SELECT id, name, image_url FROM pegi WHERE id IN ($ph)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param(str_repeat('i', count($pegiIds)), ...$pegiIds);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            while ($row = $result->fetch_assoc()) $pegiMap[$row['id']] = $row;
+            $stmt->close();
+        }
+
+        foreach ($games as &$game) {
+            $game['categories'] = $categoriesMap[$game['id']] ?? [];
+            $game['developer']  = $studiosMap[$game['developer_id'] ?? 0] ?? null;
+            $game['publisher']  = $studiosMap[$game['publisher_id'] ?? 0] ?? null;
+            $game['pegi']       = $pegiMap[$game['pegi_id'] ?? 0] ?? null;
+        }
+        unset($game);
+    }
     private $allowedConditions_get = array(
         'id', 'title', 'slug', 'release_date', 'metacritic_score', 'pegi_id', 'published_at', 'is_featured', 'is_active', 'developer_id', 'publisher_id', 'steam_id', 'igdb_id', 'view', 'all'
     );
@@ -208,13 +272,8 @@ class Games extends Database {
         unset($params['all']);
         $items = $fetchAll ? parent::getAllDB($this->table, $params) : parent::getDB($this->table, $params);
         $games = $items;
-        // Embedding para lista
-        foreach ($games as &$game) {
-            $game['categories'] = $this->getCategoriesForGame($game['id']);
-            $game['developer'] = $this->getStudioById($game['developer_id']);
-            $game['publisher'] = $this->getStudioById($game['publisher_id']);
-            $game['pegi'] = $this->getPegiById($game['pegi_id']);
-        }
+        // Embedding para lista (batch: 3 queries en lugar de 4×N)
+        $this->enrichGames($games);
         // Si pedimos vista de detalle para una lista, hacemos un batch (limit fijo 10)
         if (isset($params['view']) && $params['view'] === 'detail') {
             $igdbIds = [];
@@ -288,12 +347,7 @@ class Games extends Database {
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) $games[] = $row;
         $stmt->close();
-        foreach ($games as &$g) {
-            $g['categories'] = $this->getCategoriesForGame($g['id']);
-            $g['developer']  = $this->getStudioById($g['developer_id']);
-            $g['publisher']  = $this->getStudioById($g['publisher_id']);
-            $g['pegi'] = $this->getPegiById($g['pegi_id']);
-}
+        $this->enrichGames($games);
         return $games;
     }
 
@@ -312,12 +366,7 @@ class Games extends Database {
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) $games[] = $row;
         $stmt->close();
-        foreach ($games as &$g) {
-            $g['categories'] = $this->getCategoriesForGame($g['id']);
-            $g['developer']  = $this->getStudioById($g['developer_id']);
-            $g['publisher']  = $this->getStudioById($g['publisher_id']);
-            $g['pegi'] = $this->getPegiById($g['pegi_id']);
-}
+        $this->enrichGames($games);
         return $games;
     }
 
@@ -331,12 +380,7 @@ class Games extends Database {
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) $games[] = $row;
         $stmt->close();
-        foreach ($games as &$g) {
-            $g['categories'] = $this->getCategoriesForGame($g['id']);
-            $g['developer']  = $this->getStudioById($g['developer_id']);
-            $g['publisher']  = $this->getStudioById($g['publisher_id']);
-            $g['pegi'] = $this->getPegiById($g['pegi_id']);
-}
+        $this->enrichGames($games);
         return $games;
     }
 
@@ -350,12 +394,7 @@ class Games extends Database {
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) $games[] = $row;
         $stmt->close();
-        foreach ($games as &$g) {
-            $g['categories'] = $this->getCategoriesForGame($g['id']);
-            $g['developer']  = $this->getStudioById($g['developer_id']);
-            $g['publisher']  = $this->getStudioById($g['publisher_id']);
-            $g['pegi'] = $this->getPegiById($g['pegi_id']);
-}
+        $this->enrichGames($games);
         return $games;
     }
 
@@ -376,12 +415,7 @@ class Games extends Database {
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) $games[] = $row;
         $stmt->close();
-        foreach ($games as &$g) {
-            $g['categories'] = $this->getCategoriesForGame($g['id']);
-            $g['developer']  = $this->getStudioById($g['developer_id']);
-            $g['publisher']  = $this->getStudioById($g['publisher_id']);
-            $g['pegi'] = $this->getPegiById($g['pegi_id']);
-}
+        $this->enrichGames($games);
         return $games;
     }
 
@@ -401,12 +435,7 @@ class Games extends Database {
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) $games[] = $row;
         $stmt->close();
-        foreach ($games as &$g) {
-            $g['categories'] = $this->getCategoriesForGame($g['id']);
-            $g['developer']  = $this->getStudioById($g['developer_id']);
-            $g['publisher']  = $this->getStudioById($g['publisher_id']);
-            $g['pegi'] = $this->getPegiById($g['pegi_id']);
-}
+        $this->enrichGames($games);
         return $games;
     }
 
@@ -426,12 +455,7 @@ class Games extends Database {
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) $games[] = $row;
         $stmt->close();
-        foreach ($games as &$g) {
-            $g['categories'] = $this->getCategoriesForGame($g['id']);
-            $g['developer']  = $this->getStudioById($g['developer_id']);
-            $g['publisher']  = $this->getStudioById($g['publisher_id']);
-            $g['pegi'] = $this->getPegiById($g['pegi_id']);
-}
+        $this->enrichGames($games);
         return $games;
     }
 
@@ -451,12 +475,7 @@ class Games extends Database {
         }
         $stmt->close();
 
-        foreach ($games as &$game) {
-            $game['categories'] = $this->getCategoriesForGame($game['id']);
-            $game['developer'] = $this->getStudioById($game['developer_id']);
-            $game['publisher'] = $this->getStudioById($game['publisher_id']);
-            $game['pegi']    = $this->getPegiById($game['pegi_id']);
-        }
+        $this->enrichGames($games);
         return $games;
     }
 
@@ -500,12 +519,7 @@ class Games extends Database {
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) $games[] = $row;
         $stmt->close();
-        foreach ($games as &$g) {
-            $g['categories'] = $this->getCategoriesForGame($g['id']);
-            $g['developer']  = $this->getStudioById($g['developer_id']);
-            $g['publisher']  = $this->getStudioById($g['publisher_id']);
-            $g['pegi'] = $this->getPegiById($g['pegi_id']);
-}
+        $this->enrichGames($games);
         return $games;
     }
 
@@ -537,12 +551,7 @@ class Games extends Database {
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) $games[] = $row;
         $stmt->close();
-        foreach ($games as &$g) {
-            $g['categories'] = $this->getCategoriesForGame($g['id']);
-            $g['developer']  = $this->getStudioById($g['developer_id']);
-            $g['publisher']  = $this->getStudioById($g['publisher_id']);
-            $g['pegi'] = $this->getPegiById($g['pegi_id']);
-}
+        $this->enrichGames($games);
         return $games;
     }
 
@@ -566,12 +575,7 @@ class Games extends Database {
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()) $games[] = $row;
         $stmt->close();
-        foreach ($games as &$g) {
-            $g['categories'] = $this->getCategoriesForGame($g['id']);
-            $g['developer']  = $this->getStudioById($g['developer_id']);
-            $g['publisher']  = $this->getStudioById($g['publisher_id']);
-            $g['pegi'] = $this->getPegiById($g['pegi_id']);
-}
+        $this->enrichGames($games);
         return $games;
     }
 
@@ -591,12 +595,7 @@ class Games extends Database {
         }
         $stmt->close();
 
-        foreach ($games as &$game) {
-            $game['categories'] = $this->getCategoriesForGame($game['id']);
-            $game['developer'] = $this->getStudioById($game['developer_id']);
-            $game['publisher'] = $this->getStudioById($game['publisher_id']);
-            $game['pegi']    = $this->getPegiById($game['pegi_id']);
-        }
+        $this->enrichGames($games);
         return $games;
     }
 
@@ -622,12 +621,7 @@ class Games extends Database {
         }
         $stmt->close();
         $collections['novedades'] = $novedades;
-        foreach ($collections['novedades'] as &$g) {
-            $g['categories'] = $this->getCategoriesForGame($g['id']);
-            $g['developer'] = $this->getStudioById($g['developer_id']);
-            $g['publisher'] = $this->getStudioById($g['publisher_id']);
-            $g['pegi'] = $this->getPegiById($g['pegi_id']);
-}
+        $this->enrichGames($collections['novedades']);
 
         // Nuevos juegos (ordenados por release_date)
         $sql = "SELECT * FROM {$this->table} WHERE release_date IS NOT NULL ORDER BY release_date DESC LIMIT ?";
@@ -641,12 +635,7 @@ class Games extends Database {
         }
         $stmt->close();
         $collections['nuevos'] = $nuevos;
-        foreach ($collections['nuevos'] as &$g) {
-            $g['categories'] = $this->getCategoriesForGame($g['id']);
-            $g['developer'] = $this->getStudioById($g['developer_id']);
-            $g['publisher'] = $this->getStudioById($g['publisher_id']);
-            $g['pegi'] = $this->getPegiById($g['pegi_id']);
-}
+        $this->enrichGames($collections['nuevos']);
 
         // Most played
         $collections['most_played'] = $this->getMostPlayed($limit);
