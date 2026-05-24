@@ -5,7 +5,8 @@ RUN rm -f /etc/apache2/mods-enabled/mpm_*.conf \
           /etc/apache2/mods-enabled/mpm_*.load \
     && ln -s /etc/apache2/mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/mpm_prefork.conf \
     && ln -s /etc/apache2/mods-available/mpm_prefork.load /etc/apache2/mods-enabled/mpm_prefork.load \
-    && a2enmod rewrite
+    && a2enmod rewrite \
+    && apache2ctl configtest
 
 # Cambiar el DocumentRoot a /var/www/html/public
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
