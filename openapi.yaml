@@ -1284,7 +1284,6 @@ components:
           maxLength: 50
         password:
           type: string
-          minLength: 3
         email:
           type: string
           format: email

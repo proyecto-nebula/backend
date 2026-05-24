@@ -29,10 +29,15 @@ class Plans extends Database {
 	 */
 	private $allowedConditions_insert = array(
 		'name',
-		'description',
 		'price',
 		'quality',
-		'gpu'
+		'gpu',
+		'fps',
+		'priority',
+		'session_limit',
+		'storage',
+		'mods',
+		'audio'
 	);
 
 	/**
@@ -40,10 +45,10 @@ class Plans extends Database {
 	 */
 	private function validate($data) {
 
-		if (!isset($data['name']) || empty($data['name']) || !isset($data['description']) || empty($data['description']) || !isset($data['price']) || empty($data['price'])) {
+		if (!isset($data['name']) || empty($data['name']) || !isset($data['price']) || $data['price'] === '' || $data['price'] === null) {
 			$response = array(
 				'result' => 'error',
-				'details' => 'El campo nombre, descripcion, y precio son obligatorio'
+				'details' => 'El campo nombre y precio son obligatorios'
 			);
 
 			Response::result(400, $response);

@@ -37,7 +37,7 @@ CREATE TABLE `studios` (
 
 -- Pegi Ratings
 CREATE TABLE `pegi` (
-  `id` int NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL,
   `name` varchar(255) NOT NULL,
   `image_url` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -53,11 +53,16 @@ CREATE TABLE `roles` (
 -- Subscription Plans
 CREATE TABLE `plans` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) DEFAULT NULL,
-  `description` text,
-  `price` decimal(10,2) DEFAULT NULL,
-  `quality` varchar(10) DEFAULT NULL,
-  `gpu` varchar(100) DEFAULT NULL,
+  `name` varchar(50) NOT NULL,
+  `price` decimal(10,2) NOT NULL,
+  `quality` varchar(10) NOT NULL,
+  `gpu` varchar(100) NOT NULL,
+  `fps` int NOT NULL,
+  `priority` varchar(50) NOT NULL,
+  `session_limit` int DEFAULT NULL, -- NULL significará ilimitado
+  `storage` int NOT NULL,
+  `mods` varchar(50) NOT NULL,
+  `audio` varchar(50) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -325,14 +330,14 @@ INSERT INTO `pegi` (`id`, `name`, `image_url`) VALUES
 
 -- Roles
 INSERT INTO `roles` (`id`, `name`) VALUES
-(0, 'Administrador'),
-(1, 'Usuario');
+(1, 'Administrador'),
+(2, 'Usuario');
 
 -- Subscription Plans
-INSERT INTO `plans` (`id`, `name`, `description`, `price`, `quality`, `gpu`) VALUES
-(0, 'Gratis', 'Acceso limitado a juegos antiguos', 4.99, '720p', 'NVIDIA GeForce RTX 4090'),
-(1, 'Standar', 'Acceso a 200 juegos y descuentos exclusivos', 9.99, '1080p', 'NVIDIA GeForce RTX 5070ti'),
-(2, 'Premium', 'Acceso total a todo el catálogo y betas', 19.99, '4K', 'NVIDIA GeForce RTX 5090');
+INSERT INTO `plans` (`id`, `name`, `price`, `quality`, `gpu`, `fps`, `priority`, `session_limit`, `storage`, `mods`, `audio`) VALUES
+(1, 'Bronce', 4.99, '720p', 'NVIDIA GeForce RTX 4090', 60, 'Estándar', 3, 50, 'No disponible', 'Estéreo 2.0'),
+(2, 'Plata', 9.99, '1080p', 'NVIDIA GeForce RTX 5070ti', 120, 'Prioritario', 6, 200, 'Básico (Workshop)', 'Envolvente 5.1'),
+(3, 'Oro', 19.99, '4K', 'NVIDIA GeForce RTX 5090', 240, 'Instantáneo', NULL, 1000, 'Avanzado', 'Dolby Atmos 7.1');
 
 -- Games
 INSERT INTO `games` (`id`, `title`, `slug`, `is_active`, `is_featured`, `published_at`, `release_date`, `developer_id`, `publisher_id`, `steam_id`, `igdb_id`, `pegi_id`, `metacritic_score`, `cover_url`, `banner_url`, `hero_url`, `logo_url`, `summary`) VALUES
@@ -554,31 +559,29 @@ UPDATE `games` SET `description` = 'Zero Escape: The Nonary Games es una sobresa
 
 
 -- Users
-INSERT INTO `users` (`id`, `plan_id`, `role_id`, `username`, `password`, `token`, `email`, `birth_date`, `last_login_at`, `is_active`, `created_at`, `avatar_id`) VALUES
-(0, 2, 0, 'admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzM5MTAsImRhdGEiOnsiaWQiOiIwIiwibm9tYnJlIjoiYWRtaW5AZWplbXBsby5jb20ifX0.CiryWHQbch2W2xS982JCjdQRbKs1lJo8NSwIVtOAlKU', 'admin@ejemplo.com', '1990-05-15', '2026-04-03 19:34:55', 1, '2026-04-03 19:34:55', 4),
-(1, 0, 1, 'usuario', '9250e222c4c71f0c58d4c54b50a880a312e9f9fed55d5c3aa0b0e860ded99165', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzQwMTIsImRhdGEiOnsiaWQiOiIxIiwibm9tYnJlIjoidXN1YXJpb0B0ZXN0LmNvbSJ9fQ.Qw6ybv4POr1QIauFET8F1KBemdKw5dY6m1UtaJPESZE', 'usuario@test.com', '1995-08-22', '2026-04-07 11:35:29', 1, '2026-04-07 11:35:29', 5);
+INSERT INTO `users` (`id`, `role_id`, `plan_id`, `username`, `email`, `password`, `token`, `birth_date`, `last_login_at`, `is_active`, `created_at`, `avatar_id`) VALUES
+(1, 1, null, 'admin', 'admin@nebula.com', '2000-01-01', '16d74232d666243e3dd9711daaef2b7538f849efaa62cf19f91a97e82c420e34', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzM5MTAsImRhdGEiOnsiaWQiOiIwIiwibm9tYnJlIjoiYWRtaW5AZWplbXBsby5jb20ifX0.CiryWHQbch2W2xS982JCjdQRbKs1lJo8NSwIVtOAlKU', '2026-04-03 19:34:55', 1, '2026-04-03 19:34:55', 4),
+(2, 2, 1, 'Angel', 'angel@nebula.com', '2005-01-01', '16d74232d666243e3dd9711daaef2b7538f849efaa62cf19f91a97e82c420e34', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzQwMTIsImRhdGEiOnsiaWQiOiIxIiwibm9tYnJlIjoidXN1YXJpb0B0ZXN0LmNvbSJ9fQ.Qw6ybv4POr1QIauFET8F1KBemdKw5dY6m1UtaJPESZE', '2026-04-07 11:35:29', 1, '2026-04-07 11:35:29', 3),
+(3, 2, 2, 'MD', 'md@nebula.com', '2010-01-01', '16d74232d666243e3dd9711daaef2b7538f849efaa62cf19f91a97e82c420e34', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzQwMTIsImRhdGEiOnsiaWQiOiIxIiwibm9tYnJlIjoidXN1YXJpb0B0ZXN0LmNvbSJ9fQ.Qw6ybv4POr1QIauFET8F1KBemdKw5dY6m1UtaJPESZE', '2026-04-07 11:35:29', 1, '2026-04-07 11:35:29', 23),
+(4, 2, 3, 'Iván', 'ivan@nebula.com', '2015-01-01', '16d74232d666243e3dd9711daaef2b7538f849efaa62cf19f91a97e82c420e34', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzQwMTIsImRhdGEiOnsiaWQiOiIxIiwibm9tYnJlIjoidXN1YXJpb0B0ZXN0LmNvbSJ9fQ.Qw6ybv4POr1QIauFET8F1KBemdKw5dY6m1UtaJPESZE', '2026-04-07 11:35:29', 1, '2026-04-07 11:35:29', 1);
 
 -- Favorites (Pivot Table)
 INSERT INTO `favorites` (`user_id`, `game_id`) VALUES
-(0, 1),
+(1, 1),
 (1, 2),
 (1, 3),
-(0, 4),
-(0, 7),
-(0, 9),
-(0, 10),
-(1, 11),
-(1, 13),
-(0, 15),
-(1, 17),
-(1, 18),
-(1, 95),
-(1, 98),
-(1, 99),
-(0, 101),
-(1, 102),
-(0, 105),
-(1, 108);
+(1, 4),
+(1, 7),
+(2, 9),
+(2, 10),
+(2, 11),
+(2, 13),
+(2, 15),
+(3, 17),
+(3, 18),
+(3, 95),
+(3, 98),
+(3, 100);
 
 -- Game Categories (Pivot Table)
 -- Categorías referencia: 1: Acción, 2: Aventura, 3: Estrategia, 4: RPG, 5: Simulación, 7: Indie, 8: Arcade
