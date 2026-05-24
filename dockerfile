@@ -12,7 +12,17 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.
 # Instalar extensiones necesarias
 RUN docker-php-ext-install mysqli && docker-php-ext-enable mysqli
 
+# Instalar unzip (requerido por Composer para extraer paquetes)
+RUN apt-get update && apt-get install -y unzip && rm -rf /var/lib/apt/lists/*
+
+# Instalar Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
 WORKDIR /var/www/html
 
 RUN cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini \
     && sed -i 's/variables_order = "GPCS"/variables_order = "EGPCS"/' /usr/local/etc/php/php.ini
+
+# Instalar dependencias PHP (capa separada para aprovechar la caché de Docker)
+COPY composer.json composer.lock* ./
+RUN composer install --no-dev --optimize-autoloader --no-interaction

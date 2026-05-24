@@ -559,8 +559,8 @@ UPDATE `games` SET `description` = 'Zero Escape: The Nonary Games es una sobresa
 
 
 -- Users
-INSERT INTO `users` (`id`, `role_id`, `plan_id`, `username`, `email`, `password`, `token`, `birth_date`, `last_login_at`, `is_active`, `created_at`, `avatar_id`) VALUES
-(1, 1, null, 'admin', 'admin@nebula.com', '2000-01-01', '16d74232d666243e3dd9711daaef2b7538f849efaa62cf19f91a97e82c420e34', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzM5MTAsImRhdGEiOnsiaWQiOiIwIiwibm9tYnJlIjoiYWRtaW5AZWplbXBsby5jb20ifX0.CiryWHQbch2W2xS982JCjdQRbKs1lJo8NSwIVtOAlKU', '2026-04-03 19:34:55', 1, '2026-04-03 19:34:55', 4),
+INSERT INTO `users` (`id`, `role_id`, `plan_id`, `username`, `email`, `birth_date`, `password`, `token`, `last_login_at`, `is_active`, `created_at`, `avatar_id`) VALUES
+(1, 1, null, 'ADMIN', 'admin@nebula.com', '2000-01-01', '16d74232d666243e3dd9711daaef2b7538f849efaa62cf19f91a97e82c420e34', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzM5MTAsImRhdGEiOnsiaWQiOiIwIiwibm9tYnJlIjoiYWRtaW5AZWplbXBsby5jb20ifX0.CiryWHQbch2W2xS982JCjdQRbKs1lJo8NSwIVtOAlKU', '2026-04-03 19:34:55', 1, '2026-04-03 19:34:55', 4),
 (2, 2, 1, 'Angel', 'angel@nebula.com', '2005-01-01', '16d74232d666243e3dd9711daaef2b7538f849efaa62cf19f91a97e82c420e34', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzQwMTIsImRhdGEiOnsiaWQiOiIxIiwibm9tYnJlIjoidXN1YXJpb0B0ZXN0LmNvbSJ9fQ.Qw6ybv4POr1QIauFET8F1KBemdKw5dY6m1UtaJPESZE', '2026-04-07 11:35:29', 1, '2026-04-07 11:35:29', 3),
 (3, 2, 2, 'MD', 'md@nebula.com', '2010-01-01', '16d74232d666243e3dd9711daaef2b7538f849efaa62cf19f91a97e82c420e34', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzQwMTIsImRhdGEiOnsiaWQiOiIxIiwibm9tYnJlIjoidXN1YXJpb0B0ZXN0LmNvbSJ9fQ.Qw6ybv4POr1QIauFET8F1KBemdKw5dY6m1UtaJPESZE', '2026-04-07 11:35:29', 1, '2026-04-07 11:35:29', 23),
 (4, 2, 3, 'Iván', 'ivan@nebula.com', '2015-01-01', '16d74232d666243e3dd9711daaef2b7538f849efaa62cf19f91a97e82c420e34', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzQwMTIsImRhdGEiOnsiaWQiOiIxIiwibm9tYnJlIjoidXN1YXJpb0B0ZXN0LmNvbSJ9fQ.Qw6ybv4POr1QIauFET8F1KBemdKw5dY6m1UtaJPESZE', '2026-04-07 11:35:29', 1, '2026-04-07 11:35:29', 1);
