@@ -30,4 +30,9 @@ RUN cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini \
 
 # Instalar dependencias PHP (capa separada para aprovechar la caché de Docker)
 COPY composer.json composer.lock* ./
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
+# 1. Copiar el resto del código fuente del proyecto al contenedor
+COPY . .
+
+# 2. Ajustar los permisos para que Apache pueda acceder y servir los archivos
+RUN chown -R www-data:www-data /var/www/html
