@@ -1,12 +1,7 @@
 FROM php:8.2-apache-bullseye
 
-# Garantizar un único MPM: eliminar TODOS los symlinks mpm_* y recrear solo prefork
-RUN rm -f /etc/apache2/mods-enabled/mpm_*.conf \
-          /etc/apache2/mods-enabled/mpm_*.load \
-    && ln -s /etc/apache2/mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/mpm_prefork.conf \
-    && ln -s /etc/apache2/mods-available/mpm_prefork.load /etc/apache2/mods-enabled/mpm_prefork.load \
-    && a2enmod rewrite \
-    && apache2ctl configtest
+# Habilitar mod_rewrite
+RUN a2enmod rewrite
 
 # Cambiar el DocumentRoot a /var/www/html/public
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
@@ -31,8 +26,13 @@ RUN cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini \
 # Instalar dependencias PHP (capa separada para aprovechar la caché de Docker)
 COPY composer.json composer.lock* ./
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
-# 1. Copiar el resto del código fuente del proyecto al contenedor
+# Copiar el resto del código fuente del proyecto al contenedor
 COPY . .
 
-# 2. Ajustar los permisos para que Apache pueda acceder y servir los archivos
+# Ajustar los permisos para que Apache pueda acceder y servir los archivos
 RUN chown -R www-data:www-data /var/www/html
+
+# Entrypoint personalizado: garantiza que solo mpm_prefork esté activo en Railway
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+CMD ["/usr/local/bin/docker-entrypoint.sh"]
