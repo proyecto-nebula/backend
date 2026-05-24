@@ -1,7 +1,8 @@
 FROM php:8.2-apache
 
-# Habilitar mod_rewrite para el .htaccess
-RUN a2enmod rewrite
+# Garantizar un único MPM (Railway puede activar mpm_event además del prefork de la imagen)
+RUN a2dismod mpm_event mpm_worker 2>/dev/null || true \
+    && a2enmod mpm_prefork rewrite
 
 # Cambiar el DocumentRoot a /var/www/html/public
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
