@@ -220,6 +220,13 @@ class Games extends Database {
         $this->filtrarParametros($params, $this->allowedConditions_get);
 
         if (isset($params['slug'])) {
+            $view     = $params['view'] ?? '';
+            $cacheKey = 'game_slug_' . $params['slug'] . ($view ? "_{$view}" : '');
+            $ttl      = ($view === 'detail') ? 1800 : 600;
+            if (function_exists('apcu_fetch')) {
+                $success = false; $hit = apcu_fetch($cacheKey, $success);
+                if ($success) return $hit;
+            }
             $items = parent::getDB($this->table, ['slug' => $params['slug']]);
             if (count($items) > 0) {
                 $game = $items[0];
@@ -238,6 +245,7 @@ class Games extends Database {
                         }
                     }
                 }
+                if (function_exists('apcu_store')) apcu_store($cacheKey, $game, $ttl);
                 return $game;
             } else {
                 return null;
@@ -245,6 +253,13 @@ class Games extends Database {
         }
 
         if (isset($params['id'])) {
+            $view     = $params['view'] ?? '';
+            $cacheKey = 'game_id_' . $params['id'] . ($view ? "_{$view}" : '');
+            $ttl      = ($view === 'detail') ? 1800 : 600;
+            if (function_exists('apcu_fetch')) {
+                $success = false; $hit = apcu_fetch($cacheKey, $success);
+                if ($success) return $hit;
+            }
             $items = parent::getDB($this->table, ['id' => $params['id']]);
             if (count($items) > 0) {
                 $game = $items[0];
@@ -262,6 +277,7 @@ class Games extends Database {
                         }
                     }
                 }
+                if (function_exists('apcu_store')) apcu_store($cacheKey, $game, $ttl);
                 return $game;
             } else {
                 return null;
@@ -298,6 +314,7 @@ class Games extends Database {
         $this->filtrarParametros($params, $this->allowedConditions_insert);
         if ($this->validate($params)) {
             $result = parent::insertDB($this->table, $params);
+            if (function_exists('apcu_clear_cache')) apcu_clear_cache();
             return $result;
         }
     }
@@ -310,6 +327,7 @@ class Games extends Database {
                 Response::error('Error al actualizar el juego en la base de datos', 500);
                 exit;
             }
+            if (function_exists('apcu_clear_cache')) apcu_clear_cache();
             // affected_rows === 0 means data was identical — still a valid success
         }
     }
@@ -321,6 +339,7 @@ class Games extends Database {
             Response::result(200, array('result' => 'error', 'details' => 'No hubo cambios'));
             exit;
         }
+        if (function_exists('apcu_clear_cache')) apcu_clear_cache();
     }
 
     public function delete($id) {
@@ -329,9 +348,15 @@ class Games extends Database {
             Response::result(200, array('result' => 'error', 'details' => 'No hubo cambios'));
             exit;
         }
+        if (function_exists('apcu_clear_cache')) apcu_clear_cache();
     }
 
     private function getMostPlayedInPeriod(string $interval, int $limit = 10): array {
+        $cacheKey = 'trending_' . str_replace(' ', '_', $interval) . "_{$limit}";
+        if (function_exists('apcu_fetch')) {
+            $success = false; $hit = apcu_fetch($cacheKey, $success);
+            if ($success) return $hit;
+        }
         $conn = $this->getConnection();
         $sql  = "SELECT g.*, SUM(COALESCE(s.duration, 0)) AS total_duration
                  FROM {$this->table} g
@@ -348,10 +373,16 @@ class Games extends Database {
         while ($row = $result->fetch_assoc()) $games[] = $row;
         $stmt->close();
         $this->enrichGames($games);
+        if (function_exists('apcu_store')) apcu_store($cacheKey, $games, 300);
         return $games;
     }
 
     private function getMostFavorited(int $limit = 10): array {
+        $cacheKey = "most_favorited_{$limit}";
+        if (function_exists('apcu_fetch')) {
+            $success = false; $hit = apcu_fetch($cacheKey, $success);
+            if ($success) return $hit;
+        }
         $conn = $this->getConnection();
         $sql  = "SELECT g.*, COUNT(f.user_id) AS favorite_count
                  FROM {$this->table} g
@@ -367,10 +398,16 @@ class Games extends Database {
         while ($row = $result->fetch_assoc()) $games[] = $row;
         $stmt->close();
         $this->enrichGames($games);
+        if (function_exists('apcu_store')) apcu_store($cacheKey, $games, 300);
         return $games;
     }
 
     private function getRecentlyPublished(int $limit = 10): array {
+        $cacheKey = "recently_published_{$limit}";
+        if (function_exists('apcu_fetch')) {
+            $success = false; $hit = apcu_fetch($cacheKey, $success);
+            if ($success) return $hit;
+        }
         $conn = $this->getConnection();
         $sql  = "SELECT * FROM {$this->table} WHERE published_at IS NOT NULL ORDER BY published_at DESC LIMIT ?";
         $stmt = $conn->prepare($sql);
@@ -381,10 +418,16 @@ class Games extends Database {
         while ($row = $result->fetch_assoc()) $games[] = $row;
         $stmt->close();
         $this->enrichGames($games);
+        if (function_exists('apcu_store')) apcu_store($cacheKey, $games, 300);
         return $games;
     }
 
     private function getNewReleases(int $limit = 10): array {
+        $cacheKey = "new_releases_{$limit}";
+        if (function_exists('apcu_fetch')) {
+            $success = false; $hit = apcu_fetch($cacheKey, $success);
+            if ($success) return $hit;
+        }
         $conn = $this->getConnection();
         $sql  = "SELECT * FROM {$this->table} WHERE release_date IS NOT NULL ORDER BY release_date DESC LIMIT ?";
         $stmt = $conn->prepare($sql);
@@ -395,6 +438,7 @@ class Games extends Database {
         while ($row = $result->fetch_assoc()) $games[] = $row;
         $stmt->close();
         $this->enrichGames($games);
+        if (function_exists('apcu_store')) apcu_store($cacheKey, $games, 300);
         return $games;
     }
 
@@ -463,6 +507,11 @@ class Games extends Database {
      * Devuelve los juegos más reproducidos (por duración total de sesiones)
      */
     public function getMostPlayed($limit = 10) {
+        $cacheKey = "most_played_{$limit}";
+        if (function_exists('apcu_fetch')) {
+            $success = false; $hit = apcu_fetch($cacheKey, $success);
+            if ($success) return $hit;
+        }
         $conn = $this->getConnection();
         $sql = "SELECT g.*, SUM(COALESCE(s.duration, 0)) AS total_duration FROM {$this->table} g JOIN sessions s ON s.game_id = g.id GROUP BY g.id ORDER BY total_duration DESC LIMIT ?";
         $stmt = $conn->prepare($sql);
@@ -474,8 +523,8 @@ class Games extends Database {
             $games[] = $row;
         }
         $stmt->close();
-
         $this->enrichGames($games);
+        if (function_exists('apcu_store')) apcu_store($cacheKey, $games, 300);
         return $games;
     }
 
@@ -583,6 +632,11 @@ class Games extends Database {
      * Devuelve los juegos marcados como destacados
      */
     public function getFeatured($limit = 10) {
+        $cacheKey = "featured_{$limit}";
+        if (function_exists('apcu_fetch')) {
+            $success = false; $hit = apcu_fetch($cacheKey, $success);
+            if ($success) return $hit;
+        }
         $conn = $this->getConnection();
         $sql = "SELECT * FROM {$this->table} WHERE is_featured = 1 ORDER BY published_at DESC LIMIT ?";
         $stmt = $conn->prepare($sql);
@@ -594,8 +648,8 @@ class Games extends Database {
             $games[] = $row;
         }
         $stmt->close();
-
         $this->enrichGames($games);
+        if (function_exists('apcu_store')) apcu_store($cacheKey, $games, 300);
         return $games;
     }
 
