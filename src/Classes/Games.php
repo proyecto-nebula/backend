@@ -220,13 +220,7 @@ class Games extends Database {
         $this->filtrarParametros($params, $this->allowedConditions_get);
 
         if (isset($params['slug'])) {
-            $view     = $params['view'] ?? '';
-            $cacheKey = 'game_slug_' . $params['slug'] . ($view ? "_{$view}" : '');
-            $ttl      = ($view === 'detail') ? 1800 : 600;
-            if (function_exists('apcu_fetch')) {
-                $success = false; $hit = apcu_fetch($cacheKey, $success);
-                if ($success) return $hit;
-            }
+            $view  = $params['view'] ?? '';
             $items = parent::getDB($this->table, ['slug' => $params['slug']]);
             if (count($items) > 0) {
                 $game = $items[0];
@@ -245,7 +239,6 @@ class Games extends Database {
                         }
                     }
                 }
-                if (function_exists('apcu_store')) apcu_store($cacheKey, $game, $ttl);
                 return $game;
             } else {
                 return null;
@@ -253,13 +246,7 @@ class Games extends Database {
         }
 
         if (isset($params['id'])) {
-            $view     = $params['view'] ?? '';
-            $cacheKey = 'game_id_' . $params['id'] . ($view ? "_{$view}" : '');
-            $ttl      = ($view === 'detail') ? 1800 : 600;
-            if (function_exists('apcu_fetch')) {
-                $success = false; $hit = apcu_fetch($cacheKey, $success);
-                if ($success) return $hit;
-            }
+            $view  = $params['view'] ?? '';
             $items = parent::getDB($this->table, ['id' => $params['id']]);
             if (count($items) > 0) {
                 $game = $items[0];
@@ -277,7 +264,6 @@ class Games extends Database {
                         }
                     }
                 }
-                if (function_exists('apcu_store')) apcu_store($cacheKey, $game, $ttl);
                 return $game;
             } else {
                 return null;
