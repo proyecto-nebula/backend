@@ -23,7 +23,10 @@ WORKDIR /var/www/html
 RUN cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini \
     && sed -i 's/variables_order = "GPCS"/variables_order = "EGPCS"/' /usr/local/etc/php/php.ini \
     && docker-php-ext-enable opcache \
-    && printf '[opcache]\nopcache.enable=1\nopcache.memory_consumption=128\nopcache.max_accelerated_files=4000\nopcache.revalidate_freq=60\n' > /usr/local/etc/php/conf.d/opcache.ini
+    && printf '[opcache]\nopcache.enable=1\nopcache.memory_consumption=128\nopcache.max_accelerated_files=4000\nopcache.revalidate_freq=60\n' > /usr/local/etc/php/conf.d/opcache.ini \
+    && pecl install apcu \
+    && docker-php-ext-enable apcu \
+    && printf '[apcu]\napc.enable=1\napc.enable_cli=1\napc.shm_size=64M\n' > /usr/local/etc/php/conf.d/apcu.ini
 
 # Instalar dependencias PHP (capa separada para aprovechar la caché de Docker)
 COPY composer.json composer.lock* ./

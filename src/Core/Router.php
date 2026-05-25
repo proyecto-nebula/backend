@@ -72,6 +72,12 @@ class Router {
             return;
         }
 
+        // Cache HTTP para recursos que no varían por usuario
+        $cacheableResources = ['games', 'categories', 'pegi', 'plans', 'studios', 'screenshots', 'avatars', 'roles'];
+        if ($_SERVER['REQUEST_METHOD'] === 'GET' && in_array($resource, $cacheableResources)) {
+            header('Cache-Control: private, max-age=300');
+        }
+
         require_once $realFile;
     }
 }
