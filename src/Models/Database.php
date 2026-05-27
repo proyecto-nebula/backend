@@ -46,37 +46,46 @@ class Database
 	public function getDB($table, $extra = null)
 	{
 		$page = 0;
-		$query = "SELECT * FROM $table";
+		$safeTable = str_replace('`', '', $table);
+		$query = "SELECT * FROM `$safeTable`";
+		$types = '';
+		$bindings = [];
 
 		if (isset($extra['page'])) {
-			$page = $extra['page'];
+			$page = (int) $extra['page'];
 			unset($extra['page']);
 		}
 
-		if ($extra != null) {
-			$query .= ' WHERE';
-
+		if (!empty($extra)) {
+			$conditions = [];
 			foreach ($extra as $key => $condition) {
-				$query .= ' ' . $key . ' = "' . $condition . '"';
-				if ($extra[$key] != end($extra)) {
-					$query .= " AND ";
-				}
+				$safeKey = str_replace('`', '', $key);
+				$conditions[] = "`$safeKey` = ?";
+				$types .= 's';
+				$bindings[] = $condition;
 			}
+			$query .= ' WHERE ' . implode(' AND ', $conditions);
 		}
 
 		/**
 		 * Aquí se paginan los resultados para evitar recuperar todos los registros de una tabla que contenga muchísimos
 		 */
-		if ($page > 0) {
-			$since = (($page - 1) * $this->results_page);
-			$query .= " LIMIT $since, $this->results_page";
-		} else {
-			$query .= " LIMIT 0, $this->results_page";
+		$since = $page > 0 ? ($page - 1) * $this->results_page : 0;
+		$query .= ' LIMIT ?, ?';
+		$types .= 'ii';
+		$bindings[] = $since;
+		$bindings[] = $this->results_page;
+
+		$stmt = $this->connection->prepare($query);
+		if (!$stmt) {
+			throw new \Exception('Error en prepare: ' . $this->connection->error);
 		}
+		$stmt->bind_param($types, ...$bindings);
+		$stmt->execute();
+		$results = $stmt->get_result();
+		$stmt->close();
 
-		$results = $this->connection->query($query);
-		$resultArray = array();
-
+		$resultArray = [];
 		foreach ($results as $value) {
 			$resultArray[] = $value;
 		}
@@ -88,19 +97,35 @@ class Database
 	 */
 	public function getAllDB($table, $extra = null)
 	{
-		$query = "SELECT * FROM $table";
+		$safeTable = str_replace('`', '', $table);
+		$query = "SELECT * FROM `$safeTable`";
+		$types = '';
+		$bindings = [];
 
-		if ($extra != null) {
-			$query .= ' WHERE';
+		if (!empty($extra)) {
+			$conditions = [];
 			foreach ($extra as $key => $condition) {
-				$query .= ' ' . $key . ' = "' . $condition . '"';
-				if ($extra[$key] != end($extra)) {
-					$query .= " AND ";
-				}
+				$safeKey = str_replace('`', '', $key);
+				$conditions[] = "`$safeKey` = ?";
+				$types .= 's';
+				$bindings[] = $condition;
 			}
+			$query .= ' WHERE ' . implode(' AND ', $conditions);
 		}
 
-		$results = $this->connection->query($query);
+		if (!empty($bindings)) {
+			$stmt = $this->connection->prepare($query);
+			if (!$stmt) {
+				throw new \Exception('Error en prepare: ' . $this->connection->error);
+			}
+			$stmt->bind_param($types, ...$bindings);
+			$stmt->execute();
+			$results = $stmt->get_result();
+			$stmt->close();
+		} else {
+			$results = $this->connection->query($query);
+		}
+
 		$resultArray = [];
 		foreach ($results as $value) {
 			$resultArray[] = $value;
@@ -181,14 +206,19 @@ class Database
 	 */
 	public function deleteDB($table, $id, $pk)
 	{
-		$query = "DELETE FROM $table WHERE $pk = $id";
-		$this->connection->query($query);
-
-		if (!$this->connection->affected_rows) {
-			return 0;
+		$safeTable = str_replace('`', '', $table);
+		$safePk    = str_replace('`', '', $pk);
+		$query = "DELETE FROM `$safeTable` WHERE `$safePk` = ?";
+		$stmt = $this->connection->prepare($query);
+		if (!$stmt) {
+			throw new \Exception('Error en prepare: ' . $this->connection->error);
 		}
+		$stmt->bind_param('i', $id);
+		$stmt->execute();
+		$affected = $stmt->affected_rows;
+		$stmt->close();
 
-		return $this->connection->affected_rows;
+		return $affected > 0 ? $affected : 0;
 	}
 
 	public function getConnection() {

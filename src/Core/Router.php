@@ -49,6 +49,13 @@ class Router {
             return;
         }
 
+        // Bloquear endpoints de debug/test en producción
+        $debugEndpoints = ['test', 'test_encoding', 'test_db_encoding_api'];
+        if (getenv('APP_ENV') === 'production' && in_array($resource, $debugEndpoints, true)) {
+            Response::error('Recurso no válido', 404);
+            return;
+        }
+
         if ($id) {
             $_GET['id'] = intval($id);
         }
@@ -72,11 +79,10 @@ class Router {
             return;
         }
 
-        // Cache HTTP para recursos que no varían por usuario (solo peticiones anónimas)
+        // Cache HTTP para recursos que no varían por usuario
         $cacheableResources = ['games', 'categories', 'pegi', 'plans', 'studios', 'screenshots', 'avatars', 'roles'];
         if ($_SERVER['REQUEST_METHOD'] === 'GET' && in_array($resource, $cacheableResources)) {
-            $isAuthenticated = !empty($_SERVER['HTTP_AUTHORIZATION']);
-            header($isAuthenticated ? 'Cache-Control: no-cache, must-revalidate' : 'Cache-Control: private, max-age=300');
+            header('Cache-Control: private, max-age=300');
         }
 
         require_once $realFile;

@@ -17,6 +17,7 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - IGDB_CLIENT_ID=${IGDB_CLIENT_ID}
       - IGDB_CLIENT_SECRET=${IGDB_CLIENT_SECRET}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
     depends_on:
       - db
 

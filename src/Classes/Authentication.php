@@ -26,6 +26,15 @@ class Authentication extends AuthModel
      */
     public function signIn($user)
     {
+        // Rate limiting basado en sesión contra fuerza bruta
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        if (isset($_SESSION['lockout_time']) && (time() - $_SESSION['lockout_time']) < 60) {
+            Response::error('Demasiados intentos. Inténtelo de nuevo en 1 minuto.', 429);
+            exit;
+        }
+
         if(!isset($user['email']) || !isset($user['password']) || empty($user['email']) || empty($user['password'])){
             $response = array(
                 'result' => 'error',
@@ -41,6 +50,12 @@ class Authentication extends AuthModel
         $result = parent::login($user['email'], hash('sha256' , $user['password']));
 
         if(sizeof($result) == 0){
+            // Incrementar contador de intentos fallidos
+            $_SESSION['login_attempts'] = ($_SESSION['login_attempts'] ?? 0) + 1;
+            if ($_SESSION['login_attempts'] >= 5) {
+                $_SESSION['lockout_time'] = time();
+                $_SESSION['login_attempts'] = 0;
+            }
             $response = array(
                 'result' => 'error',
                 'details' => 'El email y/o la contraseña son incorrectas'
@@ -50,8 +65,12 @@ class Authentication extends AuthModel
             exit;
         }
 
+        // Resetear contador en login exitoso
+        unset($_SESSION['login_attempts'], $_SESSION['lockout_time']);
+
         $dataToken = array(
             'iat' => time(),
+            'exp' => time() + $this->tokenTtlSeconds,
             'data' => array(
                 'id' => $result[0]['id'],
                 'email' => $result[0]['email']

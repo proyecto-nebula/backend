@@ -49,6 +49,11 @@ final class JwtService
             throw new \InvalidArgumentException('Invalid token payload');
         }
 
+        // Validar claim exp si está presente
+        if (isset($payload['exp']) && time() > (int) $payload['exp']) {
+            throw new \InvalidArgumentException('Token has expired');
+        }
+
         return $payload;
     }
 
