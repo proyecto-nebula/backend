@@ -10,7 +10,7 @@ class Router {
     private static $endpoints = [
         'users', 'games', 'avatars', 'screenshots', 'categories',
         'studios', 'favorites', 'game_categories', 'sessions',
-        'pegi', 'roles', 'plans', 'auth', 'reports',
+        'pegi', 'roles', 'plans', 'auth', 'reports', 'logs',
         'test', 'test_encoding', 'test_db_encoding_api'
     ];
 
