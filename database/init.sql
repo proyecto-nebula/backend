@@ -354,7 +354,8 @@ INSERT INTO `pegi` (`id`, `name`, `image_url`) VALUES
 -- Roles
 INSERT INTO `roles` (`id`, `name`) VALUES
 (1, 'Administrador'),
-(2, 'Usuario');
+(2, 'Editor'),
+(3, 'Usuario');
 
 -- Subscription Plans
 INSERT INTO `plans` (`id`, `name`, `price`, `quality`, `gpu`, `fps`, `priority`, `session_limit`, `storage`, `mods`, `audio`) VALUES
@@ -584,27 +585,28 @@ UPDATE `games` SET `description` = 'Zero Escape: The Nonary Games es una sobresa
 -- Users
 INSERT INTO `users` (`id`, `role_id`, `plan_id`, `username`, `email`, `birth_date`, `password`, `token`, `last_login_at`, `is_active`, `created_at`, `avatar_id`) VALUES
 (1, 1, null, 'ADMIN', 'admin@nebula.com', '2000-01-01', '16d74232d666243e3dd9711daaef2b7538f849efaa62cf19f91a97e82c420e34', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzM5MTAsImRhdGEiOnsiaWQiOiIwIiwibm9tYnJlIjoiYWRtaW5AZWplbXBsby5jb20ifX0.CiryWHQbch2W2xS982JCjdQRbKs1lJo8NSwIVtOAlKU', '2026-04-03 19:34:55', 1, '2026-04-03 19:34:55', 4),
-(2, 2, 1, 'Angel', 'angel@nebula.com', '2005-01-01', '16d74232d666243e3dd9711daaef2b7538f849efaa62cf19f91a97e82c420e34', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzQwMTIsImRhdGEiOnsiaWQiOiIxIiwibm9tYnJlIjoidXN1YXJpb0B0ZXN0LmNvbSJ9fQ.Qw6ybv4POr1QIauFET8F1KBemdKw5dY6m1UtaJPESZE', '2026-04-07 11:35:29', 1, '2026-04-07 11:35:29', 3),
-(3, 2, 2, 'MD', 'md@nebula.com', '2010-01-01', '16d74232d666243e3dd9711daaef2b7538f849efaa62cf19f91a97e82c420e34', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzQwMTIsImRhdGEiOnsiaWQiOiIxIiwibm9tYnJlIjoidXN1YXJpb0B0ZXN0LmNvbSJ9fQ.Qw6ybv4POr1QIauFET8F1KBemdKw5dY6m1UtaJPESZE', '2026-04-07 11:35:29', 1, '2026-04-07 11:35:29', 23),
-(4, 2, 3, 'Iván', 'ivan@nebula.com', '2015-01-01', '16d74232d666243e3dd9711daaef2b7538f849efaa62cf19f91a97e82c420e34', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzQwMTIsImRhdGEiOnsiaWQiOiIxIiwibm9tYnJlIjoidXN1YXJpb0B0ZXN0LmNvbSJ9fQ.Qw6ybv4POr1QIauFET8F1KBemdKw5dY6m1UtaJPESZE', '2026-04-07 11:35:29', 1, '2026-04-07 11:35:29', 1);
+(2, 2, null, 'EDITOR', 'editor@nebula.com', '2005-01-01', '16d74232d666243e3dd9711daaef2b7538f849efaa62cf19f91a97e82c420e34', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzQwMTIsImRhdGEiOnsiaWQiOiIxIiwibm9tYnJlIjoidXN1YXJpb0B0ZXN0LmNvbSJ9fQ.Qw6ybv4POr1QIauFET8F1KBemdKw5dY6m1UtaJPESZE', '2026-04-07 11:35:29', 1, '2026-04-07 11:35:29', 3),
+(3, 3, 1, 'Angel', 'angel@nebula.com', '2005-01-01', '16d74232d666243e3dd9711daaef2b7538f849efaa62cf19f91a97e82c420e34', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzQwMTIsImRhdGEiOnsiaWQiOiIxIiwibm9tYnJlIjoidXN1YXJpb0B0ZXN0LmNvbSJ9fQ.Qw6ybv4POr1QIauFET8F1KBemdKw5dY6m1UtaJPESZE', '2026-04-07 11:35:29', 1, '2026-04-07 11:35:29', 3),
+(4, 3, 2, 'MD', 'md@nebula.com', '2010-01-01', '16d74232d666243e3dd9711daaef2b7538f849efaa62cf19f91a97e82c420e34', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzQwMTIsImRhdGEiOnsiaWQiOiIxIiwibm9tYnJlIjoidXN1YXJpb0B0ZXN0LmNvbSJ9fQ.Qw6ybv4POr1QIauFET8F1KBemdKw5dY6m1UtaJPESZE', '2026-04-07 11:35:29', 1, '2026-04-07 11:35:29', 23),
+(5, 3, 3, 'Iván', 'ivan@nebula.com', '2015-01-01', '16d74232d666243e3dd9711daaef2b7538f849efaa62cf19f91a97e82c420e34', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3NzU2NzQwMTIsImRhdGEiOnsiaWQiOiIxIiwibm9tYnJlIjoidXN1YXJpb0B0ZXN0LmNvbSJ9fQ.Qw6ybv4POr1QIauFET8F1KBemdKw5dY6m1UtaJPESZE', '2026-04-07 11:35:29', 1, '2026-04-07 11:35:29', 1);
 
 -- Favorites (Pivot Table)
 INSERT INTO `favorites` (`user_id`, `game_id`) VALUES
-(1, 1),
-(1, 2),
-(1, 3),
-(1, 4),
-(1, 7),
-(2, 9),
-(2, 10),
-(2, 11),
-(2, 13),
-(2, 15),
-(3, 17),
-(3, 18),
-(3, 95),
-(3, 98),
-(3, 100);
+(3, 1),
+(3, 2),
+(3, 3),
+(3, 4),
+(3, 7),
+(4, 9),
+(4, 10),
+(4, 11),
+(4, 13),
+(4, 15),
+(5, 17),
+(5, 18),
+(5, 95),
+(5, 98),
+(5, 100);
 
 -- Game Categories (Pivot Table)
 -- Categorías referencia: 1: Acción, 2: Aventura, 3: Estrategia, 4: RPG, 5: Simulación, 7: Indie, 8: Arcade
@@ -720,31 +722,31 @@ INSERT INTO `game_categories` (`game_id`, `category_id`) VALUES
 
 -- Play Sessions
 INSERT INTO `sessions` (`id`, `user_id`, `game_id`, `started_at`, `duration`) VALUES
-(1, NULL, 1, '2026-01-10 10:00:00', 1800),
-(2, NULL, 2, '2026-01-12 15:30:00', 3600),
-(3, NULL, 3, '2026-01-15 20:00:00', 2700),
-(4, NULL, 4, '2026-01-18 12:45:00', 4320),
-(5, NULL, 5, '2026-01-20 18:00:00', 900),
-(6, NULL, 6, '2026-01-22 09:00:00', 1200),
-(7, NULL, 7, '2026-01-25 21:15:00', 2100),
-(8, NULL, 8, '2026-01-28 14:20:00', 480),
-(9, NULL, 9, '2026-02-01 19:30:00', 3360),
-(10, NULL, 10, '2026-02-03 11:00:00', 4800),
-(11, NULL, 11, '2026-02-05 22:00:00', 4200),
-(12, NULL, 12, '2026-02-07 08:00:00', 1320),
-(13, NULL, 13, '2026-02-10 17:45:00', 1080),
-(14, NULL, 14, '2026-02-12 13:00:00', 240),
-(15, NULL, 15, '2026-02-14 20:30:00', 2520),
-(16, NULL, 16, '2026-02-16 10:15:00', 1860),
-(17, NULL, 17, '2026-02-18 15:00:00', 1680),
-(18, NULL, 18, '2026-02-20 23:00:00', 3000),
-(19, 1, 101, '2026-03-01 10:00:00', 900),
-(20, 1, 102, '2026-03-02 12:00:00', 540),
-(21, 1, 103, '2026-03-03 14:00:00', 720),
-(22, 1, 104, '2026-03-04 16:00:00', 1500),
-(23, 1, 105, '2026-03-05 18:00:00', 240),
-(24, 1, 106, '2026-03-06 20:00:00', 1140),
-(25, 1, 107, '2026-03-07 22:00:00', 480);
+(1, 3, 1, '2026-01-10 10:00:00', 1800),
+(2, 3, 2, '2026-01-12 15:30:00', 3600),
+(3, 3, 3, '2026-01-15 20:00:00', 2700),
+(4, 3, 4, '2026-01-18 12:45:00', 4320),
+(5, 3, 5, '2026-01-20 18:00:00', 900),
+(6, 3, 6, '2026-01-22 09:00:00', 1200),
+(7, 4, 7, '2026-01-25 21:15:00', 2100),
+(8, 4, 8, '2026-01-28 14:20:00', 480),
+(9, 4, 9, '2026-02-01 19:30:00', 3360),
+(10, 4, 10, '2026-02-03 11:00:00', 4800),
+(11, 4, 11, '2026-02-05 22:00:00', 4200),
+(12, 4, 12, '2026-02-07 08:00:00', 1320),
+(13, 4, 13, '2026-02-10 17:45:00', 1080),
+(14, 4, 14, '2026-02-12 13:00:00', 240),
+(15, 4, 15, '2026-02-14 20:30:00', 2520),
+(16, 4, 16, '2026-02-16 10:15:00', 1860),
+(17, 4, 17, '2026-02-18 15:00:00', 1680),
+(18, 4, 18, '2026-02-20 23:00:00', 3000),
+(19, 5, 101, '2026-03-01 10:00:00', 900),
+(20, 5, 102, '2026-03-02 12:00:00', 540),
+(21, 5, 103, '2026-03-03 14:00:00', 720),
+(22, 5, 104, '2026-03-04 16:00:00', 1500),
+(23, 5, 105, '2026-03-05 18:00:00', 240),
+(24, 5, 106, '2026-03-06 20:00:00', 1140),
+(25, 5, 107, '2026-03-07 22:00:00', 480);
 
 -- --------------------------------------------------------
 -- RELACIONES (FOREIGN KEYS)
