@@ -126,6 +126,7 @@ CREATE TABLE `users` (
   `birth_date` date DEFAULT NULL,
   `last_login_at` timestamp NULL DEFAULT NULL,
   `is_active` boolean DEFAULT 1,
+  `ban_reason` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email_idx` (`email`),

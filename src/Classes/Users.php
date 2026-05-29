@@ -38,6 +38,7 @@ class Users extends Database {
         'email',
         'birth_date',
         'is_active',
+        'ban_reason',
         'avatar_id',
         'plan_id',
         'created_at'
