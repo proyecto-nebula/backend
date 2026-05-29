@@ -1,4 +1,6 @@
 FROM php:8.2-apache-bullseye
+ARG APP_ENV=production
+ENV APP_ENV=${APP_ENV}
 
 # Habilitar módulos Apache
 RUN a2enmod rewrite headers
@@ -19,6 +21,7 @@ RUN apt-get update && apt-get install -y unzip && rm -rf /var/lib/apt/lists/*
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
+
 
 RUN cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini \
     && sed -i 's/variables_order = "GPCS"/variables_order = "EGPCS"/' /usr/local/etc/php/php.ini \
