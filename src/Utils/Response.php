@@ -10,6 +10,11 @@ class Response
     {
         // Refuerzo: header siempre antes de cualquier salida
         header('Content-Type: application/json; charset=utf-8');
+        // Deshabilitar caché del navegador en todas las respuestas de la API.
+        // Para reactivar: eliminar las tres líneas siguientes.
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        header('Pragma: no-cache');
+        header('Expires: 0');
 
         if (self::isSuccessEnvelope($response)) {
             $payload = $response['data'] ?? null;
