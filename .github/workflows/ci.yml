@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: ['**']
+
+jobs:
+  backend:
+    name: Backend — PHPUnit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, mysqli, pdo_mysql, curl, json
+
+      - name: Install Composer dependencies
+        run: |
+          composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Run PHPUnit
+        run: |
+          ./vendor/bin/phpunit --configuration phpunit.xml --verbose
+
+  integration:
+    if: >-
+      github.ref == 'refs/heads/main' || (github.event_name == 'pull_request' && github.base_ref == 'main')
+    name: Backend — Integration tests (MySQL)
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: Proyecto_Final
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_NAME: Proyecto_Final
+      DB_USER: root
+      DB_PASSWORD: root
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, mysqli, pdo_mysql, curl, json
+
+      - name: Install Composer dependencies
+        run: |
+          composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Install MySQL client & wait for DB
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y default-mysql-client
+          for i in $(seq 1 30); do mysqladmin ping -h 127.0.0.1 -uroot -proot && break || sleep 2; done
+
+      - name: Import DB schema
+        run: |
+          mysql -h 127.0.0.1 -uroot -proot Proyecto_Final < database/init.sql
+
+      - name: Start PHP built-in server
+        run: |
+          nohup php -S 127.0.0.1:8000 -t public > server.log 2>&1 &
+          for i in $(seq 1 30); do curl --silent --fail http://127.0.0.1:8000/ && break || sleep 1; done
+
+      - name: Run Feature tests (PHPUnit)
+        run: |
+          ./vendor/bin/phpunit --configuration phpunit.xml --verbose
