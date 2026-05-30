@@ -627,7 +627,7 @@ INSERT INTO `game_categories` (`game_id`, `category_id`) VALUES
 (13, 6), (13, 1),  -- Resident Evil 4 (Terror, Acción)
 (14, 5), (14, 1),  -- ARC Raiders (Shooter, Acción)
 (15, 1), (15, 3),  -- God of War Ragnarök (Acción, Aventura)
-(16, 12), (16, 9),  -- Horizon Forbidden West (Carreras, Mundo Abierto)
+(16, 1), (16, 9),  --  Horizon Forbidden West (Acción, Mundo Abierto)
 (17, 3), (17, 8),  -- The Last of Us Part II (Aventura, Supervivencia)
 (18, 1), (18, 9),  -- Ghost of Tsushima (Acción, Mundo Abierto)
 (19, 5), (19, 1),  -- Returnal (Shooter, Acción)
