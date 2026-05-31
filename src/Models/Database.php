@@ -16,11 +16,11 @@ class Database
 
 	public function __construct()
 	{
-		$this->host     = getenv('DB_HOST');
-		$this->db       = getenv('DB_NAME');
-		$this->user     = getenv('DB_USER');
-		$this->password = getenv('DB_PASSWORD');
-		$this->port     = getenv('DB_PORT');
+		$this->host     = getenv('DB_HOST') ?: '127.0.0.1';
+		$this->db       = getenv('DB_NAME') ?: '';
+		$this->user     = getenv('DB_USER') ?: 'root';
+		$this->password = getenv('DB_PASSWORD') ?: '';
+		$this->port     = getenv('DB_PORT') ?: 3306;
 
 		//$this->connection = new \mysqli('db', 'root', 'root', 'Proyecto_Final', '3306');
 		$this->connection = mysqli_init();
@@ -34,9 +34,10 @@ class Database
 		);
 
 		if ($this->connection->connect_errno) {
-			echo 'Error de conexión a la base de datos';
-			exit;
-		}
+    throw new \Exception(
+        'DB connection failed: ' . $this->connection->connect_error
+    );
+}
 
 	}
 
