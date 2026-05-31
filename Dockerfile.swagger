@@ -1,68 +1,12 @@
-FROM node:18-alpine
-
-WORKDIR /app
-
-# Utils necesarios
-RUN apk add --no-cache curl tar gzip bash
-
-# Descargar swagger-ui dist
-RUN curl -L https://github.com/swagger-api/swagger-ui/archive/refs/heads/master.tar.gz \
-	| tar xz --strip-components=1 swagger-ui-master/dist -C /app
+FROM swaggerapi/swagger-ui:latest
 
 # Copiar el spec OpenAPI
 COPY openapi.yaml /app/openapi.yaml
 
-# Crear index.html personalizado que apunte a nuestro openapi.yaml
-RUN cat > /app/index.html << 'EOF'
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Swagger UI - Nebula API</title>
-  <link rel="stylesheet" type="text/css" href="./swagger-ui.css">
-  <link rel="icon" type="image/png" href="./favicon-32x32.png" sizes="32x32">
-  <link rel="icon" type="image/png" href="./favicon-16x16.png" sizes="16x16">
-  <style>
-    html { box-sizing: border-box; overflow: -moz-scrollbars-vertical; overflow-y: scroll; }
-    *, *:before, *:after { box-sizing: inherit; }
-    body { margin:0; padding:0; }
-  </style>
-</head>
-<body>
-  <div id="swagger-ui"></div>
-  <script src="./swagger-ui-bundle.js" charset="UTF-8"></script>
-  <script src="./swagger-ui-standalone-preset.js" charset="UTF-8"></script>
-  <script>
-    window.onload = function() {
-      const ui = SwaggerUIBundle({
-        url: "/openapi.yaml",
-        dom_id: '#swagger-ui',
-        deepLinking: true,
-        presets: [
-          SwaggerUIBundle.presets.apis,
-          SwaggerUIStandalonePreset
-        ],
-        plugins: [
-          SwaggerUIBundle.plugins.DownloadUrl
-        ],
-        layout: "StandaloneLayout"
-      });
-      window.ui = ui;
-    };
-  </script>
-</body>
-</html>
-EOF
+# Configurar variable de entorno para apuntar al spec
+ENV SWAGGER_JSON=/app/openapi.yaml
 
-# Instalar http-server
-RUN npm install -g http-server@14
-
-# Exponer puerto
 EXPOSE 8080
-
-# Servir desde /app con soporte para $PORT
-CMD ["sh", "-c", "http-server /app -p ${PORT:-8080} --cors"]
 
 EXPOSE 8080
 
