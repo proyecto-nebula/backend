@@ -22,7 +22,7 @@ class ConnectionTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function test_auth_endpoint_response(): void
+   public function test_auth_endpoint_response(): void
 {
     $response = $this->client->request('POST', '/api/v1/auth', [
         'json' => [
@@ -31,13 +31,23 @@ class ConnectionTest extends TestCase
         ]
     ]);
 
-    echo "\nSTATUS: ".$response->getStatusCode()."\n";
-    echo (string) $response->getBody()."\n";
+    echo "\nSTATUS: " . $response->getStatusCode() . "\n";
+    echo (string) $response->getBody() . "\n";
+
+    $status = $response->getStatusCode();
 
     $this->assertContains(
-        $response->getStatusCode(),
-        [200, 201, 400, 401, 403]
+        $status,
+        [200, 201, 400, 401, 403],
+        "El endpoint de Auth devolvió un estado inesperado: $status"
     );
+
+    if ($status === 200 || $status === 201) {
+        $payload = json_decode((string) $response->getBody(), true);
+
+        $this->assertNotNull($payload);
+        $this->assertArrayHasKey('token', $payload);
+    }
 }
 
         // Solo validar token si login correcto
