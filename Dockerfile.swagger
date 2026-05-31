@@ -1,0 +1,12 @@
+FROM swaggerapi/swagger-ui:latest
+
+# Copiar el spec OpenAPI
+COPY openapi.yaml /app/openapi.yaml
+
+# Variable de entorno para apuntar al spec
+ENV SWAGGER_JSON=/app/openapi.yaml
+
+# Puerto por defecto
+EXPOSE 8080
+
+# El contenedor base ya tiene el entrypoint correcto
