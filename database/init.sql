@@ -110,7 +110,10 @@ CREATE TABLE `games` (
   KEY `pegi_id_idx` (`pegi_id`),
   KEY `published_at_idx` (`published_at`),
   KEY `release_date_idx` (`release_date`),
-  KEY `is_featured_idx` (`is_featured`)
+  KEY `is_featured_idx` (`is_featured`),
+  CONSTRAINT `fk_games_developer_id` FOREIGN KEY (`developer_id`) REFERENCES `studios` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_games_publisher_id` FOREIGN KEY (`publisher_id`) REFERENCES `studios` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_games_pegi_id` FOREIGN KEY (`pegi_id`) REFERENCES `pegi` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Users
@@ -133,7 +136,10 @@ CREATE TABLE `users` (
   UNIQUE KEY `username_idx` (`username`),
   KEY `plan_id_idx` (`plan_id`),
   KEY `role_id_idx` (`role_id`),
-  KEY `avatar_id_idx` (`avatar_id`)
+  KEY `avatar_id_idx` (`avatar_id`),
+  CONSTRAINT `fk_users_plan_id` FOREIGN KEY (`plan_id`) REFERENCES `plans` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_users_role_id` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_users_avatar_id` FOREIGN KEY (`avatar_id`) REFERENCES `avatars` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Favorites (Pivot Table)
@@ -141,7 +147,9 @@ CREATE TABLE `favorites` (
   `user_id` int NOT NULL,
   `game_id` int NOT NULL,
   PRIMARY KEY (`user_id`, `game_id`),
-  KEY `game_id_idx` (`game_id`)
+  KEY `game_id_idx` (`game_id`),
+  CONSTRAINT `fk_favorites_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_favorites_game_id` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Game Categories (Pivot Table)
@@ -149,7 +157,9 @@ CREATE TABLE `game_categories` (
   `game_id` int NOT NULL,
   `category_id` int NOT NULL,
   PRIMARY KEY (`game_id`, `category_id`),
-  KEY `category_id_idx` (`category_id`)
+  KEY `category_id_idx` (`category_id`),
+  CONSTRAINT `fk_game_categories_game_id` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_game_categories_category_id` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Play Sessions
@@ -162,7 +172,25 @@ CREATE TABLE `sessions` (
   PRIMARY KEY (`id`),
   KEY `user_id_idx` (`user_id`),
   KEY `game_id_idx` (`game_id`),
-  KEY `started_at_idx` (`started_at`)
+  KEY `started_at_idx` (`started_at`),
+  CONSTRAINT `fk_sessions_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_sessions_game_id` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Reports
+CREATE TABLE `reports` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `game_id` int NOT NULL,
+  `user_id` int DEFAULT NULL,
+  `type` tinyint NOT NULL DEFAULT 4,
+  `description` text DEFAULT NULL,
+  `is_solved` boolean NOT NULL DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `game_id_idx` (`game_id`),
+  KEY `user_id_idx` (`user_id`),
+  CONSTRAINT `fk_reports_game` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_reports_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
@@ -748,53 +776,6 @@ INSERT INTO `sessions` (`id`, `user_id`, `game_id`, `started_at`, `duration`) VA
 (23, 5, 105, '2026-03-05 18:00:00', 240),
 (24, 5, 106, '2026-03-06 20:00:00', 1140),
 (25, 5, 107, '2026-03-07 22:00:00', 480);
-
--- --------------------------------------------------------
--- RELACIONES (FOREIGN KEYS)
--- --------------------------------------------------------
-
--- Games Relations
-ALTER TABLE `games`
-  ADD CONSTRAINT `fk_games_developer` FOREIGN KEY (`developer_id`) REFERENCES `studios` (`id`),
-  ADD CONSTRAINT `fk_games_publisher` FOREIGN KEY (`publisher_id`) REFERENCES `studios` (`id`),
-  ADD CONSTRAINT `fk_games_pegi` FOREIGN KEY (`pegi_id`) REFERENCES `pegi` (`id`);
-
--- Users Relations
-ALTER TABLE `users`
-  ADD CONSTRAINT `fk_users_plan` FOREIGN KEY (`plan_id`) REFERENCES `plans` (`id`),
-  ADD CONSTRAINT `fk_users_role` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`),
-  ADD CONSTRAINT `fk_users_avatar` FOREIGN KEY (`avatar_id`) REFERENCES `avatars` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
--- Favorites Relations
-ALTER TABLE `favorites`
-  ADD CONSTRAINT `fk_favorites_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_favorites_game` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE;
-
--- Game Categories Relations
-ALTER TABLE `game_categories`
---  ADD CONSTRAINT `fk_gc_game` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_gc_category` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE CASCADE;
-
--- Sessions Relations
-ALTER TABLE `sessions`
-  ADD CONSTRAINT `fk_sessions_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_sessions_game` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE;
-
--- Reports
-CREATE TABLE `reports` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `game_id` int NOT NULL,
-  `user_id` int DEFAULT NULL,
-  `type` tinyint NOT NULL DEFAULT 4,
-  `description` text DEFAULT NULL,
-  `is_solved` boolean NOT NULL DEFAULT 0,
-  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `game_id_idx` (`game_id`),
-  KEY `user_id_idx` (`user_id`),
-  CONSTRAINT `fk_reports_game` FOREIGN KEY (`game_id`) REFERENCES `games` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `fk_reports_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 -- COMMIT
