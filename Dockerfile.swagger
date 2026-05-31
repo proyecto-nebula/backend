@@ -5,14 +5,14 @@ WORKDIR /app
 # Utils necesarios
 RUN apk add --no-cache curl tar gzip bash
 
-# Descargar swagger-ui dist
+# Descargar swagger-ui y extraer todo directamente a /app
 RUN curl -L https://github.com/swagger-api/swagger-ui/archive/refs/heads/master.tar.gz \
-	| tar xz --strip-components=1 swagger-ui-master/dist -C /app
+	| tar xz --strip-components=2 swagger-ui-master/dist -C /app
 
 # Copiar el spec OpenAPI
 COPY openapi.yaml /app/openapi.yaml
 
-# Crear index.html personalizado que apunte a nuestro openapi.yaml
+# Reemplazar index.html con nuestra versión personalizada
 RUN cat > /app/index.html << 'EOF'
 <!DOCTYPE html>
 <html lang="en">
@@ -61,7 +61,7 @@ RUN npm install -g http-server@14
 # Exponer puerto
 EXPOSE 8080
 
-# Servir desde /app con soporte para $PORT
+# Servir desde /app con soporte para $PORT y CORS
 CMD ["sh", "-c", "http-server /app -p ${PORT:-8080} --cors"]
 
 EXPOSE 8080
