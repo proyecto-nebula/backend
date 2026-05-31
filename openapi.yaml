@@ -12,8 +12,10 @@ info:
     - Los endpoints protegidos requieren `Authorization: Bearer <token>`.
 
 servers:
+  - url: https://api.nebula.railway.app/api/v1
+    description: Production (Railway)
   - url: http://localhost:8000/api/v1
-    description: Local
+    description: Local Development
 
 tags:
   - name: Auth
@@ -30,6 +32,8 @@ tags:
   - name: Pegi
   - name: Roles
   - name: Plans
+  - name: Logs
+  - name: Reports
 
 security:
   - bearerAuth: []
@@ -1105,6 +1109,105 @@ paths:
         '204':
           $ref: '#/components/responses/NoContent'
 
+  /logs:
+    get:
+      tags: [Logs]
+      summary: Obtener logs de seguridad (solo Admin)
+      operationId: logsList
+      description: |
+        Devuelve registros de logs de seguridad del sistema (auditoría).
+        Solo accesible por administradores (role_id = 1).
+      responses:
+        '200':
+          description: Lista de eventos de seguridad
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SecurityLog'
+              examples:
+                ok:
+                  value:
+                    - timestamp: '2026-05-31 10:15:13'
+                      event: 'LOGIN_SUCCESS'
+                      ip: '172.18.0.1'
+                      ua: 'Mozilla/5.0...'
+                      email: 'editor@nebula.com'
+                      userId: 2
+        '401':
+          $ref: '#/components/responses/Error401'
+        '403':
+          description: Acceso restringido a administradores
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                forbidden:
+                  value:
+                    code: FORBIDDEN
+                    message: 'Acceso restringido a administradores'
+
+  /reports:
+    get:
+      tags: [Reports]
+      summary: Listar reportes
+      operationId: reportsList
+      responses:
+        '200':
+          description: Lista de reportes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Report'
+        '401':
+          $ref: '#/components/responses/Error401'
+    post:
+      tags: [Reports]
+      summary: Crear reporte (público)
+      operationId: reportsCreate
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportWriteRequest'
+      responses:
+        '201':
+          $ref: '#/components/responses/CreatedID'
+        '400':
+          $ref: '#/components/responses/Error400'
+
+  /reports/{id}:
+    parameters:
+      - $ref: '#/components/parameters/ResourceID'
+    get:
+      tags: [Reports]
+      summary: Obtener reporte por ID
+      operationId: reportsGetById
+      responses:
+        '200':
+          description: Reporte encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+        '404':
+          $ref: '#/components/responses/Error404'
+    delete:
+      tags: [Reports]
+      summary: Eliminar reporte
+      operationId: reportsDelete
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/Error401'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -1621,9 +1724,57 @@ components:
         description:
           type: string
           nullable: true
+
+    RoleWriteRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+
+    Plan:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
         price:
           type: number
           format: float
+          nullable: true
+        quality:
+          type: string
+          nullable: true
+          example: '1080p @ 30fps'
+        gpu:
+          type: string
+          nullable: true
+          example: 'RTX 3070'
+        fps:
+          type: integer
+          nullable: true
+          example: 30
+        priority:
+          type: string
+          nullable: true
+          example: 'Estándar'
+        sessionLimit:
+          type: integer
+          nullable: true
+          description: Límite en horas
+        storage:
+          type: integer
+          nullable: true
+          description: Almacenamiento en GB
+        mods:
+          type: string
+          nullable: true
+        audio:
+          type: string
           nullable: true
 
     PlanWriteRequest:
@@ -1632,10 +1783,115 @@ components:
         name:
           type: string
           nullable: true
-        description:
-          type: string
-          nullable: true
         price:
           type: number
           format: float
+          nullable: true
+        quality:
+          type: string
+          nullable: true
+        gpu:
+          type: string
+          nullable: true
+        fps:
+          type: integer
+          nullable: true
+        priority:
+          type: string
+          nullable: true
+        sessionLimit:
+          type: integer
+          nullable: true
+        storage:
+          type: integer
+          nullable: true
+        mods:
+          type: string
+          nullable: true
+        audio:
+          type: string
+          nullable: true
+
+    SecurityLog:
+      type: object
+      description: Registro de evento de seguridad en el sistema
+      properties:
+        timestamp:
+          type: string
+          example: '2026-05-31 10:15:13'
+          description: Momento del evento
+        event:
+          type: string
+          example: 'LOGIN_SUCCESS'
+          enum:
+            - 'LOGIN_SUCCESS'
+            - 'LOGIN_FAILED'
+            - 'TOKEN_INVALID'
+            - 'UNAUTHORIZED_ACCESS'
+          description: Tipo de evento
+        ip:
+          type: string
+          example: '172.18.0.1'
+          description: Dirección IP del cliente
+        ua:
+          type: string
+          example: 'Mozilla/5.0...'
+          description: User-Agent del navegador
+        email:
+          type: string
+          format: email
+          nullable: true
+          example: 'editor@nebula.com'
+        userId:
+          type: integer
+          nullable: true
+          example: 2
+
+    Report:
+      type: object
+      description: Reporte de problema enviado por usuario
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+          nullable: true
+          description: ID del usuario que reporta (null si es anónimo)
+        email:
+          type: string
+          format: email
+          nullable: true
+          description: Email del reportante si no está autenticado
+        subject:
+          type: string
+          example: 'Juego no inicia'
+        message:
+          type: string
+          example: 'No puedo iniciar el juego X desde la aplicación'
+        gameId:
+          type: integer
+          nullable: true
+        createdAt:
+          type: string
+          example: '2026-05-31 09:30:00'
+        isResolved:
+          type: boolean
+          default: false
+
+    ReportWriteRequest:
+      type: object
+      required: [email, subject, message]
+      properties:
+        email:
+          type: string
+          format: email
+          nullable: true
+          description: Email del reportante (requerido si no está autenticado)
+        subject:
+          type: string
+          maxLength: 255
+        message:
+          type: string
+        gameId:
+          type: integer
           nullable: true
