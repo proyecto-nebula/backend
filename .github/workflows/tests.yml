@@ -1,75 +1,80 @@
-name: CI
+name: CI Nebula Auto-Testing
 
 on:
   push:
-    branches: ['**']
+    branches: [ main, master, develop ]
   pull_request:
-    branches: ['**']
+    branches: [ main ]
 
 jobs:
-  backend:
-    name: Backend — PHPUnit
+  build-and-test:
     runs-on: ubuntu-latest
 
-    # 🚀 MySQL REAL en el job (OBLIGATORIO)
     services:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: test_db
+          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.DB_NAME }}
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=10
 
-    env:
-      DB_HOST: 127.0.0.1
-      DB_PORT: 3306
-      DB_NAME: test_db
-      DB_USER: root
-      DB_PASSWORD: root
-      JWT_SECRET: test_secret
-
     steps:
-      # 📥 Descargar repo
-      - name: Checkout
+      - name: Checkout del código
         uses: actions/checkout@v4
 
-      # 🐘 PHP 8.2
-      - name: Setup PHP
+      - name: Instalación de PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mbstring, mysqli, pdo_mysql, curl, json
+          extensions: mbstring, mysql, curl, json
+          ini-values: display_errors=On, error_reporting=E_ALL
 
-      # 📦 Dependencias
-      - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Instalación de Dependencias
+        run: composer install --prefer-dist --no-progress
 
-      # ⏳ Esperar MySQL listo
-      - name: Wait for MySQL
+      - name: Generar autoload de Composer
+        run: composer dump-autoload --optimize --classmap-authoritative
+
+      - name: Crear archivo .env desde Secrets
+        # Este paso es VITAL: toma tus Action Secrets y los mete en un .env temporal
+        # que solo existe durante el test en GitHub.
         run: |
-          for i in $(seq 1 30); do
-            mysqladmin ping -h 127.0.0.1 -uroot -proot && echo "MySQL ready" && break || sleep 2
-          done
+          echo "DB_HOST=127.0.0.1" >> .env
+          echo "DB_USER=root" >> .env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
+          echo "DB_PORT=3306" >> .env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+          echo "TOKEN_TTL_SECONDS=86400" >> .env
 
-      # 🗄️ Importar base de datos
-      - name: Import database
+      - name: Importar Base de Datos
+        run: mysql -h 127.0.0.1 -u root -p${{ secrets.DB_PASSWORD }} ${{ secrets.DB_NAME }} < database/init.sql
+        
+      - name: Levantar Servidor API
+        env:
+          DB_HOST: 127.0.0.1
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: root
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        run: php -S 127.0.0.1:8000 -t public > php_server.log 2>&1 &
+
+      - name: Esperar a que el servidor responda
         run: |
-          mysql -h 127.0.0.1 -uroot -proot test_db < database/init.sql
+          timeout 30s bash -c 'until curl -s localhost:8000 > /dev/null; do sleep 1; done'
+          echo "Servidor listo!"
 
-      # 🚀 Levantar servidor PHP MVC
-      - name: Start PHP server
+      - name: Ejecutar PHPUnit
+        run: ./vendor/bin/phpunit --colors=always
+
+      - name: Logs de error en caso de fallo
+        if: failure()
         run: |
-          nohup php -S 127.0.0.1:8000 -t public > server.log 2>&1 &
-          for i in $(seq 1 30); do
-            curl --silent --fail http://127.0.0.1:8000 && echo "Server ready" && break || sleep 1
-          done
-
-      # 🧪 Ejecutar PHPUnit
-      - name: Run PHPUnit
-        run: ./vendor/bin/phpunit --configuration phpunit.xml
+          echo "--- LOG DE PHP ---"
+          cat php_server.log
