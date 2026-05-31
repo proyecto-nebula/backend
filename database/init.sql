@@ -618,7 +618,7 @@ INSERT INTO `game_categories` (`game_id`, `category_id`) VALUES
 (4, 9), (4, 1),  -- Red Dead Redemption 2 (Mundo Abierto, Acción)
 (5, 9), (5, 1),  -- Star Wars Outlaws (Mundo Abierto, Acción)
 (6, 1), (6, 9),  -- Marvel's Spider-Man 2 (Acción, Mundo Abierto)
-(7, 2), (7, 9),  -- Hogwarts Legacy (RPG, Mundo Abierto)
+(7, 8), (7, 6),  -- Dayz (Supervivencia, Terror)
 (8, 3), (8, 6),  -- The Wolf Among Us (Aventura, Terror)
 (9, 2), (9, 9),  -- Cyberpunk 2077 (RPG, Mundo Abierto)
 (10, 2), (10, 1),  -- Elden Ring (RPG, Acción)
