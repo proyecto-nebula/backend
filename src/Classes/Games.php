@@ -201,6 +201,7 @@ class Games extends Database {
             switch ($params['collection']) {
                 case 'recently_published': return $this->getRecentlyPublished($limit);
                 case 'new_releases':       return $this->getNewReleases($limit);
+                case 'upcoming_releases':  return $this->getUpcomingReleases($limit);
                 case 'favorites':          return $userId !== null ? $this->getFavoriteGames($userId, $limitRequested ? $limit : null) : [];
                 case 'last_played':        return $userId !== null ? $this->getLastPlayedGames($userId, $limit)  : [];
                 case 'most_played_by':     return $userId !== null ? $this->getMostPlayedByUser($userId, $limit) : $this->getMostPlayed($limit);
@@ -348,6 +349,7 @@ class Games extends Database {
                  FROM {$this->table} g
                  LEFT JOIN sessions s ON s.game_id = g.id
                      AND s.started_at >= NOW() - INTERVAL $interval
+                 WHERE g.is_active = 1
                  GROUP BY g.id
                  ORDER BY total_duration DESC, RAND()
                  LIMIT ?";
@@ -373,6 +375,7 @@ class Games extends Database {
         $sql  = "SELECT g.*, COUNT(f.user_id) AS favorite_count
                  FROM {$this->table} g
                  JOIN favorites f ON f.game_id = g.id
+                 WHERE g.is_active = 1
                  GROUP BY g.id
                  ORDER BY favorite_count DESC
                  LIMIT ?";
@@ -395,7 +398,7 @@ class Games extends Database {
             if ($success) return $hit;
         }
         $conn = $this->getConnection();
-        $sql  = "SELECT * FROM {$this->table} WHERE published_at IS NOT NULL ORDER BY published_at DESC LIMIT ?";
+        $sql  = "SELECT * FROM {$this->table} WHERE published_at IS NOT NULL AND is_active = 1 ORDER BY published_at DESC LIMIT ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param('i', $limit);
         $stmt->execute();
@@ -415,7 +418,7 @@ class Games extends Database {
             if ($success) return $hit;
         }
         $conn = $this->getConnection();
-        $sql  = "SELECT * FROM {$this->table} WHERE release_date IS NOT NULL ORDER BY release_date DESC LIMIT ?";
+        $sql  = "SELECT * FROM {$this->table} WHERE release_date IS NOT NULL AND is_active = 1 ORDER BY release_date DESC LIMIT ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param('i', $limit);
         $stmt->execute();
@@ -538,7 +541,8 @@ class Games extends Database {
                 ) raw
                 GROUP BY category_id
             ) cw ON cw.category_id = gc.category_id
-            WHERE g.id NOT IN (
+            WHERE g.is_active = 1
+            AND g.id NOT IN (
                 SELECT game_id FROM favorites WHERE user_id = ?
                 UNION
                 SELECT game_id FROM sessions WHERE user_id = ?
@@ -574,7 +578,7 @@ class Games extends Database {
             JOIN game_categories gc_match
                 ON gc_match.game_id = g.id
                 AND gc_match.category_id IN (SELECT category_id FROM game_categories WHERE game_id = ?)
-            WHERE g.id != ?
+            WHERE g.id != ? AND g.is_active = 1
             GROUP BY g.id
             ORDER BY shared_cats DESC, RAND()
             LIMIT ?
@@ -602,9 +606,26 @@ class Games extends Database {
         $developerId = (int)$row['developer_id'];
 
         $stmt = $conn->prepare(
-            "SELECT * FROM {$this->table} WHERE developer_id = ? AND id != ? ORDER BY RAND() LIMIT ?"
+            "SELECT * FROM {$this->table} WHERE developer_id = ? AND id != ? AND is_active = 1 ORDER BY RAND() LIMIT ?"
         );
         $stmt->bind_param('iii', $developerId, $gameId, $limit);
+        $stmt->execute();
+        $games = [];
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) $games[] = $row;
+        $stmt->close();
+        $this->enrichGames($games);
+        return $games;
+    }
+
+    private function getUpcomingReleases(int $limit = 100): array {
+        $conn = $this->getConnection();
+        $sql  = "SELECT * FROM {$this->table}
+                 WHERE release_date > CURDATE()
+                 ORDER BY release_date ASC
+                 LIMIT ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('i', $limit);
         $stmt->execute();
         $games = [];
         $result = $stmt->get_result();
@@ -624,7 +645,7 @@ class Games extends Database {
             if ($success) return $hit;
         }
         $conn = $this->getConnection();
-        $sql = "SELECT * FROM {$this->table} WHERE is_featured = 1 ORDER BY published_at DESC LIMIT ?";
+        $sql = "SELECT * FROM {$this->table} WHERE is_featured = 1 AND is_active = 1 ORDER BY published_at DESC LIMIT ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param('i', $limit);
         $stmt->execute();
