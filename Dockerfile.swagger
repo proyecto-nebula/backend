@@ -5,10 +5,3 @@ COPY openapi.yaml /app/openapi.yaml
 
 # Configurar variable de entorno para apuntar al spec
 ENV SWAGGER_JSON=/app/openapi.yaml
-
-EXPOSE 8080
-
-EXPOSE 8080
-
-# Arranque: usar la variable $PORT si está definida por la plataforma
-CMD ["sh", "-c", "http-server /app -p ${PORT:-8080}"]
