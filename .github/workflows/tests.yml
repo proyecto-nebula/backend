@@ -1,80 +1,75 @@
-name: CI Nebula Auto-Testing
+name: CI
 
 on:
   push:
-    branches: [ main, master, develop ]
+    branches: ['**']
   pull_request:
-    branches: [ main ]
+    branches: ['**']
 
 jobs:
-  build-and-test:
+  backend:
+    name: Backend — PHPUnit
     runs-on: ubuntu-latest
 
+    # 🚀 MySQL REAL en el job (OBLIGATORIO)
     services:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          MYSQL_DATABASE: ${{ secrets.DB_NAME }}
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test_db
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD"
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=10
 
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_NAME: test_db
+      DB_USER: root
+      DB_PASSWORD: root
+      JWT_SECRET: test_secret
+
     steps:
-      - name: Checkout del código
+      # 📥 Descargar repo
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Instalación de PHP
+      # 🐘 PHP 8.2
+      - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
-          extensions: mbstring, mysql, curl, json
-          ini-values: display_errors=On, error_reporting=E_ALL
+          extensions: mbstring, mysqli, pdo_mysql, curl, json
 
-      - name: Instalación de Dependencias
-        run: composer install --prefer-dist --no-progress
+      # 📦 Dependencias
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
 
-      - name: Generar autoload de Composer
-        run: composer dump-autoload --optimize --classmap-authoritative
-
-      - name: Crear archivo .env desde Secrets
-        # Este paso es VITAL: toma tus Action Secrets y los mete en un .env temporal
-        # que solo existe durante el test en GitHub.
+      # ⏳ Esperar MySQL listo
+      - name: Wait for MySQL
         run: |
-          echo "DB_HOST=127.0.0.1" >> .env
-          echo "DB_USER=root" >> .env
-          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
-          echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
-          echo "DB_PORT=3306" >> .env
-          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-          echo "TOKEN_TTL_SECONDS=86400" >> .env
+          for i in $(seq 1 30); do
+            mysqladmin ping -h 127.0.0.1 -uroot -proot && echo "MySQL ready" && break || sleep 2
+          done
 
-      - name: Importar Base de Datos
-        run: mysql -h 127.0.0.1 -u root -p${{ secrets.DB_PASSWORD }} ${{ secrets.DB_NAME }} < database/init.sql
-        
-      - name: Levantar Servidor API
-        env:
-          DB_HOST: 127.0.0.1
-          DB_NAME: ${{ secrets.DB_NAME }}
-          DB_USER: root
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-        run: php -S 127.0.0.1:8000 -t public > php_server.log 2>&1 &
-
-      - name: Esperar a que el servidor responda
+      # 🗄️ Importar base de datos
+      - name: Import database
         run: |
-          timeout 30s bash -c 'until curl -s localhost:8000 > /dev/null; do sleep 1; done'
-          echo "Servidor listo!"
+          mysql -h 127.0.0.1 -uroot -proot test_db < database/init.sql
 
-      - name: Ejecutar PHPUnit
-        run: ./vendor/bin/phpunit --colors=always
-
-      - name: Logs de error en caso de fallo
-        if: failure()
+      # 🚀 Levantar servidor PHP MVC
+      - name: Start PHP server
         run: |
-          echo "--- LOG DE PHP ---"
-          cat php_server.log
+          nohup php -S 127.0.0.1:8000 -t public > server.log 2>&1 &
+          for i in $(seq 1 30); do
+            curl --silent --fail http://127.0.0.1:8000 && echo "Server ready" && break || sleep 1
+          done
+
+      # 🧪 Ejecutar PHPUnit
+      - name: Run PHPUnit
+        run: ./vendor/bin/phpunit --configuration phpunit.xml
