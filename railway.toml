@@ -9,4 +9,4 @@ startCommand = "apache2-foreground"
 
 [services.swagger]
 builder = "DOCKERFILE"
-dockerfilePath = "Dockerfile.swagger"
+dockerfilePath = "backend/Dockerfile.swagger"

@@ -1,12 +1,25 @@
-FROM swaggerapi/swagger-ui:latest
+FROM node:18-alpine
 
-# Copiar el spec OpenAPI
+# Servir Swagger UI usando un servidor estático que respeta $PORT (Railway)
+WORKDIR /app
+
+# Utils necesarios
+RUN apk add --no-cache curl tar gzip bash
+
+# Descargar la última distribución de swagger-ui y extraer solo 'dist'
+RUN curl -L https://github.com/swagger-api/swagger-ui/archive/refs/heads/master.tar.gz \
+	| tar xz --strip-components=1 swagger-ui-master/dist -C /app
+
+# Copiar el spec OpenAPI al contenedor
 COPY openapi.yaml /app/openapi.yaml
 
-# Variable de entorno para apuntar al spec
-ENV SWAGGER_JSON=/app/openapi.yaml
+# URL del spec (puede ser /app/openapi.yaml o una URL externa)
+ENV SWAGGER_JSON=/openapi.yaml
 
-# Puerto por defecto
+# Instalar un servidor estático ligero que permita usar $PORT
+RUN npm install -g http-server@14
+
 EXPOSE 8080
 
-# El contenedor base ya tiene el entrypoint correcto
+# Arranque: usar la variable $PORT si está definida por la plataforma
+CMD ["sh", "-c", "http-server /app -p ${PORT:-8080}"]
