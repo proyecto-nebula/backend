@@ -24,6 +24,38 @@ jobs:
         run: |
           composer install --no-interaction --prefer-dist --no-progress
 
+      - name: Generar autoload de Composer
+        run: composer dump-autoload --optimize --classmap-authoritative
+
+      - name: Crear archivo .env desde Secrets
+        # Este paso es VITAL: toma tus Action Secrets y los mete en un .env temporal
+        # que solo existe durante el test en GitHub.
+        run: |
+          echo "DB_HOST=127.0.0.1" >> .env
+          echo "DB_USER=root" >> .env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
+          echo "DB_PORT=3306" >> .env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+          echo "TOKEN_TTL_SECONDS=86400" >> .env
+
+      - name: Importar Base de Datos
+        run: mysql -h 127.0.0.1 -u root -p${{ secrets.DB_PASSWORD }} ${{ secrets.DB_NAME }} < database/init.sql
+        
+      - name: Levantar Servidor API
+        env:
+          DB_HOST: 127.0.0.1
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: root
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        run: php -S 127.0.0.1:8000 -t public > php_server.log 2>&1 &
+
+      - name: Esperar a que el servidor responda
+        run: |
+          timeout 30s bash -c 'until curl -s localhost:8000 > /dev/null; do sleep 1; done'
+          echo "Servidor listo!"
+
       - name: Run PHPUnit
         run: |
           ./vendor/bin/phpunit --configuration phpunit.xml
