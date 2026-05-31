@@ -11,7 +11,7 @@ class ConnectionTest extends TestCase
     {
         $this->client = new Client([
             'base_uri' => 'http://localhost:8000',
-            'http_errors' => false
+            'http_errors' => false,
         ]);
     }
 
@@ -22,37 +22,29 @@ class ConnectionTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-   public function test_auth_endpoint_response(): void
-{
-    $response = $this->client->request('POST', '/api/v1/auth', [
-        'json' => [
-            'email' => 'admin@ejemplo.com',
-            'password' => 'admin'
-        ]
-    ]);
+    public function test_auth_endpoint_response(): void
+    {
+        $response = $this->client->request('POST', '/api/v1/auth', [
+            'json' => [
+                'email' => 'admin@ejemplo.com',
+                'password' => 'admin',
+            ],
+        ]);
 
-    echo "\nSTATUS: " . $response->getStatusCode() . "\n";
-    echo (string) $response->getBody() . "\n";
+        // Mostrar información de depuración en CI
+        echo "\nSTATUS: " . $response->getStatusCode() . "\n";
+        echo (string) $response->getBody() . "\n";
 
-    $status = $response->getStatusCode();
+        $status = $response->getStatusCode();
 
-    $this->assertContains(
-        $status,
-        [200, 201, 400, 401, 403],
-        "El endpoint de Auth devolvió un estado inesperado: $status"
-    );
+        $this->assertContains(
+            $status,
+            [200, 201, 400, 401, 403],
+            "El endpoint de Auth devolvió un estado inesperado: $status"
+        );
 
-    if ($status === 200 || $status === 201) {
-        $payload = json_decode((string) $response->getBody(), true);
-
-        $this->assertNotNull($payload);
-        $this->assertArrayHasKey('token', $payload);
-    }
-}
-
-        // Solo validar token si login correcto
+        // Validar token únicamente cuando el login es exitoso
         if ($status === 200 || $status === 201) {
-
             $body = (string) $response->getBody();
 
             $this->assertNotEmpty(
@@ -69,9 +61,16 @@ class ConnectionTest extends TestCase
 
             $this->assertIsArray($payload);
 
-            $this->assertArrayHasKey('token', $payload);
+            $this->assertArrayHasKey(
+                'token',
+                $payload,
+                'La respuesta no contiene el campo token.'
+            );
 
-            $this->assertNotEmpty($payload['token']);
+            $this->assertNotEmpty(
+                $payload['token'],
+                'El token está vacío.'
+            );
         }
     }
 
@@ -88,11 +87,10 @@ class ConnectionTest extends TestCase
             'pegi',
             'roles',
             'plans',
-            'users'
+            'users',
         ];
 
         foreach ($endpoints as $resource) {
-
             $response = $this->client->request(
                 'GET',
                 "/api/v1/$resource"
@@ -100,7 +98,6 @@ class ConnectionTest extends TestCase
 
             $status = $response->getStatusCode();
 
-            // Endpoints protegidos pueden devolver 401
             $this->assertContains(
                 $status,
                 [200, 401],
@@ -110,16 +107,16 @@ class ConnectionTest extends TestCase
     }
 
     public function test_auth_endpoint_exists(): void
-{
-    $response = $this->client->request(
-        'GET',
-        '/api/v1/auth'
-    );
+    {
+        $response = $this->client->request(
+            'GET',
+            '/api/v1/auth'
+        );
 
-    $this->assertEquals(
-        401,
-        $response->getStatusCode(),
-        'El endpoint de Auth debería responder 401 en GET.'
-    );
-}
+        $this->assertEquals(
+            401,
+            $response->getStatusCode(),
+            'El endpoint de Auth debería responder 401 en GET.'
+        );
+    }
 }
