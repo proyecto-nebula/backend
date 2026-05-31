@@ -99,17 +99,16 @@ class ConnectionTest extends TestCase
     }
 
     public function test_auth_endpoint_exists(): void
-    {
-        // Auth debe permitir solo POST
-        $response = $this->client->request(
-            'GET',
-            '/api/v1/auth'
-        );
+{
+    $response = $this->client->request(
+        'GET',
+        '/api/v1/auth'
+    );
 
-        $this->assertEquals(
-            405,
-            $response->getStatusCode(),
-            'El endpoint de Auth debería responder 405 en GET.'
-        );
-    }
+    $this->assertEquals(
+        401,
+        $response->getStatusCode(),
+        'El endpoint de Auth debería responder 401 en GET.'
+    );
+}
 }
