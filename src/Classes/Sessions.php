@@ -77,6 +77,11 @@ class Sessions extends Database {
      * Método para recuperar registros, pudiendo indicar algunos filtros 
      */
     public function get($params) {
+        // Si se pasa 'all', devolver todos los registros sin límite
+        if (isset($params['all'])) {
+            return parent::getAllDB($this->table);
+        }
+
         // Validación de parámetros permitidos y limpieza de variables de ruta
         $this->filtrarParametros($params, $this->allowedConditions_get);
 

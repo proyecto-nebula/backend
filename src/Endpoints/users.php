@@ -18,8 +18,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
                 \App\Utils\Response::error('Usuario no encontrado', 404);
             }
         } elseif (isset($_GET['list'])) {
-            // Lista completa de usuarios (usada por el debug panel en dev)
-            \App\Utils\Response::ok($item->get([]));
+            \App\Utils\Response::ok($item->getAll());
         } elseif (!empty($_SERVER['AUTH_USER_ID'])) {
             // Devolver el perfil del usuario autenticado
             $userData = $item->getPerfilCompleto($_SERVER['AUTH_USER_ID']);
