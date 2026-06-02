@@ -73,6 +73,17 @@ class Users extends Database {
      * Método para recuperar registros, pudiendo indicar algunos filtros 
      */
     public function get($params) {
+        // Si se pasa 'list', devolver todos los usuarios con relaciones embebidas
+        if (isset($params['list'])) {
+            $items = parent::getAllDB($this->table);
+            foreach ($items as &$item) {
+                $item['role'] = $this->getRoleById($item['role_id']);
+                $item['avatar'] = $this->getAvatarById($item['avatar_id']);
+                $item['plan'] = $this->getPlanById($item['plan_id']);
+            }
+            return $items;
+        }
+
         foreach ($params as $key => $param) {
             if (!in_array($key, $this->allowedConditions_get)) {
                 unset($params[$key]);
@@ -223,6 +234,16 @@ class Users extends Database {
     /**
      * Método para recuperar toda la información vinculada del usuario
      */
+    public function getAll(): array {
+        $items = parent::getAllDB($this->table);
+        foreach ($items as &$item) {
+            $item['role']   = $this->getRoleById($item['role_id']);
+            $item['avatar'] = $this->getAvatarById($item['avatar_id']);
+            $item['plan']   = $this->getPlanById($item['plan_id']);
+        }
+        return $items;
+    }
+
     public function getPerfilCompleto($id) {
         // Recuperar datos básicos del usuario
         $items = parent::getDB($this->table, ['id' => $id]);
